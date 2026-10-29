@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>数7游戏（100以内）</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, sans-serif;
+        }
+        body {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+            background-color: #f0f4f8;
+        }
+        h1 {
+            text-align: center;
+            color: #222;
+        }
+        .rule {
+            background: #fff;
+            padding:15px;
+            border-radius:8px;
+            margin-bottom:20px;
+        }
+        .box{
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap:10px;
+        }
+        .item{
+            padding:16px 0;
+            text-align:center;
+            font-size:18px;
+            border-radius:6px;
+            background:#ffffff;
+        }
+        .skip{
+            background:#ff6b6b;
+            color:white;
+            font-weight:bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>数7游戏 1~100</h1>
+    <div class="rule">
+        规则：数字中包含7，或是7的倍数 → 显示【过】
+    </div>
+    <div class="box" id="container"></div>
+
+    <script>
+        const container = document.getElementById('container');
+        for(let i = 1; i <= 100; i++){
+            let div = document.createElement('div');
+            div.className = 'item';
+            // 判断条件：是7的倍数 或者 字符串包含'7'
+            if( i %7 ===0 || String(i).includes('7') ){
+                div.innerText = '过';
+                div.classList.add('skip');
+            }else{
+                div.innerText = i;
+            }
+            container.appendChild(div);
+        }
+    </script>
+</body>
+</html>

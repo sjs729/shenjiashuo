@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Awesome 字体图标 | 申家硕</title>
+    <meta name="description" content="Font Awesome 6.5.2 字体图标样本页，字体文件已本地化到 cdn 目录。">
+    <link rel="stylesheet" href="cdn/fontawesome/css/all.min.css">
+    <style>
+        :root {
+            --sjs_paper: #f0f1ed;
+            --sjs_ink: #171a17;
+            --sjs_ink_soft: #4b5049;
+            --sjs_ink_faint: #7c8178;
+            --sjs_rule: #d2d5ca;
+            --sjs_blue: #1d3fbf;
+            --sjs_red: #d63a1e;
+            --sjs_display: "Bodoni 72", "Didot", "Iowan Old Style", "Songti SC", Georgia, serif;
+            --sjs_body: "Avenir Next", "Avenir", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            --sjs_maxw: 1180px;
+            --sjs_ease: cubic-bezier(.2, .7, .2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--sjs_body);
+            color: var(--sjs_ink);
+            background-color: var(--sjs_paper);
+            background-image: radial-gradient(rgba(23, 26, 23, .055) .5px, transparent .6px);
+            background-size: 4px 4px;
+            line-height: 1.7;
+            padding: 0 clamp(20px, 5vw, 56px);
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        a:focus-visible {
+            outline: 2px solid var(--sjs_blue);
+            outline-offset: 4px;
+        }
+
+        /* ---------- 顶部 ---------- */
+        .sjs_topbar {
+            max-width: var(--sjs_maxw);
+            margin: 0 auto;
+            padding: 26px 0 18px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid var(--sjs_rule);
+        }
+
+        .sjs_signature {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .sjs_signature_name {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: .04em;
+        }
+
+        .sjs_signature_course {
+            font-size: 12.5px;
+            letter-spacing: .08em;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_nav {
+            display: flex;
+            align-items: center;
+            gap: clamp(12px, 2vw, 26px);
+            font-size: 13px;
+        }
+
+        .sjs_nav_link {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 7px;
+            color: var(--sjs_ink_soft);
+            padding-bottom: 2px;
+            border-bottom: 1px solid transparent;
+            transition: color .25s var(--sjs_ease), border-color .25s var(--sjs_ease);
+        }
+
+        .sjs_nav_link:hover {
+            color: var(--sjs_blue);
+        }
+
+        .sjs_nav_link.sjs_is_active {
+            color: var(--sjs_ink);
+            border-bottom-color: var(--sjs_ink);
+        }
+
+        .sjs_nav_num {
+            font-family: var(--sjs_display);
+            font-size: 12px;
+            color: var(--sjs_ink_faint);
+            letter-spacing: .02em;
+        }
+
+        /* ---------- 首屏 ---------- */
+        .sjs_hero {
+            max-width: var(--sjs_maxw);
+            margin: clamp(48px, 7vw, 88px) auto 0;
+            display: grid;
+            grid-template-columns: minmax(300px, 1.02fr) minmax(300px, .98fr);
+            gap: clamp(32px, 6vw, 88px);
+            align-items: center;
+        }
+
+        .sjs_hero_figure {
+            position: relative;
+        }
+
+        .sjs_hero_stack {
+            position: relative;
+            display: inline-block;
+        }
+
+        .sjs_hero_glyph,
+        .sjs_hero_ghost {
+            display: block;
+            font-size: clamp(150px, 21vw, 288px);
+            line-height: .78;
+        }
+
+        .sjs_hero_glyph {
+            position: relative;
+            z-index: 1;
+            color: var(--sjs_blue);
+            animation: sjs_impress .95s var(--sjs_ease) both;
+        }
+
+        .sjs_hero_ghost {
+            position: absolute;
+            top: 9px;
+            left: 12px;
+            z-index: 0;
+            color: var(--sjs_red);
+            opacity: .62;
+            mix-blend-mode: multiply;
+        }
+
+        @keyframes sjs_impress {
+            from {
+                opacity: 0;
+                transform: translateY(14px) scale(1.035);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .sjs_figure_caption {
+            margin-top: clamp(20px, 3vw, 30px);
+            font-size: 12.5px;
+            line-height: 1.8;
+            color: var(--sjs_ink_faint);
+            max-width: 30em;
+        }
+
+        .sjs_hero_text {
+            padding-top: 6px;
+        }
+
+        .sjs_display {
+            font-family: var(--sjs_display);
+            font-weight: 400;
+            font-size: clamp(52px, 6.8vw, 90px);
+            line-height: .9;
+            letter-spacing: -.018em;
+        }
+
+        .sjs_standfirst {
+            margin-top: clamp(22px, 3vw, 32px);
+            font-size: 16.5px;
+            line-height: 1.9;
+            color: var(--sjs_ink_soft);
+            max-width: 26em;
+        }
+
+        .sjs_spec {
+            margin-top: clamp(26px, 3.4vw, 38px);
+            font-size: 13px;
+            border-top: 1px solid var(--sjs_rule);
+        }
+
+        .sjs_spec_row {
+            display: grid;
+            grid-template-columns: 5.6em minmax(0, 1fr);
+            gap: 16px;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--sjs_rule);
+        }
+
+        .sjs_spec_row dt {
+            color: var(--sjs_ink_faint);
+            letter-spacing: .04em;
+        }
+
+        .sjs_spec_row dd {
+            color: var(--sjs_ink);
+            word-break: break-all;
+        }
+
+        /* ---------- 图标分区 ---------- */
+        .sjs_section {
+            max-width: var(--sjs_maxw);
+            margin: clamp(64px, 8.5vw, 112px) auto 0;
+        }
+
+        .sjs_section_head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--sjs_rule);
+        }
+
+        .sjs_section_title {
+            font-family: var(--sjs_display);
+            font-weight: 400;
+            font-size: clamp(30px, 3.4vw, 40px);
+            line-height: 1;
+            letter-spacing: -.01em;
+        }
+
+        .sjs_count {
+            font-family: var(--sjs_display);
+            font-style: italic;
+            font-size: 22px;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_section_note {
+            margin-top: 10px;
+            font-size: 13.5px;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_grid {
+            list-style: none;
+            margin-top: clamp(26px, 3.4vw, 38px);
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+            column-gap: clamp(12px, 2.2vw, 26px);
+            row-gap: clamp(26px, 3.4vw, 40px);
+        }
+
+        .sjs_item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .sjs_item_glyph {
+            font-size: 32px;
+            line-height: 1;
+            color: var(--sjs_ink_soft);
+            transition: color .28s var(--sjs_ease), transform .28s var(--sjs_ease);
+        }
+
+        .sjs_item:hover .sjs_item_glyph {
+            color: var(--sjs_blue);
+            transform: translateY(-3px);
+        }
+
+        .sjs_item_name {
+            font-size: 11px;
+            letter-spacing: .05em;
+            color: var(--sjs_ink_faint);
+            word-break: break-all;
+        }
+
+        .sjs_item:hover .sjs_item_name {
+            color: var(--sjs_ink);
+        }
+
+        /* ---------- 页脚 ---------- */
+        .sjs_footer {
+            max-width: var(--sjs_maxw);
+            margin: clamp(72px, 9vw, 120px) auto 0;
+            padding: 24px 0 60px;
+            border-top: 1px solid var(--sjs_rule);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 14px 28px;
+            font-size: 13px;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_footer_links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .sjs_footer_link {
+            color: var(--sjs_ink_soft);
+            border-bottom: 1px solid var(--sjs_rule);
+            padding-bottom: 1px;
+            transition: color .25s var(--sjs_ease), border-color .25s var(--sjs_ease);
+        }
+
+        .sjs_footer_link:hover {
+            color: var(--sjs_blue);
+            border-bottom-color: var(--sjs_blue);
+        }
+
+        /* ---------- 响应式 ---------- */
+        @media (max-width: 860px) {
+            .sjs_hero {
+                grid-template-columns: 1fr;
+                align-items: start;
+                gap: 36px;
+            }
+
+            .sjs_display {
+                font-size: clamp(46px, 11vw, 68px);
+            }
+
+            .sjs_grid {
+                grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+            }
+        }
+
+        @media (max-width: 520px) {
+            .sjs_signature_course {
+                display: none;
+            }
+
+            .sjs_item_glyph {
+                font-size: 26px;
+            }
+
+            .sjs_item_name {
+                font-size: 10px;
+            }
+
+            .sjs_footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .sjs_hero_glyph {
+                animation: none;
+            }
+
+            .sjs_item_glyph,
+            .sjs_nav_link,
+            .sjs_footer_link {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="sjs_topbar">
+        <a class="sjs_signature" href="index.html">
+            <span class="sjs_signature_name">申家硕</span>
+            <span class="sjs_signature_course">高级网页设计</span>
+        </a>
+        <nav class="sjs_nav">
+            <a class="sjs_nav_link" href="index.html">返回首页</a>
+            <a class="sjs_nav_link sjs_is_active" href="iconfont-1.html"><span class="sjs_nav_num">01</span>字体图标</a>
+            <a class="sjs_nav_link" href="iconfont-2.html"><span class="sjs_nav_num">02</span>矢量图标</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="sjs_hero">
+            <figure class="sjs_hero_figure">
+                <span class="sjs_hero_stack">
+                    <span class="sjs_hero_ghost" aria-hidden="true"><i class="fa-solid fa-font-awesome"></i></span>
+                    <span class="sjs_hero_glyph" aria-hidden="true"><i class="fa-solid fa-font-awesome"></i></span>
+                </span>
+                <figcaption class="sjs_figure_caption">
+                    Font Awesome 的标志字形。把它放大到 288px，边缘依然是干净的曲线，因为它本来就是一套字体，而不是一张位图。
+                </figcaption>
+            </figure>
+
+            <div class="sjs_hero_text">
+                <h1 class="sjs_display">Font<br>Awesome</h1>
+                <p class="sjs_standfirst">
+                    这里的每一个图标，都是一个字符。字体文件把图形刻进字形里，页面只需要写上类名，
+                    浏览器就会像排字一样把它印在纸上。放大、改色、换粗细，靠的都是排版的规则。
+                </p>
+                <dl class="sjs_spec">
+                    <div class="sjs_spec_row">
+                        <dt>版本</dt>
+                        <dd>Font Awesome 6.5.2</dd>
+                    </div>
+                    <div class="sjs_spec_row">
+                        <dt>样式</dt>
+                        <dd>cdn/fontawesome/css/all.min.css</dd>
+                    </div>
+                    <div class="sjs_spec_row">
+                        <dt>字体</dt>
+                        <dd>fa-solid-900.woff2（另有 regular / brands）</dd>
+                    </div>
+                    <div class="sjs_spec_row">
+                        <dt>写法</dt>
+                        <dd>&lt;i class="fa-solid fa-house"&gt;</dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+
+        <section class="sjs_section">
+            <div class="sjs_section_head">
+                <h2 class="sjs_section_title">Solid</h2>
+                <p class="sjs_count">28</p>
+            </div>
+            <p class="sjs_section_note">实心图标，界面里最常用的一组。</p>
+            <ul class="sjs_grid">
+                <li class="sjs_item"><i class="fa-solid fa-house sjs_item_glyph"></i><span class="sjs_item_name">fa-house</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-user sjs_item_glyph"></i><span class="sjs_item_name">fa-user</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-heart sjs_item_glyph"></i><span class="sjs_item_name">fa-heart</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-star sjs_item_glyph"></i><span class="sjs_item_name">fa-star</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-bell sjs_item_glyph"></i><span class="sjs_item_name">fa-bell</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-bookmark sjs_item_glyph"></i><span class="sjs_item_name">fa-bookmark</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-camera sjs_item_glyph"></i><span class="sjs_item_name">fa-camera</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-cloud sjs_item_glyph"></i><span class="sjs_item_name">fa-cloud</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-gear sjs_item_glyph"></i><span class="sjs_item_name">fa-gear</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-envelope sjs_item_glyph"></i><span class="sjs_item_name">fa-envelope</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-music sjs_item_glyph"></i><span class="sjs_item_name">fa-music</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-palette sjs_item_glyph"></i><span class="sjs_item_name">fa-palette</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-cart-shopping sjs_item_glyph"></i><span class="sjs_item_name">fa-cart-shopping</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-location-dot sjs_item_glyph"></i><span class="sjs_item_name">fa-location-dot</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-mug-hot sjs_item_glyph"></i><span class="sjs_item_name">fa-mug-hot</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-comments sjs_item_glyph"></i><span class="sjs_item_name">fa-comments</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-download sjs_item_glyph"></i><span class="sjs_item_name">fa-download</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-share-nodes sjs_item_glyph"></i><span class="sjs_item_name">fa-share-nodes</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-calendar-days sjs_item_glyph"></i><span class="sjs_item_name">fa-calendar-days</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-clock sjs_item_glyph"></i><span class="sjs_item_name">fa-clock</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-image sjs_item_glyph"></i><span class="sjs_item_name">fa-image</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-code sjs_item_glyph"></i><span class="sjs_item_name">fa-code</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-lightbulb sjs_item_glyph"></i><span class="sjs_item_name">fa-lightbulb</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-folder-open sjs_item_glyph"></i><span class="sjs_item_name">fa-folder-open</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-graduation-cap sjs_item_glyph"></i><span class="sjs_item_name">fa-graduation-cap</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-truck-fast sjs_item_glyph"></i><span class="sjs_item_name">fa-truck-fast</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-wifi sjs_item_glyph"></i><span class="sjs_item_name">fa-wifi</span></li>
+                <li class="sjs_item"><i class="fa-solid fa-shield-halved sjs_item_glyph"></i><span class="sjs_item_name">fa-shield-halved</span></li>
+            </ul>
+        </section>
+
+        <section class="sjs_section">
+            <div class="sjs_section_head">
+                <h2 class="sjs_section_title">Regular</h2>
+                <p class="sjs_count">12</p>
+            </div>
+            <p class="sjs_section_note">同一套字体里的细线字重，气质更轻。</p>
+            <ul class="sjs_grid">
+                <li class="sjs_item"><i class="fa-regular fa-heart sjs_item_glyph"></i><span class="sjs_item_name">fa-heart</span></li>
+                <li class="sjs_item"><i class="fa-regular fa-star sjs_item_glyph"></i><span class="sjs_item_name">fa-star</span></li>
+                <li class="sjs_item"><i class="fa-regular fa-face-smile sjs_item_glyph"></i><span class="sjs_item_name">fa-face-smile</span></li>
+                <li class="sjs_item"><i class="fa-regular fa-bell sjs_item_glyph"></i><span class="sjs_item_name">fa-bell</span></li>
+                <li class="sjs_item"><i class="fa-regular fa-envelope sjs_item_glyph"></i><span class="sjs_item_name">fa-envelope</span></li>
+                <li class="sjs_item"><i class="fa-regular fa-clock sjs_item_glyph"></i><span class="sjs_item_name">fa-clock</span></li>
+                <li class="sjs_item"><i class="fa-regular fa-comment sjs_item_glyph"></i><span class="sjs_item_name">fa-comment</span></li>
+                <li class="sjs_item"><i class="fa-regular fa-circle-user sjs_item_glyph"></i><span class="sjs_item_name">fa-circle-user</span></li>
+                <li class="sjs_item"><i class="fa-regular fa-image sjs_item_glyph"></i><span class="sjs_item_name">fa-image</span></li>
+                <li class="sjs_item"><i class="fa-regular fa-bookmark sjs_item_glyph"></i><span class="sjs_item_name">fa-bookmark</span></li>
+                <li class="sjs_item"><i class="fa-regular fa-calendar sjs_item_glyph"></i><span class="sjs_item_name">fa-calendar</span></li>
+                <li class="sjs_item"><i class="fa-regular fa-file-lines sjs_item_glyph"></i><span class="sjs_item_name">fa-file-lines</span></li>
+            </ul>
+        </section>
+
+        <section class="sjs_section">
+            <div class="sjs_section_head">
+                <h2 class="sjs_section_title">Brands</h2>
+                <p class="sjs_count">12</p>
+            </div>
+            <p class="sjs_section_note">平台与技术标识，同样收在这套字体里。</p>
+            <ul class="sjs_grid">
+                <li class="sjs_item"><i class="fa-brands fa-github sjs_item_glyph"></i><span class="sjs_item_name">fa-github</span></li>
+                <li class="sjs_item"><i class="fa-brands fa-weixin sjs_item_glyph"></i><span class="sjs_item_name">fa-weixin</span></li>
+                <li class="sjs_item"><i class="fa-brands fa-qq sjs_item_glyph"></i><span class="sjs_item_name">fa-qq</span></li>
+                <li class="sjs_item"><i class="fa-brands fa-bilibili sjs_item_glyph"></i><span class="sjs_item_name">fa-bilibili</span></li>
+                <li class="sjs_item"><i class="fa-brands fa-google sjs_item_glyph"></i><span class="sjs_item_name">fa-google</span></li>
+                <li class="sjs_item"><i class="fa-brands fa-apple sjs_item_glyph"></i><span class="sjs_item_name">fa-apple</span></li>
+                <li class="sjs_item"><i class="fa-brands fa-figma sjs_item_glyph"></i><span class="sjs_item_name">fa-figma</span></li>
+                <li class="sjs_item"><i class="fa-brands fa-html5 sjs_item_glyph"></i><span class="sjs_item_name">fa-html5</span></li>
+                <li class="sjs_item"><i class="fa-brands fa-css3-alt sjs_item_glyph"></i><span class="sjs_item_name">fa-css3-alt</span></li>
+                <li class="sjs_item"><i class="fa-brands fa-js sjs_item_glyph"></i><span class="sjs_item_name">fa-js</span></li>
+                <li class="sjs_item"><i class="fa-brands fa-react sjs_item_glyph"></i><span class="sjs_item_name">fa-react</span></li>
+                <li class="sjs_item"><i class="fa-brands fa-vuejs sjs_item_glyph"></i><span class="sjs_item_name">fa-vuejs</span></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="sjs_footer">
+        <p>所有样式与字体均从本地 cdn 目录读取，页面不依赖外部网络。</p>
+        <div class="sjs_footer_links">
+            <a class="sjs_footer_link" href="index.html">返回首页</a>
+            <a class="sjs_footer_link" href="iconfont-2.html">下一页：矢量图标</a>
+        </div>
+    </footer>
+</body>
+
+</html>

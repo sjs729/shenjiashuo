@@ -1,0 +1,138 @@
+/* ==========================================================
+   2.html 配套样式：层叠与继承 + 盒模型
+   页面结构：.container > h2.container-title
+                       > #card-wrap > .card > img + h3 + p.card-desc
+                       > h2 + ol
+   ========================================================== */
+
+/* ----------------------------------------------------------
+   一、继承（inherit）
+   写在 body 上的这些属性会被子元素自动继承，
+   所以 p、li、h3 不写颜色也有颜色。
+   可继承的常见属性：color、font-*、line-height、text-align、letter-spacing
+   不可继承的常见属性：border、padding、margin、width、height、background
+   ---------------------------------------------------------- */
+body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #1c2a2f;
+    background: #f7f5ef;
+    padding: 28px 18px;
+}
+
+/* ----------------------------------------------------------
+   二、层叠与权重（cascade）
+   同一个元素被多条规则命中时，比权重：
+   ID 选择器(100) > 类选择器(10) > 标签选择器(1)
+   权重相同时，写在后面的生效（就近原则）
+   ---------------------------------------------------------- */
+
+/* ① 标签选择器，权重 1：h2 统一给个灰色 */
+h2 {
+    font-size: 24px;
+    color: #7c8aa3;
+    margin: 26px 0 14px;
+}
+
+/* ② 类选择器，权重 10：覆盖上面标签选择器的颜色 */
+.container-title {
+    color: #1f4fd8;
+    border-left: 6px solid #1f4fd8;
+    padding-left: 12px;
+}
+
+/* ③ ID 选择器，权重 100：整页只有这一个 id */
+#card-wrap {
+    max-width: 560px;
+    margin: 18px 0 30px;
+}
+
+/* ④ 后代选择器 + 类选择器叠加，权重 20：比单写 .card-desc 更"优先" */
+.card .card-desc {
+    color: #a8692a;
+    font-weight: 600;
+}
+
+/* 容器：居中 */
+.container {
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+/* ----------------------------------------------------------
+   三、盒模型（box model）
+   一个元素的占地 = content + padding + border + margin
+   下面把 padding、border、margin 都设成明显不同的值，
+   方便在浏览器里对照着看它们分别占了多少空间。
+   box-sizing: border-box 时，width 里已经包含 padding 和 border。
+   ---------------------------------------------------------- */
+.card {
+    background: #ffffff;
+    /* padding：内容和边框之间的距离（内边距），四边 16px */
+    padding: 16px;
+    /* border：边框，4px 实线 */
+    border: 4px solid #d9d4c8;
+    /* margin：卡片外面的空隙（外边距），上下 20px、左右 0 */
+    margin: 20px 0;
+    /* border-box：width 包含 padding + border */
+    box-sizing: border-box;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px -12px rgba(28, 42, 47, .45);
+    transition: border-color .2s ease, transform .2s ease;
+}
+
+/* 鼠标移上去加深边框，能更清楚地看到边框那 4px */
+.card:hover {
+    border-color: #1f4fd8;
+    transform: translateY(-3px);
+}
+
+/* 上图：固定高度 + object-fit 裁切，图片不会被拉变形。
+   如果 img/yy.jpg 放进来，这里就会显示它；
+   height 已经固定，所以图片暂时缺失时位置也不会塌掉。 */
+.card img {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 6px;
+    background: repeating-linear-gradient(135deg, #eef1f8 0 12px, #f8f9fd 12px 24px);
+}
+
+.card h3 {
+    /* margin 只写两个值：上下、左右 */
+    margin: 14px 0 6px;
+    font-size: 20px;
+    color: #1c2a2f;
+}
+
+.card .card-desc {
+    margin: 0;
+    font-size: 14.5px;
+}
+
+/* ----------------------------------------------------------
+   四、通关游戏答案列表
+   ---------------------------------------------------------- */
+ol {
+    list-style-position: outside;
+    padding-left: 26px;
+    max-width: 560px;
+}
+
+/* li 是 li 之间的空隙，用 margin 而不是换行撑开 */
+ol li {
+    margin: 6px 0;
+    padding: 6px 10px;
+    background: #ffffff;
+    border-left: 4px solid #f5c84b;
+    border-radius: 4px;
+    font-size: 15px;
+}
+
+/* 选择器本身也顺便高亮一下，便于对照 */
+ol li::marker {
+    color: #1f4fd8;
+    font-weight: 700;
+}

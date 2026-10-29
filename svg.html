@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG 图标 | 底部标签栏</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="svg.css">
+</head>
+
+<body class="subpage-body">
+
+    <header class="subpage-header">
+        <div class="shell header-inner">
+            <a class="brand" href="index.html"><span class="brand-mark">申</span><span>申家硕的高级网页设计</span></a>
+            <a class="back-link" href="index.html">返回课堂目录 <span>→</span></a>
+        </div>
+    </header>
+
+    <main class="shell subpage-main svg-main">
+
+        <!-- ==========================================================
+             图标符号表：4 个图标只在这里定义一次。
+             symbol 不会直接显示，要靠下面 <use> 引用才会画出来。
+             用内联符号表而不是外部图标库：不依赖任何 CDN，双击就能打开。
+             ========================================================== -->
+        <svg class="sprite" aria-hidden="true" focusable="false">
+            <symbol id="icon-browser" viewBox="0 0 24 24">
+                <rect x="3" y="4.5" width="18" height="15" rx="2.5"></rect>
+                <path d="M3 9.2h18"></path>
+                <path d="M6.4 6.9h.01"></path>
+                <path d="M9.4 6.9h.01"></path>
+            </symbol>
+            <symbol id="icon-love" viewBox="0 0 24 24">
+                <circle cx="8.6" cy="9" r="3.4"></circle>
+                <circle cx="15.4" cy="9" r="3.4"></circle>
+                <path d="M5.4 10.6L12 19.6l6.6-9"></path>
+            </symbol>
+            <symbol id="icon-positioning" viewBox="0 0 24 24">
+                <circle cx="12" cy="9" r="3.6"></circle>
+                <path d="M8.6 11.9L12 20.5l3.4-8.6"></path>
+            </symbol>
+            <symbol id="icon-nav" viewBox="0 0 24 24">
+                <circle cx="6" cy="12" r="2.4"></circle>
+                <circle cx="17.5" cy="6.5" r="2.4"></circle>
+                <circle cx="17.5" cy="17.5" r="2.4"></circle>
+                <path d="M8.3 10.9l6.9-3.3"></path>
+                <path d="M8.3 13.1l6.9 3.3"></path>
+            </symbol>
+        </svg>
+
+        <p class="eyebrow">CLASS PRACTICE · 06</p>
+        <h1>SVG 图标</h1>
+        <p class="lead">
+            图标用 <code>&lt;svg&gt; &gt; &lt;symbol&gt;</code> 定义成符号表，页面上用
+            <code>&lt;use href="#icon-xxx"&gt;</code> 引用；点击底部标签栏切换选中状态，
+            由一小段 JavaScript 负责增删 <code>active</code> 这个类。页面底部就是成品，滚动看看。
+        </p>
+
+        <div class="note">
+            <h2>这一页练了什么</h2>
+            <ul>
+                <li><strong>SVG symbol + use</strong>：图标只写一遍，多处复用；<code>viewBox="0 0 24 24"</code> 决定图标自身的坐标系。</li>
+                <li><strong>图标跟随文字颜色</strong>：<code>.icon</code> 上写 <code>fill: none; stroke: currentColor;</code>，文字色一变图标就跟着变，不用给图标单独配色。</li>
+                <li><strong>固定定位</strong>：标签栏 <code>position: fixed; bottom: 0;</code>，滚动页面时停在窗口底部；它不占文档流，所以主体区要补下边距。</li>
+                <li><strong>class 切换</strong>：<code>querySelectorAll</code> 拿到全部标签，<code>classList.remove</code> 清掉旧的选中态，再给当前这一项 <code>classList.add('active')</code>。</li>
+            </ul>
+            <pre>&lt;svg class="icon" aria-hidden="true"&gt;
+    &lt;use href="#icon-browser"&gt;&lt;/use&gt;
+&lt;/svg&gt;
+
+.icon { fill: none; stroke: currentColor; }   /* 颜色跟着文字走 */
+.tab-item.active { color: #1f4fd8; }          /* 选中态只改文字色 */</pre>
+        </div>
+
+    </main>
+
+    <!-- 底部标签栏：4 个标签共用同一套结构，只有 use 的引用和文字不同 -->
+    <div class="tab-nav">
+        <div class="tab-item active" onclick="changeTab(this)">
+            <svg class="icon" aria-hidden="true">
+                <use href="#icon-browser"></use>
+            </svg>
+            <span>浏览器</span>
+        </div>
+        <div class="tab-item" onclick="changeTab(this)">
+            <svg class="icon" aria-hidden="true">
+                <use href="#icon-love"></use>
+            </svg>
+            <span>关注</span>
+        </div>
+        <div class="tab-item" onclick="changeTab(this)">
+            <svg class="icon" aria-hidden="true">
+                <use href="#icon-positioning"></use>
+            </svg>
+            <span>定位</span>
+        </div>
+        <div class="tab-item" onclick="changeTab(this)">
+            <svg class="icon" aria-hidden="true">
+                <use href="#icon-nav"></use>
+            </svg>
+            <span>分享</span>
+        </div>
+    </div>
+
+    <footer>
+        <p>申家硕的《高级网页设计》课堂实践 · SVG 图标 · 2026</p>
+    </footer>
+
+    <script>
+        // 点击哪个标签，就把选中态（active）移到哪个标签上。
+        // 思路：先全部清掉，再给当前这一个加上，同一时刻只会有一个选中。
+        function changeTab(current) {
+            var items = document.querySelectorAll('.tab-item');
+
+            for (var i = 0; i < items.length; i++) {
+                items[i].classList.remove('active');
+            }
+
+            current.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>

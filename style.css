@@ -1,0 +1,215 @@
+/* ==========================================================
+   课堂练习子页面共用样式
+   用途：给 stack.html 这类"内容页"提供统一的页头、返回链接、
+        标题区与页脚样式，配色与 index.html 保持一致。
+   注意：本文件只用标签、类选择器，不写死任何具体页面的内容。
+   ========================================================== */
+
+/* ---------- 基础重置 ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    /* border-box：设置的 width 里已经包含 padding 和 border，
+       盒模型计算更直观，所有元素统一 */
+    box-sizing: border-box;
+}
+
+/* ---------- 页面底色：纸张底色 + 三处光晕 ---------- */
+body.subpage-body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+        "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
+    color: #16202e;
+    font-size: 16px;
+    line-height: 1.7;
+    min-height: 100vh;
+    /* 让页脚永远贴在页面底部 */
+    display: flex;
+    flex-direction: column;
+    background:
+        radial-gradient(700px 480px at 10% -8%, rgba(31, 79, 216, .10), transparent 62%),
+        radial-gradient(620px 440px at 98% 2%, rgba(245, 200, 75, .20), transparent 60%),
+        #f6f4ef;
+    -webkit-font-smoothing: antialiased;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+    border: none;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* ---------- 通用容器 ---------- */
+.shell {
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.subpage-main .container {
+    margin: 0 auto;
+}
+
+/* ---------- 页头：品牌 + 返回课堂目录 ---------- */
+.subpage-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(246, 244, 239, .82);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    border-bottom: 1px solid #e4e0d8;
+}
+
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: 62px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    letter-spacing: .2px;
+    /* 允许收缩，否则小屏下页头文字会换行把 62px 的头部撑破 */
+    min-width: 0;
+}
+
+/* 标题过长时用省略号，不换行 */
+.brand span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.brand-mark {
+    flex: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #1f4fd8, #4f7ff0);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 6px 16px -8px rgba(31, 79, 216, .9);
+}
+
+.back-link {
+    flex: none;
+    font-size: 14px;
+    color: #40506a;
+    padding: 8px 14px;
+    border: 1px solid #e4e0d8;
+    border-radius: 999px;
+    background: #fff;
+    transition: color .2s ease, background .2s ease, border-color .2s ease;
+}
+
+.back-link:hover {
+    color: #1f4fd8;
+    border-color: #c9d5f5;
+    background: #e8eefe;
+}
+
+/* ---------- 主体 ---------- */
+.subpage-main {
+    flex: 1;
+    padding: 48px 24px 64px;
+}
+
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #1f4fd8;
+    background: rgba(31, 79, 216, .09);
+    border: 1px solid rgba(31, 79, 216, .18);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.subpage-main h1 {
+    margin: 18px 0 0;
+    font-size: clamp(30px, 4.6vw, 46px);
+    line-height: 1.12;
+    letter-spacing: -1px;
+    font-weight: 800;
+}
+
+.lead {
+    margin-top: 14px;
+    max-width: 720px;
+    color: #40506a;
+    font-size: 16px;
+}
+
+/* 正文里的代码片段 */
+code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .92em;
+    background: #e8eefe;
+    color: #1f4fd8;
+    padding: 1px 6px;
+    border-radius: 6px;
+}
+
+/* h2 前的方块装饰。
+   stack.html 里用 .stack-main h2::before { content: ""; } 把它关掉，
+   所以这里把装饰写在 content 里，覆盖成空字符串就完全不显示。 */
+h2::before {
+    content: "◆ ";
+    color: #f5c84b;
+}
+
+/* ---------- 页脚 ---------- */
+.subpage-body footer {
+    border-top: 1px solid #e4e0d8;
+    padding: 22px 24px;
+    text-align: center;
+    color: #7c8aa3;
+    font-size: 13.5px;
+}
+
+/* ---------- 小屏适配 ---------- */
+@media (max-width: 640px) {
+    .shell {
+        padding: 0 18px;
+    }
+
+    .subpage-main {
+        padding: 32px 18px 48px;
+    }
+
+    /* 小屏下把页头两个元素都缩小，保证一行放得下 */
+    .brand {
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    .brand-mark {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        font-size: 12px;
+    }
+
+    .back-link {
+        padding: 6px 11px;
+        font-size: 13px;
+    }
+}

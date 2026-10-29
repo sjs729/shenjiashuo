@@ -1,0 +1,134 @@
+/* ==========================================================
+   obj.css · JavaScript 对象练习页
+   配色与 index.html / homework.css 保持一致，只补这一页需要的
+   代码块、控制台输出块和小标签，其余骨架复用 style.css。
+   ========================================================== */
+
+.obj-main {
+    padding-bottom: 90px;
+}
+
+.obj-main h2 {
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -.4px;
+    color: #16202e;
+    padding-left: 13px;
+    border-left: 3px solid #1f4fd8;
+    margin-bottom: 14px;
+}
+
+/* 抵消 style.css 里 h2::before 的“◆ ”装饰 */
+.obj-main h2::before {
+    content: "";
+}
+
+.obj-main h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #40506a;
+    margin: 22px 0 8px;
+}
+
+.panel {
+    background-color: #fff;
+    border: 1px solid #e4e0d8;
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(22, 32, 46, .05), 0 6px 18px -12px rgba(22, 32, 46, .18);
+    padding: 26px 26px 22px;
+    margin-bottom: 22px;
+}
+
+.panel > p {
+    color: #40506a;
+    font-size: 15px;
+}
+
+/* ---------- 代码块 ---------- */
+.code {
+    background-color: #10182a;
+    color: #dfe6f5;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin: 12px 0 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13.5px;
+    line-height: 1.85;
+    white-space: pre;
+    overflow-x: auto;
+}
+
+.code .cm {
+    color: #7f8fab;
+}
+
+.code .kw {
+    color: #ff9d7a;
+}
+
+.code .st {
+    color: #ffd98a;
+}
+
+/* ---------- 控制台输出块：和代码块成对出现，标清是运行结果 ---------- */
+.console {
+    background-color: #f4f7fd;
+    border: 1px solid #dce4f6;
+    border-left: 3px solid #1f4fd8;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 10px 0 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.9;
+    color: #26456e;
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+
+.console::before {
+    content: "运行结果";
+    display: block;
+    margin-bottom: 6px;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: #7c8aa3;
+}
+
+/* 输出里的重点值 */
+.console b {
+    color: #1f4fd8;
+}
+
+.console .no {
+    color: #b4462f;
+}
+
+/* ---------- 小结卡 ---------- */
+.takeaway {
+    background-color: #fdf8ec;
+    border: 1px solid #f0e2c2;
+    border-left: 3px solid #f5c84b;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-top: 16px;
+    font-size: 14.5px;
+    color: #6b5327;
+}
+
+.takeaway b {
+    color: #8a5a12;
+}
+
+@media (max-width: 640px) {
+    .panel {
+        padding: 20px 18px 16px;
+    }
+
+    .code,
+    .console {
+        font-size: 12.5px;
+    }
+}

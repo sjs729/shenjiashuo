@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上图下文+图上文字</title>
+    <link rel="stylesheet" href="pic_above_text.css">
+</head>
+<body>
+    <div class="container">
+        <h2>上图下文</h2>
+        <!-- ul > li > a > img + p：图片在上、文字在下，整张卡片可点击 -->
+        <ul class="list1">
+            <li><a href="./stack.html"><img src="./img/1.jpg" alt="图片1">
+            <p>一行三张</p></a></li>
+            <li><a href="./stack.html"><img src="./img/2.jpg" alt="图片2">
+            <p>自动换行</p></a></li>
+            <li><a href="./stack.html"><img src="./img/3.jpg" alt="图片3">
+            <p>gap 控制间距</p></a></li>
+            <li><a href="./stack.html"><img src="./img/4.jpg" alt="图片4">
+            <p>固定高度裁切</p></a></li>
+            <li><a href="./stack.html"><img src="./img/5.jpg" alt="图片5">
+            <p>文字水平居中</p></a></li>
+            <li><a href="./stack.html"><img src="./img/6.jpg" alt="图片6">
+            <p>文字垂直居中</p></a></li>
+        </ul>
+
+        <h2>图上文字</h2>
+        <!-- 和上面同一套结构，区别是文字绝对定位盖在图片上：
+             li 设 position: relative（父相），p 设 position: absolute（子绝） -->
+        <ul class="list2">
+            <li><a href="./stack.html"><img src="./img/4.jpg" alt="图上文字1">
+            <p>文字盖在图片底部<br>鼠标移入整条展开</p></a></li>
+            <li><a href="./stack.html"><img src="./img/5.jpg" alt="图上文字2">
+            <p>父相子绝定位<br>li 是定位父级</p></a></li>
+            <li><a href="./stack.html"><img src="./img/6.jpg" alt="图上文字3">
+            <p>半透明遮罩<br>白字压在图上</p></a></li>
+        </ul>
+    </div>
+
+</body>
+</html>

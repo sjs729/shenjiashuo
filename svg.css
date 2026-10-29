@@ -1,0 +1,134 @@
+/* ==========================================================
+   SVG 图标 —— 底部固定标签栏
+   结构：svg.sprite > symbol（图标符号表，写在 svg.html 里）
+        .tab-nav > .tab-item > svg.icon > use + span
+   图标本体只定义一次，页面上用 <use href="#icon-xxx"> 引用，
+   所以要改图标形状，只改符号表里那一处，四处引用一起变。
+   ========================================================== */
+
+/* 图标统一占 1em，跟着父元素的 font-size 缩放。
+   fill / stroke 用 none + currentColor：图标的颜色等于文字颜色，
+   所以只要改 .tab-item 的 color，图标自动跟着变色。
+   stroke-width、linecap、linejoin 写在 .icon 上会被 use 内部继承，
+   图标要统一变粗变细，改这一处就行。 */
+.icon {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.15em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: hidden;
+}
+
+/* 符号表本身不显示，只用来存放图标定义 */
+.sprite {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+/* ---------- 底部固定标签栏 ---------- */
+.tab-nav {
+    display: flex;
+    /* fixed 是固定定位：相对浏览器窗口定位，滚动页面时它不动 */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    width: 100%;
+    background-color: #fffdf8;
+    border-top: 1px solid #e4e0d8;
+    box-shadow: 0 -8px 24px -18px rgba(22, 32, 46, .5);
+}
+
+.tab-item {
+    /* flex: 1 让 4 个标签平分整条宽度 */
+    flex: 1;
+    display: flex;
+    /* 图标在上、文字在下，所以要改主轴方向 */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 4px 12px;
+    color: #7c8aa3;
+    font-size: 13px;
+    cursor: pointer;
+    transition: color .2s ease, background-color .2s ease;
+}
+
+.tab-item svg {
+    font-size: 26px;
+    /* 图标之间的间距交给父级的 gap，这里不用 margin */
+    transition: transform .2s ease;
+}
+
+.tab-item:hover {
+    background-color: #f2f5fd;
+}
+
+/* 选中的那一个：只改文字颜色，图标用 currentColor 自动跟随 */
+.tab-item.active {
+    color: #1f4fd8;
+}
+
+.tab-item.active svg {
+    transform: translateY(-2px);
+}
+
+/* 标签栏是固定定位，不占文档流，会盖住页面最下面的内容，
+   所以在主体区留出和标签栏等高的下边距。 */
+.svg-main {
+    padding-bottom: 150px;
+}
+
+/* ---------- 页面内的说明块 ---------- */
+.svg-main h2 {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -.4px;
+    color: #16202e;
+    padding-left: 13px;
+    border-left: 3px solid #1f4fd8;
+    margin-bottom: 14px;
+}
+
+/* 抵消 style.css 里 h2::before 的“◆ ”装饰 */
+.svg-main h2::before {
+    content: "";
+}
+
+.note {
+    margin-top: 30px;
+    padding: 22px 22px 18px;
+    background-color: #fffdf8;
+    border: 1px solid #e4e0d8;
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(22, 32, 46, .05), 0 6px 18px -12px rgba(22, 32, 46, .18);
+    font-size: 14.5px;
+    color: #40506a;
+}
+
+.note ul {
+    padding-left: 20px;
+}
+
+.note li {
+    margin: 7px 0;
+}
+
+.note pre {
+    background-color: #10182a;
+    color: #dfe6f5;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 12px 0 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    overflow-x: auto;
+}

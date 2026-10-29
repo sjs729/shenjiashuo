@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucide SVG 图标 | 申家硕</title>
+    <meta name="description" content="Lucide 0.544.0 图标样本页，脚本把图标绘制为内联 SVG，文件已本地化到 cdn 目录。">
+    <style>
+        :root {
+            --sjs_paper: #f0f1ed;
+            --sjs_ink: #171a17;
+            --sjs_ink_soft: #4b5049;
+            --sjs_ink_faint: #7c8178;
+            --sjs_rule: #d2d5ca;
+            --sjs_red: #d63a1e;
+            --sjs_blue: #1d3fbf;
+            --sjs_display: "Bodoni 72", "Didot", "Iowan Old Style", "Songti SC", Georgia, serif;
+            --sjs_body: "Avenir Next", "Avenir", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            --sjs_maxw: 1180px;
+            --sjs_ease: cubic-bezier(.2, .7, .2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--sjs_body);
+            color: var(--sjs_ink);
+            background-color: var(--sjs_paper);
+            background-image: radial-gradient(rgba(23, 26, 23, .055) .5px, transparent .6px);
+            background-size: 4px 4px;
+            line-height: 1.7;
+            padding: 0 clamp(20px, 5vw, 56px);
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        a:focus-visible {
+            outline: 2px solid var(--sjs_red);
+            outline-offset: 4px;
+        }
+
+        /* ---------- 顶部 ---------- */
+        .sjs_topbar {
+            max-width: var(--sjs_maxw);
+            margin: 0 auto;
+            padding: 26px 0 18px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid var(--sjs_rule);
+        }
+
+        .sjs_signature {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .sjs_signature_name {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: .04em;
+        }
+
+        .sjs_signature_course {
+            font-size: 12.5px;
+            letter-spacing: .08em;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_nav {
+            display: flex;
+            align-items: center;
+            gap: clamp(12px, 2vw, 26px);
+            font-size: 13px;
+        }
+
+        .sjs_nav_link {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 7px;
+            color: var(--sjs_ink_soft);
+            padding-bottom: 2px;
+            border-bottom: 1px solid transparent;
+            transition: color .25s var(--sjs_ease), border-color .25s var(--sjs_ease);
+        }
+
+        .sjs_nav_link:hover {
+            color: var(--sjs_red);
+        }
+
+        .sjs_nav_link.sjs_is_active {
+            color: var(--sjs_ink);
+            border-bottom-color: var(--sjs_ink);
+        }
+
+        .sjs_nav_num {
+            font-family: var(--sjs_display);
+            font-size: 12px;
+            color: var(--sjs_ink_faint);
+            letter-spacing: .02em;
+        }
+
+        /* ---------- 首屏 ---------- */
+        .sjs_hero {
+            max-width: var(--sjs_maxw);
+            margin: clamp(48px, 7vw, 88px) auto 0;
+            display: grid;
+            grid-template-columns: minmax(300px, 1.02fr) minmax(300px, .98fr);
+            gap: clamp(32px, 6vw, 88px);
+            align-items: center;
+        }
+
+        .sjs_hero_figure {
+            position: relative;
+        }
+
+        .sjs_plot {
+            position: relative;
+            width: min(100%, 500px);
+            aspect-ratio: 1 / 1;
+            display: grid;
+            place-items: center;
+        }
+
+        .sjs_plot::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--sjs_rule), var(--sjs_rule)),
+                linear-gradient(var(--sjs_rule), var(--sjs_rule));
+            background-size: 1px 76%, 76% 1px;
+            background-position: center, center;
+            background-repeat: no-repeat;
+            opacity: .7;
+        }
+
+        .sjs_plot_ring {
+            position: absolute;
+            inset: 8%;
+            border: 1px dashed var(--sjs_rule);
+            border-radius: 50%;
+        }
+
+        .sjs_plot_icon {
+            position: relative;
+            width: clamp(130px, 18vw, 210px);
+            height: auto;
+            color: var(--sjs_red);
+            stroke-width: 1;
+        }
+
+        .sjs_figure_caption {
+            margin-top: clamp(20px, 3vw, 30px);
+            font-size: 12.5px;
+            line-height: 1.8;
+            color: var(--sjs_ink_faint);
+            max-width: 30em;
+        }
+
+        .sjs_hero_text {
+            padding-top: 6px;
+        }
+
+        .sjs_display {
+            font-family: var(--sjs_display);
+            font-weight: 400;
+            font-size: clamp(52px, 6.8vw, 90px);
+            line-height: .9;
+            letter-spacing: -.018em;
+        }
+
+        .sjs_standfirst {
+            margin-top: clamp(22px, 3vw, 32px);
+            font-size: 16.5px;
+            line-height: 1.9;
+            color: var(--sjs_ink_soft);
+            max-width: 26em;
+        }
+
+        .sjs_spec {
+            margin-top: clamp(26px, 3.4vw, 38px);
+            font-size: 13px;
+            border-top: 1px solid var(--sjs_rule);
+        }
+
+        .sjs_spec_row {
+            display: grid;
+            grid-template-columns: 5.6em minmax(0, 1fr);
+            gap: 16px;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--sjs_rule);
+        }
+
+        .sjs_spec_row dt {
+            color: var(--sjs_ink_faint);
+            letter-spacing: .04em;
+        }
+
+        .sjs_spec_row dd {
+            color: var(--sjs_ink);
+            word-break: break-all;
+        }
+
+        /* ---------- 图标分区 ---------- */
+        .sjs_section {
+            max-width: var(--sjs_maxw);
+            margin: clamp(64px, 8.5vw, 112px) auto 0;
+        }
+
+        .sjs_section_head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--sjs_rule);
+        }
+
+        .sjs_section_title {
+            font-family: var(--sjs_display);
+            font-weight: 400;
+            font-size: clamp(30px, 3.4vw, 40px);
+            line-height: 1;
+            letter-spacing: -.01em;
+        }
+
+        .sjs_count {
+            font-family: var(--sjs_display);
+            font-style: italic;
+            font-size: 22px;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_section_note {
+            margin-top: 10px;
+            font-size: 13.5px;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_grid {
+            list-style: none;
+            margin-top: clamp(26px, 3.4vw, 38px);
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+            column-gap: clamp(12px, 2.2vw, 26px);
+            row-gap: clamp(26px, 3.4vw, 40px);
+        }
+
+        .sjs_item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .sjs_item_glyph {
+            width: 30px;
+            height: 30px;
+            color: var(--sjs_ink_soft);
+            stroke-width: 1.4;
+            transition: color .28s var(--sjs_ease), transform .28s var(--sjs_ease);
+        }
+
+        .sjs_item:hover .sjs_item_glyph {
+            color: var(--sjs_red);
+            transform: translateY(-3px);
+        }
+
+        .sjs_item_name {
+            font-size: 11px;
+            letter-spacing: .05em;
+            color: var(--sjs_ink_faint);
+            word-break: break-all;
+        }
+
+        .sjs_item:hover .sjs_item_name {
+            color: var(--sjs_ink);
+        }
+
+        /* ---------- 页脚 ---------- */
+        .sjs_footer {
+            max-width: var(--sjs_maxw);
+            margin: clamp(72px, 9vw, 120px) auto 0;
+            padding: 24px 0 60px;
+            border-top: 1px solid var(--sjs_rule);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 14px 28px;
+            font-size: 13px;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_footer_links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .sjs_footer_link {
+            color: var(--sjs_ink_soft);
+            border-bottom: 1px solid var(--sjs_rule);
+            padding-bottom: 1px;
+            transition: color .25s var(--sjs_ease), border-color .25s var(--sjs_ease);
+        }
+
+        .sjs_footer_link:hover {
+            color: var(--sjs_red);
+            border-bottom-color: var(--sjs_red);
+        }
+
+        /* ---------- 响应式 ---------- */
+        @media (max-width: 860px) {
+            .sjs_hero {
+                grid-template-columns: 1fr;
+                align-items: start;
+                gap: 36px;
+            }
+
+            .sjs_display {
+                font-size: clamp(46px, 11vw, 68px);
+            }
+
+            .sjs_plot {
+                width: min(100%, 420px);
+            }
+
+            .sjs_grid {
+                grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+            }
+        }
+
+        @media (max-width: 520px) {
+            .sjs_signature_course {
+                display: none;
+            }
+
+            .sjs_item_glyph {
+                width: 26px;
+                height: 26px;
+            }
+
+            .sjs_item_name {
+                font-size: 10px;
+            }
+
+            .sjs_footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .sjs_item_glyph,
+            .sjs_nav_link,
+            .sjs_footer_link {
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="sjs_topbar">
+        <a class="sjs_signature" href="index.html">
+            <span class="sjs_signature_name">申家硕</span>
+            <span class="sjs_signature_course">高级网页设计</span>
+        </a>
+        <nav class="sjs_nav">
+            <a class="sjs_nav_link" href="index.html">返回首页</a>
+            <a class="sjs_nav_link" href="iconfont-1.html"><span class="sjs_nav_num">01</span>字体图标</a>
+            <a class="sjs_nav_link sjs_is_active" href="iconfont-2.html"><span class="sjs_nav_num">02</span>矢量图标</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="sjs_hero">
+            <figure class="sjs_hero_figure">
+                <div class="sjs_plot" aria-hidden="true">
+                    <span class="sjs_plot_ring"></span>
+                    <i data-lucide="compass" class="sjs_plot_icon"></i>
+                </div>
+                <figcaption class="sjs_figure_caption">
+                    Lucide 的 compass 图标，按 1 的描边宽度一次性画出。它没有字体文件，每一笔都是页面里的一条路径。
+                </figcaption>
+            </figure>
+
+            <div class="sjs_hero_text">
+                <h1 class="sjs_display">Lucide</h1>
+                <p class="sjs_standfirst">
+                    这里的图标不是字，是线。脚本读到占位标签后，把对应的路径就地展开成内联 SVG。
+                    于是它可以只改描边粗细、按需取用、单独上色，像用一支笔在页面上重新画了一遍。
+                </p>
+                <dl class="sjs_spec">
+                    <div class="sjs_spec_row">
+                        <dt>版本</dt>
+                        <dd>Lucide 0.544.0</dd>
+                    </div>
+                    <div class="sjs_spec_row">
+                        <dt>脚本</dt>
+                        <dd>cdn/lucide/lucide.min.js</dd>
+                    </div>
+                    <div class="sjs_spec_row">
+                        <dt>调用</dt>
+                        <dd>lucide.createIcons()</dd>
+                    </div>
+                    <div class="sjs_spec_row">
+                        <dt>写法</dt>
+                        <dd>&lt;i data-lucide="house"&gt;</dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+
+        <section class="sjs_section">
+            <div class="sjs_section_head">
+                <h2 class="sjs_section_title">Interface</h2>
+                <p class="sjs_count">20</p>
+            </div>
+            <p class="sjs_section_note">界面与操作：导航、控制与反馈。</p>
+            <ul class="sjs_grid">
+                <li class="sjs_item"><i data-lucide="house" class="sjs_item_glyph"></i><span class="sjs_item_name">house</span></li>
+                <li class="sjs_item"><i data-lucide="user" class="sjs_item_glyph"></i><span class="sjs_item_name">user</span></li>
+                <li class="sjs_item"><i data-lucide="users" class="sjs_item_glyph"></i><span class="sjs_item_name">users</span></li>
+                <li class="sjs_item"><i data-lucide="heart" class="sjs_item_glyph"></i><span class="sjs_item_name">heart</span></li>
+                <li class="sjs_item"><i data-lucide="star" class="sjs_item_glyph"></i><span class="sjs_item_name">star</span></li>
+                <li class="sjs_item"><i data-lucide="bell" class="sjs_item_glyph"></i><span class="sjs_item_name">bell</span></li>
+                <li class="sjs_item"><i data-lucide="settings" class="sjs_item_glyph"></i><span class="sjs_item_name">settings</span></li>
+                <li class="sjs_item"><i data-lucide="search" class="sjs_item_glyph"></i><span class="sjs_item_name">search</span></li>
+                <li class="sjs_item"><i data-lucide="menu" class="sjs_item_glyph"></i><span class="sjs_item_name">menu</span></li>
+                <li class="sjs_item"><i data-lucide="plus" class="sjs_item_glyph"></i><span class="sjs_item_name">plus</span></li>
+                <li class="sjs_item"><i data-lucide="check" class="sjs_item_glyph"></i><span class="sjs_item_name">check</span></li>
+                <li class="sjs_item"><i data-lucide="x" class="sjs_item_glyph"></i><span class="sjs_item_name">x</span></li>
+                <li class="sjs_item"><i data-lucide="arrow-right" class="sjs_item_glyph"></i><span class="sjs_item_name">arrow-right</span></li>
+                <li class="sjs_item"><i data-lucide="chevron-down" class="sjs_item_glyph"></i><span class="sjs_item_name">chevron-down</span></li>
+                <li class="sjs_item"><i data-lucide="trash-2" class="sjs_item_glyph"></i><span class="sjs_item_name">trash-2</span></li>
+                <li class="sjs_item"><i data-lucide="pencil" class="sjs_item_glyph"></i><span class="sjs_item_name">pencil</span></li>
+                <li class="sjs_item"><i data-lucide="copy" class="sjs_item_glyph"></i><span class="sjs_item_name">copy</span></li>
+                <li class="sjs_item"><i data-lucide="eye" class="sjs_item_glyph"></i><span class="sjs_item_name">eye</span></li>
+                <li class="sjs_item"><i data-lucide="lock" class="sjs_item_glyph"></i><span class="sjs_item_name">lock</span></li>
+                <li class="sjs_item"><i data-lucide="key" class="sjs_item_glyph"></i><span class="sjs_item_name">key</span></li>
+            </ul>
+        </section>
+
+        <section class="sjs_section">
+            <div class="sjs_section_head">
+                <h2 class="sjs_section_title">Files</h2>
+                <p class="sjs_count">16</p>
+            </div>
+            <p class="sjs_section_note">文件与数据：内容管理和开发工具。</p>
+            <ul class="sjs_grid">
+                <li class="sjs_item"><i data-lucide="folder-open" class="sjs_item_glyph"></i><span class="sjs_item_name">folder-open</span></li>
+                <li class="sjs_item"><i data-lucide="file-text" class="sjs_item_glyph"></i><span class="sjs_item_name">file-text</span></li>
+                <li class="sjs_item"><i data-lucide="bookmark" class="sjs_item_glyph"></i><span class="sjs_item_name">bookmark</span></li>
+                <li class="sjs_item"><i data-lucide="calendar" class="sjs_item_glyph"></i><span class="sjs_item_name">calendar</span></li>
+                <li class="sjs_item"><i data-lucide="clock" class="sjs_item_glyph"></i><span class="sjs_item_name">clock</span></li>
+                <li class="sjs_item"><i data-lucide="download" class="sjs_item_glyph"></i><span class="sjs_item_name">download</span></li>
+                <li class="sjs_item"><i data-lucide="share-2" class="sjs_item_glyph"></i><span class="sjs_item_name">share-2</span></li>
+                <li class="sjs_item"><i data-lucide="code" class="sjs_item_glyph"></i><span class="sjs_item_name">code</span></li>
+                <li class="sjs_item"><i data-lucide="terminal" class="sjs_item_glyph"></i><span class="sjs_item_name">terminal</span></li>
+                <li class="sjs_item"><i data-lucide="database" class="sjs_item_glyph"></i><span class="sjs_item_name">database</span></li>
+                <li class="sjs_item"><i data-lucide="server" class="sjs_item_glyph"></i><span class="sjs_item_name">server</span></li>
+                <li class="sjs_item"><i data-lucide="git-branch" class="sjs_item_glyph"></i><span class="sjs_item_name">git-branch</span></li>
+                <li class="sjs_item"><i data-lucide="layers" class="sjs_item_glyph"></i><span class="sjs_item_name">layers</span></li>
+                <li class="sjs_item"><i data-lucide="palette" class="sjs_item_glyph"></i><span class="sjs_item_name">palette</span></li>
+                <li class="sjs_item"><i data-lucide="pen-tool" class="sjs_item_glyph"></i><span class="sjs_item_name">pen-tool</span></li>
+                <li class="sjs_item"><i data-lucide="lightbulb" class="sjs_item_glyph"></i><span class="sjs_item_name">lightbulb</span></li>
+            </ul>
+        </section>
+
+        <section class="sjs_section">
+            <div class="sjs_section_head">
+                <h2 class="sjs_section_title">Everyday</h2>
+                <p class="sjs_count">20</p>
+            </div>
+            <p class="sjs_section_note">媒体与生活：设备、通讯和日常物品。</p>
+            <ul class="sjs_grid">
+                <li class="sjs_item"><i data-lucide="image" class="sjs_item_glyph"></i><span class="sjs_item_name">image</span></li>
+                <li class="sjs_item"><i data-lucide="camera" class="sjs_item_glyph"></i><span class="sjs_item_name">camera</span></li>
+                <li class="sjs_item"><i data-lucide="music" class="sjs_item_glyph"></i><span class="sjs_item_name">music</span></li>
+                <li class="sjs_item"><i data-lucide="video" class="sjs_item_glyph"></i><span class="sjs_item_name">video</span></li>
+                <li class="sjs_item"><i data-lucide="mic" class="sjs_item_glyph"></i><span class="sjs_item_name">mic</span></li>
+                <li class="sjs_item"><i data-lucide="headphones" class="sjs_item_glyph"></i><span class="sjs_item_name">headphones</span></li>
+                <li class="sjs_item"><i data-lucide="phone" class="sjs_item_glyph"></i><span class="sjs_item_name">phone</span></li>
+                <li class="sjs_item"><i data-lucide="mail" class="sjs_item_glyph"></i><span class="sjs_item_name">mail</span></li>
+                <li class="sjs_item"><i data-lucide="message-circle" class="sjs_item_glyph"></i><span class="sjs_item_name">message-circle</span></li>
+                <li class="sjs_item"><i data-lucide="shopping-cart" class="sjs_item_glyph"></i><span class="sjs_item_name">shopping-cart</span></li>
+                <li class="sjs_item"><i data-lucide="map-pin" class="sjs_item_glyph"></i><span class="sjs_item_name">map-pin</span></li>
+                <li class="sjs_item"><i data-lucide="coffee" class="sjs_item_glyph"></i><span class="sjs_item_name">coffee</span></li>
+                <li class="sjs_item"><i data-lucide="sun" class="sjs_item_glyph"></i><span class="sjs_item_name">sun</span></li>
+                <li class="sjs_item"><i data-lucide="moon" class="sjs_item_glyph"></i><span class="sjs_item_name">moon</span></li>
+                <li class="sjs_item"><i data-lucide="cloud" class="sjs_item_glyph"></i><span class="sjs_item_name">cloud</span></li>
+                <li class="sjs_item"><i data-lucide="wifi" class="sjs_item_glyph"></i><span class="sjs_item_name">wifi</span></li>
+                <li class="sjs_item"><i data-lucide="laptop" class="sjs_item_glyph"></i><span class="sjs_item_name">laptop</span></li>
+                <li class="sjs_item"><i data-lucide="smartphone" class="sjs_item_glyph"></i><span class="sjs_item_name">smartphone</span></li>
+                <li class="sjs_item"><i data-lucide="monitor" class="sjs_item_glyph"></i><span class="sjs_item_name">monitor</span></li>
+                <li class="sjs_item"><i data-lucide="shield-check" class="sjs_item_glyph"></i><span class="sjs_item_name">shield-check</span></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="sjs_footer">
+        <p>所有脚本与图标均从本地 cdn 目录读取，页面不依赖外部网络。</p>
+        <div class="sjs_footer_links">
+            <a class="sjs_footer_link" href="index.html">返回首页</a>
+            <a class="sjs_footer_link" href="iconfont-1.html">上一页：字体图标</a>
+        </div>
+    </footer>
+
+    <script src="cdn/lucide/lucide.min.js"></script>
+    <script>
+        lucide.createIcons();
+
+        var sjs_shapes = document.querySelectorAll(".sjs_plot_icon path, .sjs_plot_icon circle, .sjs_plot_icon line, .sjs_plot_icon rect, .sjs_plot_icon polyline, .sjs_plot_icon polygon");
+        var sjs_reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (!sjs_reduced && sjs_shapes.length) {
+            sjs_shapes.forEach(function (sjs_shape) {
+                var sjs_length = sjs_shape.getTotalLength();
+                sjs_shape.style.strokeDasharray = sjs_length;
+                sjs_shape.style.strokeDashoffset = sjs_length;
+            });
+
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    sjs_shapes.forEach(function (sjs_shape, sjs_index) {
+                        sjs_shape.style.transition = "stroke-dashoffset 1.4s cubic-bezier(.2,.7,.2,1) " + (sjs_index * 90) + "ms";
+                        sjs_shape.style.strokeDashoffset = 0;
+                    });
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

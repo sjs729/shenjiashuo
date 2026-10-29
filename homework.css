@@ -1,0 +1,357 @@
+/* ==========================================================
+   homework.css · 主题对齐 index.html
+   色彩、字体、圆角、阴影全部沿用 index.html 的 :root 设计变量，
+   不自己另配一套"看起来像"的颜色。
+   结构（header / nav / main / aside / footer）保持原样，只换皮。
+   ========================================================== */
+
+:root{
+    --ink: #16202e;
+    --ink-soft: #40506a;
+    --ink-faint: #7c8aa3;
+    --paper: #f6f4ef;
+    --card: #ffffff;
+    --line: #e4e0d8;
+    --accent: #1f4fd8;
+    --accent-soft: #e8eefe;
+    --warm: #d97a3c;
+    --green: #2f8f6b;
+    --radius: 16px;
+    --shadow-sm: 0 1px 2px rgba(22,32,46,.05), 0 6px 18px -12px rgba(22,32,46,.18);
+    --shadow-md: 0 2px 4px rgba(22,32,46,.05), 0 22px 48px -28px rgba(22,32,46,.35);
+    /* index.html 是 1120px；这里保留 1200px，因为两栏布局 main+aside 需要更宽 */
+    --maxw: 1200px;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html{
+    scroll-behavior: smooth;
+}
+body{
+    color: var(--ink);
+    background-color: var(--paper);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+        "Microsoft YaHei", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+/* 纸张底 + 三色光晕，跟 index.html 的背景层完全一致 */
+body::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(760px 520px at 12% -6%, rgba(31,79,216,.12), transparent 62%),
+        radial-gradient(680px 480px at 96% 4%, rgba(217,122,60,.13), transparent 60%),
+        radial-gradient(900px 620px at 50% 108%, rgba(47,143,107,.10), transparent 62%),
+        var(--paper);
+}
+::selection{
+    background: var(--accent);
+    color: #fff;
+}
+a{
+    color: inherit;
+}
+/* ==========================================================
+   页头：原来是一条实心蓝条，改成 index.html 那种纸面上的大字标题
+   ========================================================== */
+header{
+    padding: 62px 24px 34px;
+    text-align: center;
+}
+header h1{
+    font-size: clamp(26px, 3.6vw, 38px);
+    line-height: 1.18;
+    letter-spacing: -1px;
+    font-weight: 800;
+    color: var(--ink);
+}
+header p{
+    margin-top: 14px;
+    font-size: 14.5px;
+    letter-spacing: .4px;
+    color: var(--ink-faint);
+}
+/* ==========================================================
+   导航：照搬 index.html 的顶栏——半透明纸面 + 毛玻璃 + 圆角药丸链接
+   ========================================================== */
+nav{
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 12px 24px;
+    text-align: center;
+    background: rgba(246,244,239,.82);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 30px;
+}
+nav a{
+    display: inline-block;
+    padding: 7px 15px;
+    margin: 0 3px;
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-radius: 999px;
+    transition: background .2s ease, color .2s ease;
+}
+nav a:hover{
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+/* ==========================================================
+   两栏骨架：宽度依旧交给 flex 分配，不写死
+   ========================================================== */
+.wrap{
+    max-width: var(--maxw);
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+.content-row{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+main{
+    flex: 1 1 690px;
+    min-width: 0;
+}
+aside{
+    flex: 1 1 400px;
+    align-self: flex-start;
+    position: sticky;
+    top: 80px;
+    background-color: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 22px 20px;
+    color: var(--ink);
+}
+aside ul{
+    padding: 0 0 0 22px;
+}
+/* ==========================================================
+   标题：改墨水色，左侧加一条强调色竖线，强调色只在细节处出现
+   ========================================================== */
+h2{
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -.4px;
+    line-height: 1.35;
+    color: var(--ink);
+    padding-left: 13px;
+    border-left: 3px solid var(--accent);
+    margin-bottom: 16px;
+}
+aside h2{
+    font-size: 16.5px;
+    padding-left: 11px;
+    margin-bottom: 14px;
+}
+h3{
+    font-size: 16.5px;
+    font-weight: 700;
+    letter-spacing: -.2px;
+    color: var(--ink);
+    margin: 22px 0 8px;
+}
+ol,ul{
+    padding: 0 0 0 22px;
+}
+li{
+    margin: 9px 0;
+}
+li::marker{
+    color: var(--accent);
+    font-weight: 700;
+}
+/* ==========================================================
+   内容卡片：白卡 + 暖灰描边 + 16px 圆角 + 淡阴影（index 的卡片语言）
+   ========================================================== */
+.panel{
+    background-color: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 26px 26px 22px;
+    margin-bottom: 20px;
+}
+/* 行内答案高亮：淡蓝底 + 强调色文字 */
+.answer-code{
+    color: var(--accent);
+    font-weight: 700;
+    background: var(--accent-soft);
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: .95em;
+}
+/* 代码块：改成 index.html 那张深色代码卡的配色 */
+.code-box{
+    background-color: #10182a;
+    color: #dfe6f5;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin: 10px 0 14px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13.5px;
+    line-height: 1.85;
+    overflow: hidden;
+}
+/* ==========================================================
+   表格：边框改暖灰，表头用强调色
+   ========================================================== */
+table{
+    width: 100%;
+    margin: 14px 0;
+    border-collapse: collapse;
+    font-size: 14.5px;
+}
+th{
+    background-color: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+}
+th,td{
+    padding: 11px 13px;
+    text-align: left;
+    vertical-align: top;
+    border: 1px solid var(--line);
+}
+img{
+    display: block;
+    width: 100%;
+    border: none;
+}
+/* ==========================================================
+   图片卡片：aspect-ratio 统一 3:2，object-fit 把 600×600 的 1.jpg
+   裁切成同一高度，六张卡才齐
+   ========================================================== */
+.card-list{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    gap: 10px;
+    padding: 0;
+    margin-top: 20px;
+}
+.card-list li{
+    flex: 0 0 calc((100% - 20px) / 3);
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    margin: 0;
+}
+.card-list li a{
+    display: block;
+    color: var(--ink);
+    text-decoration: none;
+}
+/* 图片默认状态就写transition，移入移出都有动画 */
+.card-list img{
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    transition: all .6s;
+}
+.card-list li:hover img{
+    transform: scale(1.2);
+}
+/* 文字条绝对定位到卡片底部，用 flex 做垂直居中，遮罩取墨水色 */
+.card-list p{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    line-height: 1.4;
+    text-align: center;
+    background-color: rgba(22,32,46,.72);
+    color: #fff;
+    font-weight: 700;
+    transition: all .6s;
+}
+.card-list li:hover p{
+    height: 96px;
+}
+/* 文字条铺满时靠 flex 居中，不再靠 line-height */
+.card-list li:nth-child(odd):hover p{
+    height: 100%;
+}
+/* 父相子绝示意图 */
+.draw-box{
+    position: relative;
+    width: 420px;
+    height: 180px;
+    border: 1px solid var(--accent);
+    background-color: var(--accent-soft);
+    border-radius: 12px;
+    padding: 12px;
+    margin: 14px 0;
+    color: var(--ink-soft);
+}
+.child-box{
+    position: absolute;
+    right: 24px;
+    bottom: 20px;
+    width: 150px;
+    height: 80px;
+    line-height: 30px;
+    text-align: center;
+    background-color: var(--accent);
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px 0 0;
+}
+/* ==========================================================
+   页脚：从实心蓝条改成纸面 + 顶部分隔线（index 的页脚写法）
+   ========================================================== */
+footer{
+    height: 80px;
+    line-height: 80px;
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 13.5px;
+    border-top: 1px solid var(--line);
+    margin-top: 20px;
+}
+/* 回到顶部：位置保持左下角（老师要求），只换配色和圆角 */
+.back-top{
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    z-index: 5;
+    width: 64px;
+    height: 44px;
+    line-height: 44px;
+    text-align: center;
+    font-size: 13px;
+    letter-spacing: .6px;
+    color: #fff;
+    background-color: var(--accent);
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+    opacity: .62;
+    transition: all .35s ease;
+}
+.back-top:hover{
+    opacity: 1;
+    transform: translateY(-3px);
+}

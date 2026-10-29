@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f0f1ed">
+    <title>下导航 · 字体图标 | 申家硕</title>
+    <meta name="description" content="移动端固定下导航示例，四个导航项使用 Font Awesome 字体图标，含数字徽章与红点提示。">
+    <link rel="stylesheet" href="cdn/fontawesome/css/all.min.css">
+    <style>
+        :root {
+            --sjs_paper: #f0f1ed;
+            --sjs_paper_deep: #e4e6dd;
+            --sjs_ink: #171a17;
+            --sjs_ink_soft: #4b5049;
+            --sjs_ink_faint: #7c8178;
+            --sjs_rule: #d2d5ca;
+            --sjs_accent: #1d3fbf;
+            --sjs_alert: #d63a1e;
+            --sjs_bar: #171a17;
+            --sjs_bar_soft: #a3a99d;
+            --sjs_bar_ink: #f2f3ee;
+            --sjs_display: "Bodoni 72", "Didot", "Iowan Old Style", "Songti SC", Georgia, serif;
+            --sjs_body: "Avenir Next", "Avenir", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            --sjs_ease: cubic-bezier(.2, .7, .2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--sjs_body);
+            color: var(--sjs_ink);
+            background-color: var(--sjs_paper);
+            background-image: radial-gradient(rgba(23, 26, 23, .055) .5px, transparent .6px);
+            background-size: 4px 4px;
+            line-height: 1.7;
+            padding: 0 clamp(18px, 5vw, 26px);
+            min-height: 100vh;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        a:focus-visible {
+            outline: 2px solid var(--sjs_accent);
+            outline-offset: 4px;
+        }
+
+        .sjs_shell {
+            max-width: 440px;
+            margin: 0 auto;
+            padding-bottom: 132px;
+        }
+
+        /* ---------- 顶部 ---------- */
+        .sjs_topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 22px 0 14px;
+            border-bottom: 1px solid var(--sjs_rule);
+        }
+
+        .sjs_signature {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .sjs_signature_name {
+            font-size: 13.5px;
+            font-weight: 600;
+            letter-spacing: .04em;
+        }
+
+        .sjs_signature_course {
+            font-size: 11px;
+            letter-spacing: .06em;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_toplinks {
+            display: flex;
+            gap: 16px;
+            font-size: 11.5px;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_toplink {
+            padding-bottom: 1px;
+            border-bottom: 1px solid transparent;
+            transition: color .25s var(--sjs_ease), border-color .25s var(--sjs_ease);
+        }
+
+        .sjs_toplink:hover {
+            color: var(--sjs_accent);
+        }
+
+        .sjs_toplink.sjs_is_active {
+            color: var(--sjs_ink);
+            border-bottom-color: var(--sjs_ink);
+        }
+
+        /* ---------- 正文 ---------- */
+        .sjs_main {
+            padding-top: 30px;
+        }
+
+        .sjs_title {
+            font-family: var(--sjs_display);
+            font-weight: 600;
+            font-size: clamp(34px, 9vw, 44px);
+            line-height: 1.14;
+            letter-spacing: -.01em;
+        }
+
+        .sjs_lead {
+            margin-top: 12px;
+            font-size: 14px;
+            line-height: 1.85;
+            color: var(--sjs_ink_soft);
+            max-width: 24em;
+        }
+
+        .sjs_stage {
+            margin-top: 26px;
+            padding: 34px 20px 24px;
+            background: var(--sjs_paper_deep);
+            border-radius: 22px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+            text-align: center;
+        }
+
+        .sjs_stage_icon {
+            display: block;
+            font-size: 88px;
+            line-height: 1;
+            color: var(--sjs_accent);
+            animation: sjs_pop .4s var(--sjs_ease) both;
+        }
+
+        .sjs_stage_label {
+            font-size: 12px;
+            letter-spacing: .06em;
+            color: var(--sjs_ink_soft);
+        }
+
+        @keyframes sjs_pop {
+            from {
+                opacity: 0;
+                transform: scale(.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .sjs_spec {
+            margin-top: 26px;
+            font-size: 12.5px;
+            border-top: 1px solid var(--sjs_rule);
+        }
+
+        .sjs_spec_row {
+            display: grid;
+            grid-template-columns: 4.6em minmax(0, 1fr);
+            gap: 14px;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--sjs_rule);
+        }
+
+        .sjs_spec_row dt {
+            color: var(--sjs_ink_faint);
+            letter-spacing: .04em;
+        }
+
+        .sjs_spec_row dd {
+            color: var(--sjs_ink);
+            word-break: break-all;
+        }
+
+        .sjs_hint {
+            margin-top: 18px;
+            font-size: 12.5px;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_footer {
+            margin-top: 36px;
+            padding-top: 14px;
+            border-top: 1px solid var(--sjs_rule);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 20px;
+            font-size: 12.5px;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_footer_link {
+            color: var(--sjs_ink_soft);
+            border-bottom: 1px solid var(--sjs_rule);
+            padding-bottom: 1px;
+            transition: color .25s var(--sjs_ease), border-color .25s var(--sjs_ease);
+        }
+
+        .sjs_footer_link:hover {
+            color: var(--sjs_accent);
+            border-bottom-color: var(--sjs_accent);
+        }
+
+        /* ---------- 固定下导航 ---------- */
+        .sjs_bottomnav {
+            position: fixed;
+            left: 50%;
+            bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+            transform: translateX(-50%);
+            width: min(calc(100% - 28px), 420px);
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            background: var(--sjs_bar);
+            border-radius: 20px;
+            padding: 11px 5px 10px;
+            box-shadow: 0 20px 42px -22px rgba(23, 26, 23, .62), 0 1px 0 rgba(255, 255, 255, .05) inset;
+            z-index: 10;
+        }
+
+        .sjs_tab {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 1px 0 0;
+            background: none;
+            border: 0;
+            font-family: inherit;
+            font-size: 10.5px;
+            letter-spacing: .06em;
+            color: var(--sjs_bar_soft);
+            cursor: pointer;
+            transition: color .25s var(--sjs_ease);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .sjs_tab:hover {
+            color: var(--sjs_bar_ink);
+        }
+
+        .sjs_tab.sjs_is_active {
+            color: var(--sjs_bar_ink);
+        }
+
+        .sjs_tab.sjs_is_active::before {
+            content: "";
+            position: absolute;
+            top: -11px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 2px;
+            border-radius: 2px;
+            background: var(--sjs_accent);
+        }
+
+        .sjs_tab:focus-visible {
+            outline: 2px solid var(--sjs_accent);
+            outline-offset: 2px;
+            border-radius: 12px;
+        }
+
+        .sjs_tab_icon_wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+        }
+
+        .sjs_tab_icon {
+            display: block;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .sjs_badge {
+            position: absolute;
+            top: -7px;
+            right: -10px;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            border-radius: 8px;
+            background: var(--sjs_alert);
+            color: #fbfbf7;
+            font-size: 9.5px;
+            font-weight: 600;
+            line-height: 16px;
+            letter-spacing: 0;
+            text-align: center;
+            box-shadow: 0 0 0 2px var(--sjs_bar);
+        }
+
+        .sjs_dot {
+            position: absolute;
+            top: -3px;
+            right: -5px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--sjs_alert);
+            box-shadow: 0 0 0 2px var(--sjs_bar);
+        }
+
+        @media (max-width: 360px) {
+            .sjs_stage_icon {
+                font-size: 72px;
+            }
+
+            .sjs_spec_row {
+                grid-template-columns: 4.2em minmax(0, 1fr);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .sjs_stage_icon,
+            .sjs_tab,
+            .sjs_toplink,
+            .sjs_footer_link {
+                animation: none;
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sjs_shell">
+        <header class="sjs_topbar">
+            <a class="sjs_signature" href="index.html">
+                <span class="sjs_signature_name">申家硕</span>
+                <span class="sjs_signature_course">高级网页设计</span>
+            </a>
+            <div class="sjs_toplinks">
+                <a class="sjs_toplink sjs_is_active" href="iconfont-3.html">03 字体</a>
+                <a class="sjs_toplink" href="iconfont-4.html">04 SVG</a>
+            </div>
+        </header>
+
+        <main class="sjs_main">
+            <h1 class="sjs_title">下导航</h1>
+            <p class="sjs_lead">
+                四项导航贴在屏幕底部，宽度随视口收缩，两侧始终留出 14px，底部再让出手机的安全区。
+                图标与文字用同一套字体渲染，数字徽章和红点叠在图标右上角。
+            </p>
+
+            <section class="sjs_stage">
+                <i class="fa-solid fa-house sjs_stage_icon" aria-hidden="true"></i>
+                <p class="sjs_stage_label" aria-live="polite">当前选中：首页</p>
+            </section>
+
+            <dl class="sjs_spec">
+                <div class="sjs_spec_row">
+                    <dt>导航项</dt>
+                    <dd>4 项，固定在视口底部</dd>
+                </div>
+                <div class="sjs_spec_row">
+                    <dt>数字徽章</dt>
+                    <dd>消息项右上角，显示 12</dd>
+                </div>
+                <div class="sjs_spec_row">
+                    <dt>红点提示</dt>
+                    <dd>我的项右上角，只提示不计数</dd>
+                </div>
+                <div class="sjs_spec_row">
+                    <dt>实现方式</dt>
+                    <dd>字体图标，Font Awesome 6.5.2</dd>
+                </div>
+                <div class="sjs_spec_row">
+                    <dt>写法</dt>
+                    <dd>&lt;i class="fa-solid fa-house"&gt;</dd>
+                </div>
+            </dl>
+
+            <p class="sjs_hint">点按下方任意导航项，可切换选中状态。</p>
+
+            <footer class="sjs_footer">
+                <a class="sjs_footer_link" href="index.html">返回首页</a>
+                <a class="sjs_footer_link" href="iconfont-4.html">看 SVG 版本</a>
+            </footer>
+        </main>
+    </div>
+
+    <nav class="sjs_bottomnav" aria-label="主导航">
+        <button class="sjs_tab sjs_is_active" type="button" data-tab="home" aria-current="page">
+            <span class="sjs_tab_icon_wrap">
+                <i class="fa-solid fa-house sjs_tab_icon" aria-hidden="true"></i>
+            </span>
+            <span>首页</span>
+        </button>
+        <button class="sjs_tab" type="button" data-tab="discover">
+            <span class="sjs_tab_icon_wrap">
+                <i class="fa-solid fa-compass sjs_tab_icon" aria-hidden="true"></i>
+            </span>
+            <span>发现</span>
+        </button>
+        <button class="sjs_tab" type="button" data-tab="message" aria-label="消息，12 条未读">
+            <span class="sjs_tab_icon_wrap">
+                <i class="fa-solid fa-comment-dots sjs_tab_icon" aria-hidden="true"></i>
+                <span class="sjs_badge">12</span>
+            </span>
+            <span>消息</span>
+        </button>
+        <button class="sjs_tab" type="button" data-tab="profile" aria-label="我的，有新内容">
+            <span class="sjs_tab_icon_wrap">
+                <i class="fa-solid fa-user sjs_tab_icon" aria-hidden="true"></i>
+                <span class="sjs_dot" aria-hidden="true"></span>
+            </span>
+            <span>我的</span>
+        </button>
+    </nav>
+
+    <script>
+        var sjs_tabs = document.querySelectorAll(".sjs_tab");
+        var sjs_stage_icon = document.querySelector(".sjs_stage_icon");
+        var sjs_stage_label = document.querySelector(".sjs_stage_label");
+        var sjs_tab_data = {
+            home: { icon: "fa-house", label: "当前选中：首页" },
+            discover: { icon: "fa-compass", label: "当前选中：发现" },
+            message: { icon: "fa-comment-dots", label: "当前选中：消息" },
+            profile: { icon: "fa-user", label: "当前选中：我的" }
+        };
+
+        sjs_tabs.forEach(function (sjs_tab) {
+            sjs_tab.addEventListener("click", function () {
+                sjs_tabs.forEach(function (sjs_other) {
+                    sjs_other.classList.remove("sjs_is_active");
+                    sjs_other.removeAttribute("aria-current");
+                });
+
+                sjs_tab.classList.add("sjs_is_active");
+                sjs_tab.setAttribute("aria-current", "page");
+
+                var sjs_item = sjs_tab_data[sjs_tab.dataset.tab];
+                sjs_stage_icon.className = "fa-solid " + sjs_item.icon + " sjs_stage_icon";
+                sjs_stage_label.textContent = sjs_item.label;
+            });
+        });
+    </script>
+</body>
+
+</html>

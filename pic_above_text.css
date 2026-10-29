@@ -1,0 +1,140 @@
+/* ==========================================================
+   上图下文 / 图上文字 —— Flex 版图片卡片
+   结构：.container > h2 + ul > li > a > img + p
+   ========================================================== */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    color: #16202e;
+    background: #f6f4ef;
+    line-height: 1.7;
+    padding: 24px 0 60px;
+}
+img{
+    display: block;
+    width: 100%;
+    border:none
+}
+h2{
+    font-size: 24px;
+    margin: 30px 0 0;
+    padding-left: 12px;
+    border-left: 5px solid #f5c84b;
+}
+.container{
+    /* 原来写死 width: 1200px，窗口比 1200px 窄时会横向滚动；
+       改成 max-width 后宽屏仍是 1200px 的版心，窄屏自动收缩 */
+    max-width: 1200px;
+    width: 100%;
+    padding: 0 16px;
+    margin: 0 auto;
+}
+
+/* ---------- 两个列表共用的 flex 排列 ---------- */
+.list1,
+.list2{
+    display: flex;
+    /* flex-wrap: wrap换行 */
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    /* li之间的间隔 */
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* li 一定要给宽度：不给的话一行放几张由图片的原始宽度决定。
+   下面是定宽写法，gap 是 10px，一行 3 张就有 2 个间隙，所以减 20px */
+.list1 li,
+.list2 li{
+    flex: 0 0 calc((100% - 20px) / 3);
+    /* 父相：给 .list2 里绝对定位的文字条当参考，
+       同时裁掉图片放大后溢出的部分 */
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #d9d4c8;
+    border-radius: 12px;
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+.list1 li:hover,
+.list2 li:hover{
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px -14px rgba(22, 32, 46, .6);
+}
+
+.list1 li a,
+.list2 li a{
+    text-decoration: none;
+    color: black;
+    display: block;
+}
+
+/* ---------- 图片：固定高度 + object-fit 裁切，不变形也不撑破卡片 ---------- */
+.list1 img,
+.list2 img{
+    height: 180px;
+    object-fit: cover;
+    transition: transform .6s ease;
+}
+/* 图上文字那一组顺便演示图片放大，靠 li 的 overflow: hidden 裁切 */
+.list2 li:hover img{
+    transform: scale(1.1);
+}
+
+/* ---------- 上图下文：文字排在图片下面 ---------- */
+.list1 li a p{
+    /* 文字水平居中 */
+    text-align: center;
+    /* 当文字的height和line-height一致时
+    文字垂直居中 */
+    height: 36px;
+    line-height: 36px;
+    font-size: 16px;
+    font-weight: bold;
+    /* 文字间距 */
+    letter-spacing: 2px;
+}
+
+/* ---------- 图上文字：文字盖在图片上（父相子绝） ---------- */
+.list2 li a p{
+    /* 子绝：相对最近的定位祖先 li 定位到底部 */
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    /* 默认只露出一行：height 与 line-height 相等，单行垂直居中 */
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    /* 半透明遮罩，白字压在图片上也能看清 */
+    background: rgba(0, 0, 0, .55);
+    transition: height .4s ease;
+}
+/* 移入后展开成两行：80px = 2 × 40px，第二行正好补上 */
+.list2 li:hover p{
+    height: 80px;
+}
+
+/* ---------- 窄屏：一行 3 张 → 2 张 → 1 张 ---------- */
+@media (max-width: 900px){
+    .list1 li,
+    .list2 li{
+        flex: 0 0 calc((100% - 10px) / 2);
+    }
+}
+@media (max-width: 600px){
+    .list1 li,
+    .list2 li{
+        flex: 0 0 100%;
+    }
+}

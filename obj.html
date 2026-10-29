@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 对象 | 属性、遍历与引用赋值</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="obj.css">
+</head>
+
+<body class="subpage-body">
+
+    <header class="subpage-header">
+        <div class="shell header-inner">
+            <a class="brand" href="index.html"><span class="brand-mark">申</span><span>申家硕的高级网页设计</span></a>
+            <a class="back-link" href="index.html">返回课堂目录 <span>→</span></a>
+        </div>
+    </header>
+
+    <main class="shell subpage-main obj-main">
+
+        <p class="eyebrow">CLASS PRACTICE · 07</p>
+        <h1>JavaScript 对象</h1>
+        <p class="lead">
+            对象是一组「键值对」的集合：属性存数据，方法存函数。这一页练五件事 ——
+            属性的读写与增删、判断属性是否存在、<code>for...in</code> 遍历、
+            方法里 <code>this</code> 指向谁，以及引用赋值之后两个变量为什么会一起变。
+        </p>
+
+        <!-- ================= 1. 属性与方法 ================= -->
+        <section class="panel">
+            <h2>1. 对象的属性与方法</h2>
+            <p>用花括号声明对象，<code>键: 值</code> 用逗号分隔。值是函数的，就叫做这个对象的方法。</p>
+
+            <pre class="code"><span class="cm">// 一个学生对象：前三个是属性，sayHi 是方法</span>
+var student = {
+    name: <span class="st">'申家硕'</span>,
+    id: <span class="st">'24001011009'</span>,
+    hobbies: [<span class="st">'打游戏'</span>, <span class="st">'看电影'</span>, <span class="st">'看书'</span>],
+    sayHi: <span class="kw">function</span> () {
+        <span class="cm">// this 指向调用这个方法的对象，这里就是 student</span>
+        <span class="kw">return</span> <span class="st">'大家好，我是'</span> + <span class="kw">this</span>.name;
+    }
+};
+
+console.log(student.name);        <span class="cm">// 点语法</span>
+console.log(student[<span class="st">'id'</span>]);      <span class="cm">// 方括号语法，键要用引号包起来</span>
+console.log(student.sayHi());     <span class="cm">// 调用方法，记得写括号</span></pre>
+            <pre class="console" id="out1"></pre>
+        </section>
+
+        <!-- ================= 2. 增删改查 ================= -->
+        <section class="panel">
+            <h2>2. 增、删、改、查</h2>
+            <p>对象是「动态」的：随时可以加属性、改属性、删属性，不需要提前声明字段。</p>
+
+            <pre class="code">var user = { name: <span class="st">'申家硕'</span> };
+
+user.age = 20;                 <span class="cm">// 新增：这个键原来不存在，直接赋值就是加</span>
+user.name = <span class="st">'申家硕（改过）'</span>;   <span class="cm">// 修改：键已经存在，赋值就是改</span>
+delete user.age;               <span class="cm">// 删除：delete 关键字，删掉键和值</span>
+
+<span class="cm">// 判断属性在不在，两种写法结果不一定一样</span>
+<span class="st">'name'</span> <span class="kw">in</span> user;                <span class="cm">// true</span>
+<span class="st">'age'</span> <span class="kw">in</span> user;                 <span class="cm">// false，刚被 delete 掉了</span>
+user.hasOwnProperty(<span class="st">'name'</span>);     <span class="cm">// true，只查对象自己的属性</span></pre>
+            <pre class="console" id="out2"></pre>
+
+            <div class="takeaway">
+                <b>in 和 hasOwnProperty 的区别：</b><code>in</code> 会顺着原型链往上找，
+                <code>hasOwnProperty</code> 只看对象自己身上有没有。所以用来「过滤」时，
+                一般用后者更准。
+            </div>
+        </section>
+
+        <!-- ================= 3. for...in ================= -->
+        <section class="panel">
+            <h2>3. for...in 遍历</h2>
+            <p><code>for...in</code> 把对象的键一个个取出来，遍历顺序是先整数键、再按书写顺序。</p>
+
+            <pre class="code">var book = { title: <span class="st">'高级网页设计'</span>, price: 45 };
+
+<span class="kw">for</span> (var key <span class="kw">in</span> book) {
+    console.log(key, book[key]);   <span class="cm">// 键 + 值（值要用 book[key] 取）</span>
+}</pre>
+            <pre class="console" id="out3"></pre>
+
+            <h3>有继承属性的时候要注意</h3>
+            <pre class="code"><span class="cm">// Object.create(base)：base 成为新对象的原型，新对象会“继承”到 base 的属性</span>
+var base  = { type: <span class="st">'教材'</span> };
+var book2 = Object.create(base);
+book2.title = <span class="st">'高级网页设计'</span>;
+book2.price = 45;
+
+<span class="cm">// for...in 会把继承来的 type 也遍历出来</span>
+<span class="kw">for</span> (var k <span class="kw">in</span> book2) { console.log(k); }
+
+<span class="cm">// 加上 hasOwnProperty 过滤，就只剩自己的属性</span>
+<span class="kw">for</span> (var k <span class="kw">in</span> book2) {
+    <span class="kw">if</span> (book2.hasOwnProperty(k)) { console.log(k); }
+}</pre>
+            <pre class="console" id="out4"></pre>
+        </section>
+
+        <!-- ================= 4. 引用赋值 ================= -->
+        <section class="panel">
+            <h2>4. 引用赋值：两个变量指向同一个对象</h2>
+            <p>
+                基本类型（数字、字符串、布尔）赋值时复制的是「值」；
+                对象赋值时复制的是「地址」。所以两个变量会指向同一个对象，改任何一个，另一个看到的结果也跟着变。
+            </p>
+
+            <pre class="code"><span class="cm">// ① 对象：赋的是地址</span>
+var a = { num: 1 };
+var b = a;          <span class="cm">// b 和 a 指向同一个对象</span>
+b.num = 99;
+
+<span class="cm">// ② 基本类型：赋的是值</span>
+var x = 1;
+var y = x;          <span class="cm">// 把 1 复制一份给 y，之后互不相干</span>
+y = 99;
+
+console.log(a === b);   <span class="cm">// 同一个对象的两个名字</span>
+console.log({} === {}); <span class="cm">// 内容一样，但它是两个不同的对象</span></pre>
+            <pre class="console" id="out5"></pre>
+        </section>
+
+        <!-- ================= 5. this 指向谁 ================= -->
+        <section class="panel">
+            <h2>5. 方法里的 this 指向谁</h2>
+            <p>
+                方法里的 <code>this</code> 不在写的时候决定，而在<strong>调用的时候</strong>决定：
+                谁调用这个方法，<code>this</code> 就是谁。把同一个方法挂到另一个对象上，结果就变了。
+            </p>
+
+            <pre class="code">var someone = { name: <span class="st">'小明'</span>, sayHi: student.sayHi };
+
+someone.sayHi();   <span class="cm">// this 是 someone → 大家好，我是小明</span>
+student.sayHi();   <span class="cm">// this 是 student → 大家好，我是申家硕</span></pre>
+            <pre class="console" id="out6"></pre>
+        </section>
+
+        <!-- ================= 6. 浅拷贝 ================= -->
+        <section class="panel">
+            <h2>6. 不想共享怎么办：拷贝一份</h2>
+            <p>要避免上面那种「改一个动两个」，就把对象复制一份。但直接复制是浅拷贝，只断开最外面一层。</p>
+
+            <pre class="code"><span class="cm">// Object.assign(目标, 来源)：把来源的属性复制到目标里，得到新对象</span>
+var copy = Object.assign({}, student);
+copy.name = <span class="st">'副本'</span>;              <span class="cm">// 顶层属性断开了，student.name 不变</span>
+copy.hobbies.push(<span class="st">'游泳'</span>);       <span class="cm">// 但 hobbies 是数组，还是同一个！</span>
+
+<span class="cm">// 深拷贝：把对象转成字符串再转回来，嵌套的那一层也复制了</span>
+var deep = JSON.parse(JSON.stringify(student));
+deep.hobbies.push(<span class="st">'跑步'</span>);       <span class="cm">// 这次真的互不相干了</span></pre>
+            <pre class="console" id="out7"></pre>
+
+            <div class="takeaway">
+                <b>注意：</b><code>JSON</code> 这套深拷贝会丢掉函数（<code>sayHi</code> 复制不过来）
+                和 <code>undefined</code>，只适合纯数据的对象。
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>申家硕的《高级网页设计》课堂实践 · JavaScript 对象 · 2026</p>
+    </footer>
+
+    <script>
+        /* 下面每一段都是真的在跑，控制台里输出的就是实际运行结果。 */
+
+        // 把值转义后再拼进 HTML，避免字符串里的符号把标签弄乱
+        function esc(v) {
+            return String(v)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        // 高亮一个值：正常结果用蓝色，false / undefined 用红棕色
+        function hl(v) {
+            var cls = (v === 'false' || v === 'undefined') ? ' class="no"' : '';
+            return '<b' + cls + '>' + esc(v) + '</b>';
+        }
+
+        function put(id, lines) {
+            document.getElementById(id).innerHTML = lines.join('\n');
+        }
+
+        /* ---------- 1. 属性与方法 ---------- */
+        var student = {
+            name: '申家硕',
+            id: '24001011009',
+            hobbies: ['打游戏', '看电影', '看书'],
+            sayHi: function () {
+                return '大家好，我是' + this.name;
+            }
+        };
+
+        put('out1', [
+            'student.name           → ' + hl(student.name),
+            "student['id']          → " + hl(student['id']),
+            'student.hobbies        → ' + hl(student.hobbies.join('、')),
+            'student.hobbies.length → ' + hl(student.hobbies.length),
+            'student.sayHi()        → ' + hl(student.sayHi()),
+            'typeof student.sayHi   → ' + hl(typeof student.sayHi) + '（是函数，所以能加括号调用）'
+        ]);
+
+        /* ---------- 2. 增删改查 ---------- */
+        var user = { name: '申家硕' };
+        var log2 = [];
+
+        user.age = 20;
+        log2.push('新增 age 之后     user = ' + hl(JSON.stringify(user)));
+
+        user.name = '申家硕（改过）';
+        log2.push('修改 name 之后    user = ' + hl(JSON.stringify(user)));
+
+        delete user.age;
+        log2.push('delete age 之后   user = ' + hl(JSON.stringify(user)));
+        log2.push('');
+        log2.push("'name' in user                 → " + hl('name' in user));
+        log2.push("'age'  in user                 → " + hl('age' in user) + '（已经删掉了）');
+        log2.push('user.age                       → ' + hl(user.age) + '（键不存在，取到 undefined）');
+        log2.push("user.hasOwnProperty('name')    → " + hl(user.hasOwnProperty('name')));
+        log2.push('');
+        log2.push("'toString' in user             → " + hl('toString' in user) + '（原型链上有，in 也算）');
+        log2.push('user.hasOwnProperty(\'toString\') → ' + hl(user.hasOwnProperty('toString')) + '（自己身上没有）');
+
+        put('out2', log2);
+
+        /* ---------- 3. for...in ---------- */
+        var book = { title: '高级网页设计', price: 45 };
+        var log3 = [];
+
+        for (var key in book) {
+            log3.push(key + '  =  ' + book[key]);
+        }
+
+        put('out3', log3);
+
+        var base = { type: '教材' };
+        var book2 = Object.create(base);
+        book2.title = '高级网页设计';
+        book2.price = 45;
+
+        var log4 = ['只写 for...in：'];
+        for (var k1 in book2) {
+            log4.push('  ' + k1);
+        }
+
+        log4.push('');
+        log4.push('加上 hasOwnProperty 过滤：');
+        for (var k2 in book2) {
+            if (book2.hasOwnProperty(k2)) {
+                log4.push('  ' + k2);
+            }
+        }
+        log4.push('');
+        log4.push("book2.type            → " + hl(book2.type) + '（自己没写，是从原型上拿到的）');
+        log4.push("'type' in book2        → " + hl('type' in book2));
+        log4.push("book2.hasOwnProperty('type') → " + hl(book2.hasOwnProperty('type')));
+
+        put('out4', log4);
+
+        /* ---------- 4. 引用赋值 ---------- */
+        var a = { num: 1 };
+        var b = a;
+        b.num = 99;
+
+        var x = 1;
+        var y = x;
+        y = 99;
+
+        put('out5', [
+            'b.num = 99 之后：',
+            '  a.num          → ' + hl(a.num) + '（a 也变成 99）',
+            '  b.num          → ' + hl(b.num),
+            '  a === b        → ' + hl(a === b) + '（同一个对象）',
+            '',
+            'y = 99 之后：',
+            '  x              → ' + hl(x) + '（基本类型各存各的）',
+            '  y              → ' + hl(y),
+            '',
+            '{} === {}        → ' + hl({} === {}) + '（长得一样，但地址不同）'
+        ]);
+
+        /* ---------- 5. this ---------- */
+        var someone = { name: '小明', sayHi: student.sayHi };
+
+        put('out6', [
+            'someone.sayHi()  → ' + hl(someone.sayHi()),
+            'student.sayHi()  → ' + hl(student.sayHi()),
+            '',
+            '方法还是同一个方法，只是调用它的对象换了，this 就跟着换了。'
+        ]);
+
+        /* ---------- 6. 浅拷贝 / 深拷贝 ---------- */
+        var log7 = [];
+
+        var copy = Object.assign({}, student);
+        copy.name = '副本';
+        copy.hobbies.push('游泳');
+
+        log7.push('浅拷贝之后：');
+        log7.push('  student.name             → ' + hl(student.name) + '（顶层属性没被改）');
+        log7.push('  student.hobbies          → ' + hl(student.hobbies.join('、')));
+        log7.push('  copy.hobbies === student.hobbies → ' + hl(copy.hobbies === student.hobbies));
+        log7.push('  → hobbies 还是同一个数组，push 会一起变');
+        log7.push('');
+
+        var deep = JSON.parse(JSON.stringify(student));
+        deep.hobbies.push('跑步');
+
+        log7.push('深拷贝之后：');
+        log7.push('  student.hobbies          → ' + hl(student.hobbies.join('、')) + '（没被带跑）');
+        log7.push('  deep.hobbies             → ' + hl(deep.hobbies.join('、')));
+        log7.push('  deep.hobbies === student.hobbies → ' + hl(deep.hobbies === student.hobbies));
+        log7.push('');
+        log7.push("  typeof deep.sayHi        → " + hl(typeof deep.sayHi) + '（JSON 复制不了函数）');
+
+        put('out7', log7);
+    </script>
+
+</body>
+</html>
