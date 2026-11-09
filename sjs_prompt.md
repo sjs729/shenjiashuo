@@ -203,3 +203,21 @@ https://yitianti.github.io/yangtt/ 这个网站是其他同学的 他做的比�
 - 动作：撤掉 `sjs-task1.html` 里内嵌的整份记录（含 Markdown 渲染脚本与相关样式），改为一块入口卡片，点击跳转 `sjs_prompt.html`
 - 保留：底部一行「也可以直接打开原始文件 sjs_prompt.md」的小字链接
 - 修复：入口卡片里 `<code>` 被 flex 拉伸成整条色带，加 `align-self: flex-start`
+
+## 2026-11-09 14:18:50
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+第三个换一个没讲过的dome
+
+## 2026-11-09 14:25:00 · 第三个任务换 demo
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：用一个老师没讲过的demo吧
+- 选定：`swiper/demo/300-thumbs-gallery.html`（缩略图联动）
+- 理由：老师讲过 slide/fade/cube/coverflow/flip/cards + pagination/navigation/autoplay/loop；keyboard 已用于原 task3；thumbs 讲的是"两个实例绑定"，既有 API 又有原理，答辩讲得清
+
+## 2026-11-09 14:50:00 · 任务三改用 thumbs
+- 模型：DeepSeek-V4.1-Flash
+- 动作：把 `sjs-task3.html` 从 keyboard 换成官方 `300-thumbs-gallery.html`（课堂未讲、同学也未用）
+- 内容：六件展品的主图 + 缩略图条，两实例同步；三档跟随行为（标准 / 自由滑动 / 偏移跟随）；索引实测读数
+- 勘误：原以为 thumbs 是单向，读 `swiper/modules/thumbs.mjs` 后确认模块内部监听主图 slideChange 并调 update()，天生双向；已把"单向/双向"改写成"跟随行为"
+- 修复：缩略图 `slidesPerView:'auto'` 未给宽度导致 slide 撑满容器；读数改用 `.swiper-slide-thumb-active` 判定（六张一屏放得下时 activeIndex 恒为 0）

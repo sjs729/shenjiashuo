@@ -3,23 +3,23 @@
   作者：申家硕
   建立时间：2026-11-09
   使用模型：DeepSeek-V4.1-Flash
-  功能名称：六件展品 · 键盘控制开关实验室
-  简介：为光影展补齐第六件展品（爱达·魔都号），并把选用的超纲能力 keyboard 做成可开关的实验台——
-        现场可切换 keyboard.enabled 与 onlyInViewport，观察按键何时生效、何时失效；
-        附"为什么必须 tabindex 才看得见提示"与实际按键日志。
+  功能名称：缩略图联动 · 双 Swiper 实例实验
+  简介：基于官方 300-thumbs-gallery.html（课堂未讲），用 thumbs 把「缩略图条」与「主展示区」
+        两个互相独立的实例绑成一套。页面含六件展品的主从联动、三档可切换的联动模式
+        （单向 / 双向 / 缩略图自由滑动）与索引实测读数，用于讲清 thumbs 的本质是两实例同步索引。
 -->
 <html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>六件展品 · 键盘控制实验室 | 申家硕</title>
+    <title>缩略图联动 · 双实例实验 | 申家硕</title>
     <link rel="stylesheet" href="swiper/swiper-bundle.min.css">
     <script src="swiper/swiper-bundle.min.js"></script>
     <style>
         /* ==========================================================
-           六件展品 · 键盘控制实验室
-           深色展陈区 + 纸张说明区，用明暗对比区分"展品"与"注解"
+           缩略图联动 · 双实例实验
+           纸张底色 + 衬线大标题 + 蓝色油墨，与其余页面同一套版式
            ========================================================== */
 
         :root {
@@ -33,10 +33,9 @@
             --accent-soft: #e8eefe;
             --warm: #c0392b;
             --good: #1f7a4d;
-            --night: #0d1626;
             --radius: 14px;
             --shadow-sm: 0 1px 2px rgba(22, 32, 46, .05), 0 6px 18px -12px rgba(22, 32, 46, .18);
-            --maxw: 1080px;
+            --maxw: 1000px;
         }
 
         * {
@@ -205,256 +204,184 @@
             margin-bottom: 20px;
         }
 
-        /* ---------------- 展陈区（深色） ---------------- */
-        .sjs_gallery {
-            background: var(--night);
+        /* ---------------- 主从展示区 ---------------- */
+        .sjs_board {
+            background: var(--card);
+            border: 1px solid var(--line);
             border-radius: var(--radius);
-            padding: 22px 22px 18px;
-            box-shadow: 0 18px 40px -26px rgba(13, 22, 38, .9);
+            padding: 18px;
+            box-shadow: var(--shadow-sm);
         }
 
-        .sjs_gallery-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 14px;
-        }
-
-        .sjs_gallery-top .sjs_gtxt {
-            font-size: 12px;
-            letter-spacing: 1.4px;
-            text-transform: uppercase;
-            color: #7d90ad;
-        }
-
-        /* 键盘状态灯 */
-        .sjs_kbd {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-size: 12px;
-            color: #9fb0c8;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        }
-
-        .sjs_kbd .sjs_dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #4b5b72;
-            transition: background .2s ease, box-shadow .2s ease;
-        }
-
-        .sjs_kbd[data-on="1"] .sjs_dot {
-            background: #35c07a;
-            box-shadow: 0 0 0 3px rgba(53, 192, 122, .18);
-        }
-
-        .sjs_kbd[data-on="0"] .sjs_dot {
-            background: #6b7688;
-        }
-
-        /* 轮播本体 */
-        .sjs_gallery .swiper {
+        /* 主图 */
+        .sjs_main {
             border-radius: 10px;
             overflow: hidden;
-            background: #050b14;
+            background: #e9edf3;
         }
 
-        .sjs_gallery .swiper-slide {
+        .sjs_main .swiper-slide {
             position: relative;
-            height: clamp(300px, 46vw, 460px);
+            height: clamp(260px, 40vw, 400px);
         }
 
-        .sjs_gallery .swiper-slide img {
+        .sjs_main .swiper-slide img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
         }
 
-        /* 编号：每件展品左上角一个序号，强调"六件" */
-        .sjs_no {
-            position: absolute;
-            left: 16px;
-            top: 14px;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            font-size: 11.5px;
-            letter-spacing: 2px;
-            color: rgba(255, 255, 255, .72);
-            border: 1px solid rgba(255, 255, 255, .22);
-            border-radius: 999px;
-            padding: 2px 10px;
-            backdrop-filter: blur(4px);
-        }
-
-        .sjs_gallery .sjs_cap {
+        .sjs_main .sjs_cap {
             position: absolute;
             left: 0;
             right: 0;
             bottom: 0;
             padding: 60px 22px 20px;
             color: #fff;
-            background: linear-gradient(transparent, rgba(4, 10, 20, .88));
+            background: linear-gradient(transparent, rgba(4, 10, 20, .86));
         }
 
-        .sjs_gallery .sjs_cap h3 {
-            font-size: clamp(19px, 2.6vw, 25px);
+        .sjs_main .sjs_cap h3 {
+            font-size: clamp(18px, 2.4vw, 24px);
             letter-spacing: .5px;
         }
 
-        .sjs_gallery .sjs_cap p {
-            font-size: 13px;
+        .sjs_main .sjs_cap p {
+            font-size: 12.8px;
             color: #c9d8ee;
-            margin-top: 4px;
+            margin-top: 3px;
         }
 
-        /* 分页器与箭头：深色底上要提亮 */
-        .sjs_gallery .swiper-pagination {
-            position: static;
-            margin-top: 14px;
-            text-align: center;
+        /* 主图右上角的序号，与缩略图上的角标呼应 */
+        .sjs_main .sjs_idx {
+            position: absolute;
+            right: 16px;
+            top: 14px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: #fff;
+            background: rgba(6, 14, 28, .55);
+            border: 1px solid rgba(255, 255, 255, .22);
+            border-radius: 999px;
+            padding: 2px 10px;
+            backdrop-filter: blur(4px);
         }
 
-        .sjs_gallery .swiper-pagination-bullet {
-            background: #7d90ad;
-            opacity: .45;
-        }
-
-        .sjs_gallery .swiper-pagination-bullet-active {
-            background: #fff;
-            opacity: 1;
-            width: 20px;
-            border-radius: 5px;
-        }
-
-        .sjs_gallery .swiper-button-next,
-        .sjs_gallery .swiper-button-prev {
-            width: 40px;
-            height: 40px;
+        .sjs_main .swiper-button-next,
+        .sjs_main .swiper-button-prev {
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            background: rgba(13, 22, 38, .62);
+            background: rgba(13, 22, 38, .6);
             color: #fff;
             border: 1px solid rgba(255, 255, 255, .18);
-            --swiper-navigation-size: 16px;
-            transition: background .2s ease;
+            --swiper-navigation-size: 15px;
         }
 
-        .sjs_gallery .swiper-button-next:hover,
-        .sjs_gallery .swiper-button-prev:hover {
+        .sjs_main .swiper-button-next:hover,
+        .sjs_main .swiper-button-prev:hover {
             background: var(--accent);
         }
 
-        /* 聚焦描边：说明"按键会送到这里" */
-        .sjs_gallery .swiper:focus {
-            outline: none;
+        /* 缩略图条 */
+        .sjs_thumbs {
+            margin-top: 12px;
         }
 
-        .sjs_gallery .swiper:focus-visible {
-            box-shadow: 0 0 0 3px rgba(31, 79, 216, .85);
-        }
-
-        /* ---------------- 开关面板 ---------------- */
-        .sjs_switch {
-            margin-top: 16px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-            gap: 12px;
-        }
-
-        .sjs_toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #131e30;
-            border: 1px solid #23324a;
-            border-radius: 10px;
-            padding: 11px 14px;
+        /* slidesPerView:'auto' 需要明确宽度，否则 slide 会撑满整个容器 */
+        .sjs_thumbs .swiper-slide {
+            width: 118px;
+            height: 74px;
+            border-radius: 8px;
+            overflow: hidden;
             cursor: pointer;
-            user-select: none;
-            transition: border-color .2s ease;
-        }
-
-        .sjs_toggle:hover {
-            border-color: #3a4d6b;
-        }
-
-        .sjs_toggle input {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* 自绘开关：轨道 + 滑块 */
-        .sjs_toggle .sjs_track {
-            flex: none;
-            width: 36px;
-            height: 20px;
-            border-radius: 999px;
-            background: #2b3a52;
             position: relative;
-            transition: background .2s ease;
+            opacity: .5;
+            transition: opacity .2s ease;
+            background: #e9edf3;
         }
 
-        .sjs_toggle .sjs_track::after {
+        .sjs_thumbs .swiper-slide:hover {
+            opacity: .8;
+        }
+
+        /* 缩略图与主图同步时，当前项完全点亮并加一条蓝线 */
+        .sjs_thumbs .swiper-slide-thumb-active {
+            opacity: 1;
+        }
+
+        .sjs_thumbs .swiper-slide-thumb-active::after {
             content: "";
             position: absolute;
-            left: 2px;
-            top: 2px;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #8b9bb4;
-            transition: transform .2s ease, background .2s ease;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 3px;
+            background: var(--accent);
         }
 
-        .sjs_toggle input:checked + .sjs_track {
-            background: rgba(53, 192, 122, .35);
-        }
-
-        .sjs_toggle input:checked + .sjs_track::after {
-            transform: translateX(16px);
-            background: #35c07a;
-        }
-
-        .sjs_toggle .sjs_tlabel {
-            font-size: 12.6px;
-            color: #c6d3e6;
-            line-height: 1.5;
-        }
-
-        .sjs_toggle .sjs_tlabel b {
+        .sjs_thumbs .swiper-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             display: block;
-            color: #fff;
-            font-size: 13px;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            font-weight: 600;
         }
 
-        /* 按键日志 */
-        .sjs_log {
+        /* 读数条 */
+        .sjs_readout {
             margin-top: 14px;
-            background: #0a1220;
-            border: 1px solid #1e2c42;
-            border-radius: 10px;
-            padding: 12px 14px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--line);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 26px;
+            font-size: 12.6px;
+            color: var(--ink-faint);
+            align-items: center;
+        }
+
+        .sjs_readout b {
             font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            font-size: 12px;
-            color: #8fa3bf;
-            line-height: 1.9;
-            min-height: 72px;
+            font-size: 13.4px;
+            color: var(--ink);
         }
 
-        .sjs_log b {
-            color: #35c07a;
-            font-weight: 600;
+        .sjs_readout .sjs_sync {
+            color: var(--good);
+            font-weight: 700;
         }
 
-        .sjs_log i {
-            color: #e8890c;
-            font-style: normal;
+        /* ---------------- 模式开关 ---------------- */
+        .sjs_modes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .sjs_modes button {
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--ink-soft);
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 7px 16px;
+            cursor: pointer;
+            transition: all .18s ease;
+        }
+
+        .sjs_modes button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .sjs_modes button[aria-pressed="true"] {
+            background: var(--ink);
+            color: #fff;
+            border-color: var(--ink);
         }
 
         /* ---------------- 说明卡片 ---------------- */
@@ -538,8 +465,8 @@
             color: var(--ink);
         }
 
-        /* 展品清单 */
-        .sjs_list {
+        /* 对比表 */
+        .sjs_table {
             width: 100%;
             border-collapse: collapse;
             background: var(--card);
@@ -549,14 +476,15 @@
             font-size: 13.5px;
         }
 
-        .sjs_list th,
-        .sjs_list td {
+        .sjs_table th,
+        .sjs_table td {
             text-align: left;
-            padding: 10px 16px;
+            padding: 11px 16px;
             border-bottom: 1px solid var(--line);
+            vertical-align: top;
         }
 
-        .sjs_list thead th {
+        .sjs_table thead th {
             font-size: 11.5px;
             letter-spacing: 1.2px;
             text-transform: uppercase;
@@ -565,35 +493,94 @@
             font-weight: 700;
         }
 
-        .sjs_list tbody tr:last-child td {
+        .sjs_table tbody tr:last-child td {
             border-bottom: 0;
         }
 
-        .sjs_list td:first-child {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            color: var(--ink-faint);
-            width: 48px;
-        }
-
-        .sjs_list td:nth-child(2) {
+        .sjs_table td:first-child {
             font-weight: 600;
+            width: 32%;
         }
 
-        .sjs_list td:last-child {
+        .sjs_table td:nth-child(2) {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12.6px;
+            color: var(--accent);
+        }
+
+        .sjs_table td:last-child {
             color: var(--ink-soft);
-            font-size: 13px;
         }
 
-        .sjs_badge {
-            display: inline-block;
-            font-size: 11px;
+        /* 入口卡片（与 task1 同款） */
+        .sjs_entry {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 18px 22px;
+            box-shadow: var(--shadow-sm);
+            color: inherit;
+            transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+        }
+
+        .sjs_entry:hover {
+            transform: translateY(-2px);
+            border-color: #cfd6e4;
+            box-shadow: 0 4px 8px rgba(22, 32, 46, .05), 0 18px 36px -22px rgba(22, 32, 46, .4);
+        }
+
+        .sjs_entry-icon {
+            flex: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
             font-weight: 700;
-            color: var(--good);
-            background: rgba(31, 122, 77, .08);
-            border: 1px solid rgba(31, 122, 77, .25);
-            border-radius: 999px;
-            padding: 1px 9px;
-            margin-left: 6px;
+        }
+
+        .sjs_entry-body {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .sjs_entry-body b {
+            font-size: 15px;
+        }
+
+        .sjs_entry-body span {
+            font-size: 13px;
+            color: var(--ink-soft);
+        }
+
+        .sjs_entry-body code {
+            align-self: flex-start;
+            font-size: 11.8px;
+            color: var(--ink-faint);
+            background: none;
+            padding: 0;
+        }
+
+        .sjs_entry-go {
+            flex: none;
+            font-size: 18px;
+            color: var(--ink-faint);
+            transition: transform .22s ease, color .22s ease;
+        }
+
+        .sjs_entry:hover .sjs_entry-go {
+            color: var(--accent);
+            transform: translateX(4px);
         }
 
         footer {
@@ -623,8 +610,12 @@
                 padding: 34px 0 6px;
             }
 
-            .sjs_gallery {
-                padding: 16px 14px 14px;
+            .sjs_board {
+                padding: 12px;
+            }
+
+            .sjs_thumbs .swiper-slide {
+                height: 58px;
             }
         }
     </style>
@@ -635,7 +626,7 @@
     <!-- 顶部条 -->
     <header class="sjs_top">
         <div class="sjs_wrap">
-            <div class="sjs_brand"><i>申</i> 六件展品 · 键盘实验室</div>
+            <div class="sjs_brand"><i>申</i> 缩略图联动 · 双实例实验</div>
             <a class="sjs_back" href="index.html">← 返回首页</a>
         </div>
     </header>
@@ -644,39 +635,34 @@
 
         <!-- 标题区 -->
         <div class="sjs_head">
-            <div class="sjs_kicker">Task 03 · Showcase + Keyboard</div>
-            <h1>第六件展品，<br>和一把看不见的遥控器</h1>
+            <div class="sjs_kicker">Task 03 · Thumbs Gallery</div>
+            <h1>两个轮播，<br>绑成一套</h1>
             <p class="sjs_lede">
-                讲解版要求两件事：给光影展补上第六件展品，以及挑一个课堂没讲过的 Swiper 能力。
-                我选了 <code>keyboard</code>——因为它看起来最简单，实际最容易翻车：
-                为什么有时按键没反应？为什么加了 <code>tabindex</code> 才看得到提示？
-                下面把开关直接交给你，自己试。
+                课堂上讲的都是"一个轮播怎么用"。官方 demo 里还藏着一个不同的玩法：
+                用 <code>thumbs</code> 把两个<strong>互不相干</strong>的 Swiper 实例绑起来——
+                上面是主图，下面是一条缩略图，点下面任何一个，上面立刻跟着跳。
+                这不是一个轮播，是两个在同步索引。
             </p>
             <div class="sjs_rule">
-                <span>展品 <b>6 件</b></span>
-                <span>超纲能力 <b>keyboard</b></span>
-                <span>可开关参数 <b>2 个</b></span>
+                <span>实例数量 <b>2 个</b></span>
+                <span>来源 <b>官方 300-thumbs-gallery</b></span>
+                <span>联动模式 <b>3 档</b></span>
             </div>
         </div>
 
-        <!-- 一、展陈 -->
+        <!-- 一、主从展示 -->
         <section class="sjs_sec">
-            <div class="sjs_sec-head"><span>01</span><h2>光影展 · 六件</h2></div>
-            <p>前五件沿用课堂素材，第六件是新增的爱达·魔都号。先用鼠标拖一下，再点一下画面让它聚焦，然后按 ← →。</p>
+            <div class="sjs_sec-head"><span>01</span><h2>点缩略图，看主图跟着走</h2></div>
+            <p>注意下面两个读数：当前主图是第几张、缩略图条上点亮的是第几张，两者永远相等。它们不是同一个实例，但索引被绑在一起了。</p>
 
-            <div class="sjs_gallery">
-                <div class="sjs_gallery-top">
-                    <span class="sjs_gtxt">光 影 展 · 大 国 重 器</span>
-                    <span class="sjs_kbd" id="sjsKbdState" data-on="1">
-                        <span class="sjs_dot"></span><span id="sjsKbdText">键盘已启用</span>
-                    </span>
-                </div>
+            <div class="sjs_board">
 
-                <div class="swiper" id="sjsSwShow" tabindex="0">
+                <!-- 主图 -->
+                <div class="swiper sjs_main" id="sjsMain">
                     <div class="swiper-wrapper">
                         <div class="swiper-slide">
                             <img src="swiper-imgs/tiangong_1.jpg" alt="天宫空间站">
-                            <span class="sjs_no">01 / 06</span>
+                            <span class="sjs_idx">01 / 06</span>
                             <div class="sjs_cap">
                                 <h3>天宫空间站</h3>
                                 <p>2022 年全面建成 · 中国人的太空家园</p>
@@ -684,7 +670,7 @@
                         </div>
                         <div class="swiper-slide">
                             <img src="swiper-imgs/fuxing_1.jpg" alt="复兴号动车组">
-                            <span class="sjs_no">02 / 06</span>
+                            <span class="sjs_idx">02 / 06</span>
                             <div class="sjs_cap">
                                 <h3>复兴号动车组</h3>
                                 <p>350 km/h · 世界商业运营最高时速</p>
@@ -692,23 +678,23 @@
                         </div>
                         <div class="swiper-slide">
                             <img src="swiper-imgs/c919_1.jpg" alt="C919大飞机">
-                            <span class="sjs_no">03 / 06</span>
+                            <span class="sjs_idx">03 / 06</span>
                             <div class="sjs_cap">
                                 <h3>C919 大飞机</h3>
-                                <p>2023 年商业首航 · 国产干线客机翱翔蓝天</p>
+                                <p>2023 年商业首航 · 国产干线客机</p>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <img src="swiper-imgs/fendouzhe_1.jpg" alt="奋斗者号">
-                            <span class="sjs_no">04 / 06</span>
+                            <span class="sjs_idx">04 / 06</span>
                             <div class="sjs_cap">
                                 <h3>奋斗者号</h3>
-                                <p>10909 米 · 触碰地球第四极马里亚纳海沟</p>
+                                <p>10909 米 · 坐底马里亚纳海沟</p>
                             </div>
                         </div>
                         <div class="swiper-slide">
                             <img src="swiper-imgs/fast_1.jpg" alt="中国天眼">
-                            <span class="sjs_no">05 / 06</span>
+                            <span class="sjs_idx">05 / 06</span>
                             <div class="sjs_cap">
                                 <h3>中国天眼 FAST</h3>
                                 <p>500 米口径 · 世界最大单口径射电望远镜</p>
@@ -716,284 +702,321 @@
                         </div>
                         <div class="swiper-slide">
                             <img src="swiper-imgs/adora_1.jpg" alt="爱达·魔都号">
-                            <span class="sjs_no">06 / 06</span>
+                            <span class="sjs_idx">06 / 06</span>
                             <div class="sjs_cap">
                                 <h3>爱达·魔都号</h3>
                                 <p>2024 年 1 月首航 · 首艘国产大型邮轮</p>
                             </div>
                         </div>
                     </div>
-                    <div class="swiper-pagination" id="sjsPagShow"></div>
-                    <div class="swiper-button-prev" id="sjsPrevShow"></div>
-                    <div class="swiper-button-next" id="sjsNextShow"></div>
+                    <div class="swiper-button-prev" id="sjsPrev"></div>
+                    <div class="swiper-button-next" id="sjsNext"></div>
                 </div>
 
-                <!-- 两个开关 -->
-                <div class="sjs_switch">
-                    <label class="sjs_toggle">
-                        <input type="checkbox" id="sjsToggleEnabled" checked>
-                        <span class="sjs_track"></span>
-                        <span class="sjs_tlabel">
-                            <b>keyboard.enabled</b>
-                            关掉它，方向键就完全失效
-                        </span>
-                    </label>
-                    <label class="sjs_toggle">
-                        <input type="checkbox" id="sjsToggleView" checked>
-                        <span class="sjs_track"></span>
-                        <span class="sjs_tlabel">
-                            <b>keyboard.onlyInViewport</b>
-                            关掉它，滚出屏幕也能按
-                        </span>
-                    </label>
+                <!-- 缩略图条 -->
+                <div class="sjs_thumbs">
+                    <div class="swiper" id="sjsThumbs">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide"><img src="swiper-imgs/tiangong_1.jpg" alt="天宫空间站缩略图"></div>
+                            <div class="swiper-slide"><img src="swiper-imgs/fuxing_1.jpg" alt="复兴号缩略图"></div>
+                            <div class="swiper-slide"><img src="swiper-imgs/c919_1.jpg" alt="C919 缩略图"></div>
+                            <div class="swiper-slide"><img src="swiper-imgs/fendouzhe_1.jpg" alt="奋斗者号缩略图"></div>
+                            <div class="swiper-slide"><img src="swiper-imgs/fast_1.jpg" alt="天眼缩略图"></div>
+                            <div class="swiper-slide"><img src="swiper-imgs/adora_1.jpg" alt="爱达·魔都号缩略图"></div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 按键日志 -->
-                <div class="sjs_log" id="sjsLog">
-                    按键记录：点一下画面聚焦，然后按 ← 或 → …
+                <!-- 读数 -->
+                <div class="sjs_readout">
+                    当前主图 <b id="sjsMainIdx">0</b>
+                    点亮缩略图 <b id="sjsThumbIdx">0</b>
+                    <span class="sjs_sync" id="sjsSync">已同步</span>
+                    <span id="sjsModeText">当前模式：标准跟随（主图 ⇄ 缩略图）</span>
                 </div>
+
             </div>
         </section>
 
-        <!-- 二、展品清单 -->
+        <!-- 二、联动方向 -->
         <section class="sjs_sec">
-            <div class="sjs_sec-head"><span>02</span><h2>六件展品清单</h2></div>
-            <p>第六件按讲解版要求补齐，横版 16:9，slide 结构与前五件完全一致，只多一个 file 名不同。</p>
+            <div class="sjs_sec-head"><span>02</span><h2>能调的不是方向，是跟随行为</h2></div>
+            <p>
+                我一开始以为它只有"点缩略图切主图"这一个方向，翻源码才发现<b>它天生是双向的</b>：
+                模块内部监听主图的 <code>slideChange</code>，主图一变就调 <code>update()</code> 把缩略图拨过去。
+                所以能调的其实不是方向，而是<b>缩略图跟随时的行为</b>。下面三档是这个参数的不同取值。
+            </p>
 
-            <table class="sjs_list">
+            <div class="sjs_modes" id="sjsModes">
+                <button type="button" data-mode="normal" aria-pressed="true">标准跟随</button>
+                <button type="button" data-mode="free">缩略图自由滑动</button>
+                <button type="button" data-mode="offset">缩略图偏移跟随</button>
+            </div>
+
+            <table class="sjs_table">
                 <thead>
                     <tr>
-                        <th>序号</th>
-                        <th>展品</th>
-                        <th>关键信息</th>
+                        <th>模式</th>
+                        <th>关键配置</th>
+                        <th>现象</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>01</td><td>天宫空间站</td><td>2022 年全面建成，三舱结构，神舟乘组常年值守</td></tr>
-                    <tr><td>02</td><td>复兴号动车组</td><td>350 km/h，世界商业运营最高时速</td></tr>
-                    <tr><td>03</td><td>C919 大飞机</td><td>2023 年商业首航，国产干线客机</td></tr>
-                    <tr><td>04</td><td>奋斗者号</td><td>10909 米，坐底马里亚纳海沟</td></tr>
-                    <tr><td>05</td><td>中国天眼 FAST</td><td>500 米口径，世界最大单口径射电望远镜</td></tr>
-                    <tr><td>06</td><td>爱达·魔都号<span class="sjs_badge">新增</span></td><td>2024 年 1 月首航，首艘国产大型邮轮，13.5 万吨</td></tr>
+                    <tr>
+                        <td>标准跟随</td>
+                        <td>thumbs: { swiper }</td>
+                        <td>点缩略图主图跳；主图翻页时缩略图也自动跟过去，激活类同步点亮</td>
+                    </tr>
+                    <tr>
+                        <td>缩略图自由滑动</td>
+                        <td>缩略图加 freeMode: true</td>
+                        <td>可以拖着缩略图条连续滑，不必一张一张卡位，联动依旧生效</td>
+                    </tr>
+                    <tr>
+                        <td>缩略图偏移跟随</td>
+                        <td>thumbs.autoScrollOffset: 1</td>
+                        <td>缩略图被推得比主图多一格，当前项不在最左边而在第二位</td>
+                    </tr>
                 </tbody>
             </table>
         </section>
 
-        <!-- 三、键盘原理 -->
+        <!-- 三、原理 -->
         <section class="sjs_sec">
-            <div class="sjs_sec-head"><span>03</span><h2>键盘到底挂在哪</h2></div>
-            <p>这是我最想讲清楚的一点，也是答辩时最容易答错的地方。<b>键盘监听不在轮播容器上，在 document 上。</b></p>
+            <div class="sjs_sec-head"><span>03</span><h2>它到底是怎么绑的</h2></div>
+            <p>
+                关键在这一句：<code>thumbs: { swiper: 缩略图实例 }</code>。注意——<b>它传的是实例，不是选择器</b>。
+                这意味着必须先 <code>new</code> 出缩略图，再把那个对象交给主图。
+            </p>
 
             <div class="sjs_cards">
                 <div class="sjs_card">
-                    <h4>它监听的是整个文档</h4>
-                    <p>Swiper 的 keyboard 模块在 <code>init</code> 时执行 <code>document.addEventListener('keydown', handle)</code>。
-                        所以焦点在不在轮播上，其实都能收到按键——我实测过：焦点停在 <code>body</code>，
-                        轮播在视口内，按 → 照样翻页。</p>
+                    <h4>顺序不能反</h4>
+                    <p>先创建缩略图实例，再创建主图实例，并把缩略图对象传进去。反过来的话主图拿不到引用，联动直接失效。</p>
                     <ul>
-                        <li><b>不是</b>「只对已聚焦容器生效」</li>
-                        <li><b>不是</b>「必须 tabindex 才能翻」</li>
-                        <li>tabindex 只影响视觉提示，不影响功能</li>
+                        <li>① <code>new Swiper('#sjsThumbs', {...})</code></li>
+                        <li>② <code>new Swiper('#sjsMain', { thumbs: { swiper } })</code></li>
                     </ul>
                 </div>
 
                 <div class="sjs_card">
-                    <h4>真正拦你的是 onlyInViewport</h4>
-                    <p>它默认是 <code>true</code>。每次按键前会算容器四角坐标，四个角都不在窗口内就直接
-                        <code>return</code>——这就是"滚出屏幕后按键没反应"的原因，是防误触，不是 bug。</p>
+                    <h4>两个容易漏的配置</h4>
+                    <p>缩略图要加 <code>watchSlidesProgress: true</code>，否则它不知道每张滑到哪；
+                        再用 <code>slidesPerView: 'auto'</code> 让缩略图按自身宽度排布。</p>
                     <ul>
-                        <li>还有：焦点在 <code>input</code> / <code>textarea</code> 里时不响应</li>
-                        <li>还有：按住 Shift / Alt / Ctrl / Cmd 时不响应</li>
-                        <li>还有：按的是 ↑↓ 时，横向轮播不响应</li>
+                        <li><code>spaceBetween</code> 控制缩略图间距</li>
+                        <li><code>.swiper-slide-thumb-active</code> 是同步时自动加的类</li>
                     </ul>
                 </div>
             </div>
 
-            <pre class="sjs_code"><code>// 我写的初始化（只挑了必要项）
-new Swiper('#sjsSwShow', {
-  effect: 'slide',
-  loop: true,
-  keyboard: {
-    enabled: true,        // 开启键盘
-    onlyInViewport: true  // 默认值，写出来是为了强调它
-  },
-  pagination: { el: '#sjsPagShow', clickable: true },
-  navigation: { prevEl: '#sjsPrevShow', nextEl: '#sjsNextShow' }
+            <pre class="sjs_code"><code>// ① 先建缩略图：它是被"引用"的一方
+var sjsThumb = new Swiper('#sjsThumbs', {
+  spaceBetween: 8,
+  slidesPerView: 'auto',
+  watchSlidesProgress: true   // 没有它，缩略图不知道自己滑到哪
+});
+
+// ② 再建主图：把缩略图实例交给 thumbs
+var sjsMain = new Swiper('#sjsMain', {
+  navigation: { nextEl: '#sjsNext', prevEl: '#sjsPrev' },
+  thumbs: { swiper: sjsThumb }   // ← 传对象，不是选择器字符串
 });</code></pre>
 
             <div class="sjs_note">
-                <b>答辩原话：</b>"keyboard 的 keydown 挂在 document 上，所以不需要聚焦也能用。
-                真正决定按了有没有反应的是 <code>onlyInViewport</code>，它默认 true，会算容器四角坐标，
-                四个角都不在视口内就 return。我加 <code>tabindex</code> 只是为了点一下能有聚焦描边，
-                让使用者知道'现在可以按方向键'——去掉它功能照样跑。"
+                <b>答辩原话：</b>"thumbs 的本质不是新效果，是把两个实例的 <code>slideTo</code> 互相接上。
+                所以要传实例而不是选择器——Swiper 需要在运行时调用那个对象的方法来同步索引。
+                缩略图必须加 <code>watchSlidesProgress</code>，否则它没法判断当前滑到第几张，同步就断在这。"
             </div>
         </section>
 
-        <!-- 四、和 autoHeight 的取舍 -->
+        <!-- 四、为什么不硬做 -->
         <section class="sjs_sec">
-            <div class="sjs_sec-head"><span>04</span><h2>为什么没选 parallax 和 zoom</h2></div>
-            <p>讲解版给了四个选项：keyboard / mousewheel / zoom / parallax。选 keyboard 不是因为它炫，是因为它<b>能讲出原理</b>。</p>
+            <div class="sjs_sec-head"><span>04</span><h2>为什么不用一个实例硬做</h2></div>
+            <p>可能有人会想：用一个 Swiper，下面放一排小图当分页器不就行了？技术上可以，但要自己写一堆同步逻辑。</p>
 
-            <div class="sjs_cards">
-                <div class="sjs_card">
-                    <h4>另外三个的取舍</h4>
-                    <ul>
-                        <li><b>mousewheel</b>：滚轮翻页会和页面滚动打架，在长页面里体验很差</li>
-                        <li><b>zoom</b>：双击缩放需要图片支持放大，六张图尺寸不一致时观感不统一</li>
-                        <li><b>parallax</b>：视差要配合 data-swiper-parallax 分层，改造成本高，效果偏暗</li>
-                    </ul>
-                </div>
+            <table class="sjs_table">
+                <thead>
+                    <tr>
+                        <th>做法</th>
+                        <th>实现方式</th>
+                        <th>代价</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>thumbs 双实例</td>
+                        <td>thumbs 配置一行搞定</td>
+                        <td>几乎为零，Swiper 内部处理同步</td>
+                    </tr>
+                    <tr>
+                        <td>自定义分页器</td>
+                        <td>自己生成小图、监听点击、手动 slideTo</td>
+                        <td>缩略图条不能滑动、无法处理溢出</td>
+                    </tr>
+                    <tr>
+                        <td>单实例硬塞</td>
+                        <td>把缩略图当 slide 内容的一部分</td>
+                        <td>高度、比例全乱，主图与缩略图共用一个 slide 尺寸</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
 
-                <div class="sjs_card">
-                    <h4>keyboard 的优势</h4>
-                    <ul>
-                        <li>零视觉改动，不破坏现有展陈风格</li>
-                        <li>可访问性加分：不用鼠标也能翻页</li>
-                        <li>参数少但有细节，经得起追问</li>
-                        <li>开关一摆，现场就能演示差异</li>
-                    </ul>
-                </div>
-            </div>
+        <!-- 05、提示词记录入口 -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>05</span><h2>提示词记录</h2></div>
+            <p>本页的提示词、以及整个项目的历史记录，都收在记录页里。</p>
+
+            <a class="sjs_entry" href="sjs_prompt.html">
+                <span class="sjs_entry-icon">MD</span>
+                <span class="sjs_entry-body">
+                    <b>全部提示词记录</b>
+                    <span>从 2026-10-22 的第一条命名规则起，逐条按时间追加，不覆盖历史</span>
+                    <code>sjs_prompt.md</code>
+                </span>
+                <span class="sjs_entry-go">→</span>
+            </a>
         </section>
 
     </main>
 
     <div class="sjs_wrap">
         <footer>
-            <span>六件展品 · 键盘控制实验室 · 申家硕</span>
+            <span>缩略图联动 · 双实例实验 · 申家硕</span>
             <span>高级网页设计 · 2026-2027-1</span>
         </footer>
     </div>
 
     <script>
-        // 轮播实例（切换参数时要重建，所以用 let）
-        let sjs_show = null;
+        // 两个实例：主图与缩略图
+        let sjs_main = null;
+        let sjs_thumb = null;
+        // 当前模式：normal（标准跟随）/ free（缩略图自由滑动）/ offset（偏移跟随）
+        let sjs_mode = 'normal';
 
         /**
-         * 按当前开关状态创建实例
-         * 功能：读取两个 checkbox，决定 keyboard.enabled 与 onlyInViewport，
-         *      其余配置（循环、分页器、箭头）保持一致，便于对照。
-         * @returns {void}
+         * 创建缩略图实例
+         * 功能：缩略图是被引用的一方，必须先建。watchSlidesProgress 让它记录每张滑到哪，
+         *      slidesPerView 用 'auto' 才能按缩略图自身宽度排布并允许溢出滑动；
+         *      自由滑动模式下额外打开 freeMode。
+         * @returns {Swiper} 缩略图实例
          */
-        function sjs_buildShow() {
-            const sjs_enabled = document.getElementById('sjsToggleEnabled').checked;
-            const sjs_inView = document.getElementById('sjsToggleView').checked;
-
-            sjs_show = new Swiper('#sjsSwShow', {
-                effect: 'slide',
-                loop: true,
-                speed: 600,
-                grabCursor: true,
-                keyboard: {
-                    enabled: sjs_enabled,
-                    onlyInViewport: sjs_inView
-                },
-                pagination: { el: '#sjsPagShow', clickable: true },
-                navigation: { prevEl: '#sjsPrevShow', nextEl: '#sjsNextShow' }
+        function sjs_buildThumb() {
+            return new Swiper('#sjsThumbs', {
+                spaceBetween: 8,
+                slidesPerView: 'auto',
+                watchSlidesProgress: true,
+                // 点击缩略图即切到该张：thumbs 模块本身依赖 tap 事件，
+                // 而 tap 只在 clickedIndex 变化时触发，明确打开这个参数更稳
+                slideToClickedSlide: true,
+                // 自由滑动：允许连续拖拽，不强制逐张卡位
+                freeMode: sjs_mode === 'free'
             });
         }
 
         /**
-         * 重建实例
-         * 功能：keyboard 参数在 init 时读取，改开关必须销毁重建；
-         *      重建前清掉可能残留的 slide-shadow，避免节点累积。
-         * @returns {void}
+         * 创建主图实例
+         * 功能：把缩略图对象通过 thumbs 交给主图完成绑定；
+         *      双向模式下额外监听 slideChange，反向把缩略图拨到同一张。
+         * @param {Swiper} sjs_thumbSwiper 缩略图实例
+         * @returns {Swiper} 主图实例
          */
-        function sjs_rebuildShow() {
-            if (sjs_show) {
-                sjs_show.destroy(true, true);
-                document.querySelectorAll('#sjsSwShow .swiper-slide-shadow').forEach(function (sjs_el) {
-                    sjs_el.remove();
-                });
-            }
-            sjs_buildShow();
-            sjs_paintState();
+        function sjs_buildMain(sjs_thumbSwiper) {
+            // thumbs 天生双向：无需自己监听 slideChange，模块内部已处理
+            // autoScrollOffset 只影响缩略图被推到的位置，也就是"偏移跟随"那一档
+            return new Swiper('#sjsMain', {
+                spaceBetween: 0,
+                navigation: { nextEl: '#sjsNext', prevEl: '#sjsPrev' },
+                thumbs: {
+                    swiper: sjs_thumbSwiper,
+                    autoScrollOffset: sjs_mode === 'offset' ? 1 : 0
+                }
+            });
         }
 
         /**
-         * 更新键盘状态灯与提示文字
-         * 功能：把两个开关的组合翻译成人话，让"现在按键有没有用"一眼可见。
+         * 刷新索引读数
+         * 功能：把两个实例的 activeIndex 写到页面上，并标出是否一致。
+         *      光看画面不容易发现这是两个独立实例，读数才是证据。
          * @returns {void}
          */
-        function sjs_paintState() {
-            const sjs_enabled = document.getElementById('sjsToggleEnabled').checked;
-            const sjs_inView = document.getElementById('sjsToggleView').checked;
-            const sjs_box = document.getElementById('sjsKbdState');
-            const sjs_text = document.getElementById('sjsKbdText');
+        function sjs_paintIdx() {
+            const sjs_a = sjs_main ? sjs_main.realIndex : 0;
+            // 同步的证据不是缩略图自身的 activeIndex（六张一屏放得下时它恒为 0），
+            // 而是 thumbs 模块给哪一张加了激活类
+            const sjs_lit = document.querySelector('#sjsThumbs .swiper-slide-thumb-active');
+            const sjs_all = [...document.querySelectorAll('#sjsThumbs .swiper-slide')];
+            const sjs_b = sjs_lit ? sjs_all.indexOf(sjs_lit) : -1;
 
-            sjs_box.setAttribute('data-on', sjs_enabled ? '1' : '0');
-            if (!sjs_enabled) {
-                sjs_text.textContent = '键盘已关闭';
-            } else if (sjs_inView) {
-                sjs_text.textContent = '键盘已启用 · 需在视口内';
-            } else {
-                sjs_text.textContent = '键盘已启用 · 不限视口';
-            }
+            document.getElementById('sjsMainIdx').textContent = sjs_a;
+            document.getElementById('sjsThumbIdx').textContent = sjs_b;
+
+            const sjs_flag = document.getElementById('sjsSync');
+            const sjs_same = sjs_a === sjs_b;
+            sjs_flag.textContent = sjs_same ? '已同步' : '未同步';
+            sjs_flag.className = sjs_same ? 'sjs_sync' : '';
         }
 
         /**
-         * 往日志里追加一行
-         * 功能：记录每次按键与当时的处理结果，最多保留 6 行，避免刷屏。
-         *      这是答辩时"我真的试过"的直接证据。
-         * @param {string} sjs_html 已格式化的日志片段
+         * 销毁并重建两个实例
+         * 功能：thumbs 的绑定在初始化时建立，切模式必须重来。
+         *      销毁顺序要先主图后缩略图（主图持有缩略图引用），避免悬空引用；
+         *      重建顺序则相反，先缩略图后主图。
          * @returns {void}
          */
-        function sjs_log(sjs_html) {
-            const sjs_box = document.getElementById('sjsLog');
-            if (!sjs_box.dataset.booted) {
-                sjs_box.innerHTML = '';
-                sjs_box.dataset.booted = '1';
+        function sjs_rebuild() {
+            if (sjs_main) {
+                sjs_main.destroy(true, true);
+                sjs_main = null;
             }
-            const sjs_line = document.createElement('div');
-            sjs_line.innerHTML = sjs_html;
-            sjs_box.appendChild(sjs_line);
-            while (sjs_box.children.length > 6) {
-                sjs_box.removeChild(sjs_box.firstChild);
+            if (sjs_thumb) {
+                sjs_thumb.destroy(true, true);
+                sjs_thumb = null;
             }
+            // 清掉可能残留的阴影节点，避免撑高容器
+            document.querySelectorAll('#sjsMain .swiper-slide-shadow').forEach(function (sjs_el) {
+                sjs_el.remove();
+            });
+
+            sjs_thumb = sjs_buildThumb();
+            sjs_main = sjs_buildMain(sjs_thumb);
+
+            // 两个方向的切换都要刷新读数
+            sjs_main.on('slideChange', sjs_paintIdx);
+            sjs_thumb.on('slideChange', sjs_paintIdx);
+            sjs_paintIdx();
         }
 
         /**
-         * 监听全局按键并写日志
-         * 功能：在 document 上监听 keydown（和 Swiper 同一层），记录按键名、
-         *      焦点位置、以及当前实例的索引变化，用来解释"为什么这次没翻"。
+         * 切换联动模式
+         * 功能：写入模式、更新按钮高亮与文字说明，然后重建实例。
+         * @param {string} sjs_key oneway / twoway / free
          * @returns {void}
          */
-        function sjs_watchKeys() {
-            // 关键：用 capture 阶段监听，才能比 Swiper 自己的 keydown 更早拿到"按键前"的索引
-            // （两者都挂在 document 上，Swiper 先注册，冒泡阶段会先执行它的处理）
-            document.addEventListener('keydown', function (sjs_e) {
-                if (sjs_e.key !== 'ArrowLeft' && sjs_e.key !== 'ArrowRight') return;
+        function sjs_setMode(sjs_key) {
+            sjs_mode = sjs_key;
 
-                const sjs_active = document.activeElement;
-                const sjs_where = sjs_active && sjs_active.id ? sjs_active.id : (sjs_active ? sjs_active.tagName : 'null');
-                // 按键瞬间先记下索引；autoPlay 也可能在跑，所以判定只认这一瞬间到稍后那一刻的变化
-                const sjs_idx = sjs_show ? sjs_show.realIndex : -1;
+            document.querySelectorAll('#sjsModes button').forEach(function (sjs_b) {
+                sjs_b.setAttribute('aria-pressed', sjs_b.dataset.mode === sjs_key ? 'true' : 'false');
+            });
 
-                // 稍等一拍再读：跳转动画结束后索引才会更新
-                setTimeout(function () {
-                    const sjs_after = sjs_show ? sjs_show.realIndex : -1;
-                    // 期望值：横向轮播里 → 让索引 +1，← 让索引 -1（loop 模式下取模）
-                    const sjs_total = sjs_show ? sjs_show.slides.length : 1;
-                    const sjs_want = sjs_e.key === 'ArrowRight'
-                        ? (sjs_idx + 1) % sjs_total
-                        : (sjs_idx - 1 + sjs_total) % sjs_total;
-                    const sjs_moved = sjs_after === sjs_want;
-                    sjs_log(
-                        (sjs_moved ? '<b>✓ 已翻页</b>' : '<i>× 未翻页</i>') +
-                        ' ' + sjs_e.key +
-                        ' · 焦点 ' + sjs_where +
-                        ' · 索引 ' + sjs_idx + ' → ' + sjs_after
-                    );
-                }, 400);
-            }, true);
+            const sjs_text = {
+                normal: '当前模式：标准跟随（主图 ⇄ 缩略图）',
+                free: '当前模式：缩略图可自由拖动',
+                offset: '当前模式：缩略图偏移跟随（推多一格）'
+            };
+            document.getElementById('sjsModeText').textContent = sjs_text[sjs_key];
+            sjs_rebuild();
         }
 
         // 初始化
-        sjs_buildShow();
-        sjs_paintState();
-        document.getElementById('sjsToggleEnabled').addEventListener('change', sjs_rebuildShow);
-        document.getElementById('sjsToggleView').addEventListener('change', sjs_rebuildShow);
-        sjs_watchKeys();
+        sjs_rebuild();
+        document.querySelectorAll('#sjsModes button').forEach(function (sjs_b) {
+            sjs_b.addEventListener('click', function () {
+                sjs_setMode(sjs_b.dataset.mode);
+            });
+        });
     </script>
 
 </body>

@@ -328,10 +328,10 @@
         <p>① 为光影展添加第六件展品<b>爱达·魔都号</b>（2024 年 1 月首航，首艘国产大型邮轮）；② 加一个课堂没讲过的 Swiper 能力。</p>
         <ul class="wy-gate-list">
           <li>展品：已加到演示四 slide 列表末尾，16:9 横向配图，说明文字与其余五件同格式。</li>
-          <li>超纲能力：选了 <b>keyboard 键盘控制</b>——轮播在视口内时按 <kbd>←</kbd> <kbd>→</kbd> 即可翻页。</li>
-          <li>实现要点：Swiper 把 keydown 监听挂在 <code>document</code> 上，所以<b>不需要聚焦也能翻页</b>；真正起作用的是 <code>keyboard.onlyInViewport</code>（默认 <code>true</code>）——轮播不在视口内时按键无效。补 <code>tabindex</code> 只是为了点击后能有聚焦描边。</li>
+          <li>超纲能力：选了 <b>thumbs 缩略图联动</b>——来自官方 300 号 demo，课堂未讲，同学也没用过。</li>
+          <li>实现要点：用两个独立实例，先建缩略图再建主图，通过 <code>thumbs: { swiper: 实例 }</code> 绑定；缩略图必须加 <code>watchSlidesProgress</code>。</li>
         </ul>
-        <p class="wy-gate-note">⚡ 答辩准备：keyboard 监听挂在 <code>document</code> 上，聚焦不是必要条件；真正的门槛是 <code>onlyInViewport</code>。实测焦点停在 body、轮播滚进视口，方向键照样能翻。</p>
+        <p class="wy-gate-note">⚡ 答辩准备：thumbs 传的是<b>实例对象</b>不是选择器，因为运行时要靠它调用 <code>slideTo</code> 同步索引；且它天生双向，主图翻页缩略图会自己跟。</p>
       </div>
 
     </div>
