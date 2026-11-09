@@ -150,3 +150,16 @@ new Swiper('#wySw4', {
 - 动作：index.html 新增 `#gates`「三关进阶」板块，三张卡片分别对应提示词工程 / creative 仿写 / 综合创作，各带锚点链到作业页对应卡片
 - 顶部导航新增「三关进阶」入口
 - 已推送：提交 844271b
+
+## 2026-11-09 11:45:00
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+这个老师会抽查问题 老师都会问什么 以及答案是什么
+（附截图：讲解版三关的答辩抽问与答辩四连问）
+
+## 2026-11-09 11:52:00 · 勘误
+- 模型：DeepSeek-V4.1-Flash
+- 问题：作业页原写「creativeEffect 的百分比相对容器宽高」「keyboard 只对已聚焦容器生效」，两处均与实际不符
+- 实测结论 1：百分比相对**slide 自身宽度**。容器 600px、slidesPerView:3 时 slide 宽 200px，`translate: ['50%',0,0]` 位移 100px
+- 实测结论 2：keyboard 的 keydown 监听挂在 **document** 上，焦点停在 body、轮播在视口内时方向键仍可翻页；真正门槛是 `keyboard.onlyInViewport`（默认 true）
+- 已修正页面文案与注释

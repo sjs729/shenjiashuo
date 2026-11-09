@@ -244,7 +244,7 @@
       <p><b>基础分</b>：初始化 <code>#wySw4</code>，实现循环 + 自动播放（3.2 秒）+ 圆点分页器（#wyPag4），初始效果为 <code>'cube'</code>，动画时长 800 毫秒。</p>
       <p><b>进阶分</b>：补全按钮点击事件中的 TODO——实现点击按钮<b>切换效果</b>。提示：Swiper 动态换 effect 不能只改参数，需要<b>先销毁旧实例再重建</b>（destroy + new）。</p>
       <p><b>超纲加分</b>：第 7 个按钮 <code>creative</code>（电影墙）来自课堂未讲的第 7 种效果，配合键盘 <kbd>←</kbd> <kbd>→</kbd> 控制一起体验。</p>
-      <span class="wy-star">⭐ 验证标准：基础分——轮播自动翻页；进阶分——点 cube 按钮变 3D 立方体、点 fade 变淡入淡出；加分项——点 creative 变电影选片墙，聚焦轮播后按方向键能翻页</span>
+      <span class="wy-star">⭐ 验证标准：基础分——轮播自动翻页；进阶分——点 cube 按钮变 3D 立方体、点 fade 变淡入淡出；加分项——点 creative 变电影选片墙，轮播在视口内时按方向键能翻页</span>
     </div>
     <div class="wy-fx">
       <button data-fx="slide">slide 平推（默认·稳重）</button>
@@ -256,7 +256,7 @@
       <button data-fx="creative">creative 电影墙（超纲·课堂未讲）</button>
     </div>
     <div class="wy-demo">
-      <span class="wy-demo-tag">🎛️ 演示四 · 效果实验台（点按钮切换 effect；聚焦后可用 ← → 翻页）</span>
+      <span class="wy-demo-tag">🎛️ 演示四 · 效果实验台（点按钮切换 effect；滚到视口内可用 ← → 翻页）</span>
       <div class="wy-swiper">
         <div class="swiper" id="wySw4">
           <div class="swiper-wrapper">
@@ -314,7 +314,7 @@
           <li><b>next</b> 管「下一张怎么进来」：正的 X 位移从右侧推进，正的 Z 值往前压，配合 <code>scale</code> 与 <code>opacity</code> 做入场。</li>
           <li>作答位置：上面演示四按钮组最后一个，点它即可切换。</li>
         </ul>
-        <p class="wy-gate-note">⚡ 答辩准备：transform 里的百分号是相对<b>轮播容器 swiper</b> 自身的宽高，不是相对图片。</p>
+        <p class="wy-gate-note">⚡ 答辩准备：transform 里的百分比相对的是<b>这张 slide 自己的宽度</b>——不是容器，也不是图片。实测：容器 600px、一屏三张时 slide 宽 200px，写 <code>50%</code> 只位移 100px。</p>
       </div>
 
       <!-- 第三关 -->
@@ -328,10 +328,10 @@
         <p>① 为光影展添加第六件展品<b>爱达·魔都号</b>（2024 年 1 月首航，首艘国产大型邮轮）；② 加一个课堂没讲过的 Swiper 能力。</p>
         <ul class="wy-gate-list">
           <li>展品：已加到演示四 slide 列表末尾，16:9 横向配图，说明文字与其余五件同格式。</li>
-          <li>超纲能力：选了 <b>keyboard 键盘控制</b>——聚焦轮播后按 <kbd>←</kbd> <kbd>→</kbd> 即可翻页。</li>
-          <li>实现要点：除了 <code>keyboard: { enabled: true }</code>，容器还得能聚焦，所以补了 <code>tabindex="0"</code>。</li>
+          <li>超纲能力：选了 <b>keyboard 键盘控制</b>——轮播在视口内时按 <kbd>←</kbd> <kbd>→</kbd> 即可翻页。</li>
+          <li>实现要点：Swiper 把 keydown 监听挂在 <code>document</code> 上，所以<b>不需要聚焦也能翻页</b>；真正起作用的是 <code>keyboard.onlyInViewport</code>（默认 <code>true</code>）——轮播不在视口内时按键无效。补 <code>tabindex</code> 只是为了点击后能有聚焦描边。</li>
         </ul>
-        <p class="wy-gate-note">⚡ 答辩准备：keyboard 模块只对已聚焦的容器生效，div 默认不可聚焦——这就是补 tabindex 的原因。</p>
+        <p class="wy-gate-note">⚡ 答辩准备：keyboard 监听挂在 <code>document</code> 上，聚焦不是必要条件；真正的门槛是 <code>onlyInViewport</code>。实测焦点停在 body、轮播滚进视口，方向键照样能翻。</p>
       </div>
 
     </div>
@@ -409,7 +409,7 @@
         el: '#wyPag4',
         clickable: true
       },
-      // 超纲能力：键盘方向键翻页。容器需要 tabindex 才能聚焦，
+      // 超纲能力：键盘方向键翻页。监听挂在 document 上，容器是否聚焦不影响，
       // 由下面的 sjs_watchKeyboard 兜底补上，避免用户找不到焦点。
       keyboard: {
         enabled: true
@@ -459,8 +459,8 @@
 
   /**
    * 让轮播容器可以获得键盘焦点
-   * 功能：Swiper 的 keyboard 模块只监听已聚焦的容器，而 div 默认不可聚焦，
-   *      所以给容器补 tabindex，并加一条聚焦提示，告诉使用者"按方向键"。
+   * 功能：Swiper 的 keyboard 监听挂在 document 上，聚焦与否都能翻页；
+   *      这里补 tabindex 只是为了让点击后能聚焦、亮出"可按方向键"的描边提示。
    * @param {HTMLElement} sjs_el 轮播容器
    * @returns {void}
    */
