@@ -221,3 +221,8 @@ https://yitianti.github.io/yangtt/ 这个网站是其他同学的 他做的比�
 - 内容：六件展品的主图 + 缩略图条，两实例同步；三档跟随行为（标准 / 自由滑动 / 偏移跟随）；索引实测读数
 - 勘误：原以为 thumbs 是单向，读 `swiper/modules/thumbs.mjs` 后确认模块内部监听主图 slideChange 并调 update()，天生双向；已把"单向/双向"改写成"跟随行为"
 - 修复：缩略图 `slidesPerView:'auto'` 未给宽度导致 slide 撑满容器；读数改用 `.swiper-slide-thumb-active` 判定（六张一屏放得下时 activeIndex 恒为 0）
+
+## 2026-11-09 14:35:00
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+帮我发布到GitHub上面

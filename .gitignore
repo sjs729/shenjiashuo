@@ -22,7 +22,3 @@ Desktop.ini
 # 日志与临时文件
 *.log
 *.tmp
-
-# 页面分享包与截图缓存（体积大、非页面本身）
-.screenshots/
-.trae-html-share-packages/
