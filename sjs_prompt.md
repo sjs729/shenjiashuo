@@ -174,3 +174,18 @@ new Swiper('#wySw4', {
 - 动作：新建 `sjs_prompt.html` 作为 `sjs_prompt.md` 的阅读页（运行时 fetch 原文并渲染 Markdown），首页新增独立「提示词记录」板块与导航项
 - 原因：`.md` 在浏览器里会被当成下载（GitHub Pages 返回 text/markdown），老师点开看不到内容
 - 兜底：以 `file://` 直接打开时浏览器禁止 fetch，页面给出提示并链接到原始文件
+
+## 2026-11-09 13:41:34
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+https://yitianti.github.io/yangtt/ 这个网站是其他同学的 他做的比较好 然后你把我的关于图片里面的内容参考一下这个网站的 不能跟他一模一样
+
+## 2026-11-09 14:05:00 · 三关各配独立页面
+- 模型：DeepSeek-V4.1-Flash
+- 参考：同学作品 https://yitianti.github.io/yangtt/ 的"一关一页"结构
+- 动作：新建三个独立页面，各自换一个切入角度，不与参考站重复
+  - `sjs-task1.html` 两轮对照实验台：左右两个真实轮播，点圆点后读数条直接显示"有没有跳转"
+  - `sjs-task2.html` creative 调参台：六个滑杆实时改 prev/next，配置代码实时生成，四套预设
+  - `sjs-task3.html` 键盘实验室：六件展品 + keyboard.enabled / onlyInViewport 双开关 + 按键日志
+- 首页三关卡片改为双入口（新页面 + 作业页锚点），次级入口做视觉降权
+- 修复：按键日志原先记错索引，改用 capture 阶段监听，确保取到"按键前"的值

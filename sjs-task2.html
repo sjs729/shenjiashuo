@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<!--
+  作者：申家硕
+  建立时间：2026-11-09
+  使用模型：DeepSeek-V4.1-Flash
+  功能名称：creative 调参台 · 亲手拧出电影墙
+  简介：不讲"七种配方各是什么"，而是把 creativeEffect 的 prev / next 拆成可拖动滑杆，
+        拖动即可实时看到卡片姿态变化，旁边同步显示生成的配置代码，可直接抄回页面；
+        下方附"为什么百分号相对 slide 宽度"的实测证据与答辩要点。
+-->
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>creative 调参台 | 申家硕</title>
+    <link rel="stylesheet" href="swiper/swiper-bundle.min.css">
+    <script src="swiper/swiper-bundle.min.js"></script>
+    <style>
+        /* ==========================================================
+           creative 调参台
+           与首页同一套纸张底色；强调色用蓝，滑杆用等宽数字读数
+           ========================================================== */
+
+        :root {
+            --ink: #16202e;
+            --ink-soft: #40506a;
+            --ink-faint: #7c8aa3;
+            --paper: #f6f4ef;
+            --card: #ffffff;
+            --line: #e4e0d8;
+            --accent: #1f4fd8;
+            --accent-soft: #e8eefe;
+            --warm: #c0392b;
+            --good: #1f7a4d;
+            --radius: 14px;
+            --shadow-sm: 0 1px 2px rgba(22, 32, 46, .05), 0 6px 18px -12px rgba(22, 32, 46, .18);
+            --maxw: 1120px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+                "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
+            color: var(--ink);
+            background: var(--paper);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: .88em;
+            color: var(--accent);
+            background: var(--accent-soft);
+            border-radius: 4px;
+            padding: 1px 5px;
+        }
+
+        /* ---------------- 顶部条 ---------------- */
+        .sjs_top {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: saturate(180%) blur(14px);
+            -webkit-backdrop-filter: saturate(180%) blur(14px);
+            background: rgba(246, 244, 239, .84);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .sjs_wrap {
+            width: 100%;
+            max-width: var(--maxw);
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .sjs_top .sjs_wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            height: 60px;
+        }
+
+        .sjs_brand {
+            font-weight: 700;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sjs_brand i {
+            flex: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            background: var(--ink);
+            color: #fff;
+            font-style: normal;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .sjs_back {
+            font-size: 13.5px;
+            font-weight: 600;
+            border: 1px solid var(--line);
+            background: var(--card);
+            border-radius: 999px;
+            padding: 6px 15px;
+            color: var(--ink-soft);
+        }
+
+        .sjs_back:hover {
+            color: var(--accent);
+        }
+
+        /* ---------------- 标题区 ---------------- */
+        .sjs_head {
+            padding: 54px 0 10px;
+        }
+
+        .sjs_kicker {
+            font-size: 11.5px;
+            letter-spacing: 2.4px;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .sjs_head h1 {
+            margin-top: 12px;
+            font-family: Georgia, "Songti SC", "SimSun", serif;
+            font-size: clamp(30px, 4.6vw, 46px);
+            line-height: 1.22;
+            letter-spacing: -1px;
+        }
+
+        .sjs_head .sjs_lede {
+            margin-top: 16px;
+            max-width: 740px;
+            font-size: 15.5px;
+            color: var(--ink-soft);
+        }
+
+        .sjs_head .sjs_rule {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid var(--line);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 28px;
+            font-size: 13px;
+            color: var(--ink-faint);
+        }
+
+        .sjs_head .sjs_rule b {
+            color: var(--ink);
+        }
+
+        /* ---------------- 区块 ---------------- */
+        .sjs_sec {
+            padding: 38px 0 8px;
+        }
+
+        .sjs_sec-head {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .sjs_sec-head span {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+            color: var(--accent);
+            letter-spacing: 1px;
+        }
+
+        .sjs_sec-head h2 {
+            font-family: Georgia, "Songti SC", "SimSun", serif;
+            font-size: clamp(21px, 2.6vw, 27px);
+            letter-spacing: -.4px;
+        }
+
+        .sjs_sec > p {
+            color: var(--ink-soft);
+            font-size: 14.6px;
+            max-width: 780px;
+            margin-bottom: 20px;
+        }
+
+        /* ---------------- 调参台布局 ---------------- */
+        .sjs_lab {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 360px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        /* 预览区 */
+        .sjs_stage {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sjs_stage-tag {
+            font-size: 12px;
+            color: var(--ink-faint);
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .sjs_stage .swiper {
+            border-radius: 10px;
+            overflow: hidden;
+            background: #e9edf3;
+        }
+
+        .sjs_stage .swiper-slide {
+            position: relative;
+            height: 260px;
+        }
+
+        .sjs_stage .swiper-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .sjs_stage .sjs_cap {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 30px 16px 12px;
+            color: #fff;
+            background: linear-gradient(transparent, rgba(6, 14, 28, .84));
+        }
+
+        .sjs_stage .sjs_cap h4 {
+            font-size: 15px;
+            letter-spacing: .5px;
+        }
+
+        .sjs_stage .sjs_cap p {
+            font-size: 12.4px;
+            color: #d6e2f5;
+            margin-top: 2px;
+        }
+
+        .sjs_stage .swiper-pagination {
+            position: static;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .sjs_stage .swiper-pagination-bullet {
+            background: var(--ink);
+            opacity: .25;
+        }
+
+        .sjs_stage .swiper-pagination-bullet-active {
+            background: var(--accent);
+            opacity: 1;
+            width: 20px;
+            border-radius: 5px;
+        }
+
+        .sjs_stage .swiper-button-next,
+        .sjs_stage .swiper-button-prev {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(22, 32, 46, .55);
+            color: #fff;
+            --swiper-navigation-size: 15px;
+        }
+
+        .sjs_stage .swiper-button-next:hover,
+        .sjs_stage .swiper-button-prev:hover {
+            background: var(--accent);
+        }
+
+        /* 控制区 */
+        .sjs_panel {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 20px 20px 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sjs_group {
+            margin-bottom: 16px;
+        }
+
+        .sjs_group h4 {
+            font-size: 12px;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* prev / next 各用一种油墨色区分 */
+        .sjs_group[data-side="prev"] h4::after {
+            content: "退场";
+            font-size: 10.5px;
+            letter-spacing: 0;
+            color: var(--warm);
+            border: 1px solid rgba(192, 57, 43, .28);
+            border-radius: 4px;
+            padding: 0 5px;
+            text-transform: none;
+        }
+
+        .sjs_group[data-side="next"] h4::after {
+            content: "进场";
+            font-size: 10.5px;
+            letter-spacing: 0;
+            color: var(--good);
+            border: 1px solid rgba(31, 122, 77, .28);
+            border-radius: 4px;
+            padding: 0 5px;
+            text-transform: none;
+        }
+
+        .sjs_row {
+            display: grid;
+            grid-template-columns: 62px 1fr 52px;
+            align-items: center;
+            gap: 8px;
+            margin: 6px 0;
+        }
+
+        .sjs_row label {
+            font-size: 12.4px;
+            color: var(--ink-soft);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        .sjs_row output {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12.4px;
+            color: var(--ink);
+            text-align: right;
+            font-weight: 700;
+        }
+
+        /* 滑杆：去掉系统默认外观，用一条细轨 + 圆点 */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 20px;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 3px;
+            border-radius: 2px;
+            background: #dfe3ea;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 13px;
+            height: 13px;
+            margin-top: -5px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid #fff;
+            box-shadow: 0 1px 4px rgba(22, 32, 46, .3);
+        }
+
+        input[type="range"]::-moz-range-track {
+            height: 3px;
+            border-radius: 2px;
+            background: #dfe3ea;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid #fff;
+        }
+
+        /* 预设按钮 */
+        .sjs_presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-bottom: 18px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed var(--line);
+        }
+
+        .sjs_presets button {
+            font-family: inherit;
+            font-size: 12.4px;
+            color: var(--ink-soft);
+            background: #fbfaf7;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 5px 13px;
+            cursor: pointer;
+            transition: all .18s ease;
+        }
+
+        .sjs_presets button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .sjs_presets button[aria-pressed="true"] {
+            background: var(--ink);
+            color: #fff;
+            border-color: var(--ink);
+        }
+
+        /* 生成的配置代码 */
+        .sjs_code {
+            background: #10182a;
+            border-radius: 10px;
+            padding: 16px 18px;
+            overflow-x: auto;
+            margin-top: 4px;
+        }
+
+        .sjs_code code {
+            background: none;
+            color: #e6edff;
+            padding: 0;
+            font-size: 12.4px;
+            line-height: 1.8;
+            white-space: pre;
+        }
+
+        /* ---------------- 证据区 ---------------- */
+        .sjs_evidence {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .sjs_ev {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+        }
+
+        .sjs_ev h4 {
+            font-size: 14.5px;
+            margin-bottom: 8px;
+        }
+
+        .sjs_ev p {
+            font-size: 13.4px;
+            color: var(--ink-soft);
+        }
+
+        .sjs_ev .sjs_big {
+            margin: 12px 0;
+            padding: 12px 14px;
+            background: #fbfaf7;
+            border: 1px dashed var(--line);
+            border-radius: 8px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12.6px;
+            color: var(--ink);
+            line-height: 1.9;
+        }
+
+        .sjs_ev .sjs_big em {
+            font-style: normal;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .sjs_ev .sjs_big b {
+            color: var(--warm);
+        }
+
+        .sjs_note {
+            margin: 26px 0 0;
+            padding: 18px 22px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-size: 14px;
+            color: var(--ink-soft);
+        }
+
+        .sjs_note b {
+            color: var(--ink);
+        }
+
+        footer {
+            margin-top: 46px;
+            border-top: 1px solid var(--line);
+            padding: 22px 0 52px;
+            font-size: 12.6px;
+            color: var(--ink-faint);
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 900px) {
+            .sjs_lab {
+                grid-template-columns: 1fr;
+            }
+
+            .sjs_evidence {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .sjs_wrap {
+                padding: 0 16px;
+            }
+
+            .sjs_head {
+                padding: 34px 0 6px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 顶部条 -->
+    <header class="sjs_top">
+        <div class="sjs_wrap">
+            <div class="sjs_brand"><i>申</i> creative 调参台</div>
+            <a class="sjs_back" href="index.html">← 返回首页</a>
+        </div>
+    </header>
+
+    <main class="sjs_wrap">
+
+        <!-- 标题区 -->
+        <div class="sjs_head">
+            <div class="sjs_kicker">Task 02 · Creative Effect</div>
+            <h1>第七种效果，<br>参数得自己拧</h1>
+            <p class="sjs_lede">
+                slide / fade / cube / coverflow / flip / cards 这六种，Swiper 已经把参数替你调好了。
+                第七种 <code>creative</code> 是空白的——它只给你两个盒子，<code>prev</code> 和 <code>next</code>，
+                里面放什么姿态，全凭你写。下面这台调参台把这两个盒子拆成了滑杆，拖一下就能看见卡片怎么动。
+            </p>
+            <div class="sjs_rule">
+                <span>可调参数 <b>6 个</b></span>
+                <span>预设配方 <b>4 套</b></span>
+                <span>配置代码 <b>实时生成</b></span>
+            </div>
+        </div>
+
+        <!-- 一、调参台 -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>01</span><h2>拖滑杆，看卡片</h2></div>
+            <p>左边是实时预览，右边是控制台。先点一套预设，再拖滑杆微调——右边代码会跟着变，可以直接抄回自己的页面。</p>
+
+            <div class="sjs_lab">
+
+                <!-- 预览 -->
+                <div class="sjs_stage">
+                    <div class="sjs_stage-tag">
+                        <span>实时预览 · 拖动或点箭头翻页</span>
+                        <span id="sjsFormula">—</span>
+                    </div>
+                    <div class="swiper" id="sjsSwLab">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide"><img src="swiper-imgs/tiangong_1.jpg" alt="天宫空间站"><div class="sjs_cap"><h4>天宫空间站</h4><p>2022 年全面建成</p></div></div>
+                            <div class="swiper-slide"><img src="swiper-imgs/fuxing_1.jpg" alt="复兴号动车组"><div class="sjs_cap"><h4>复兴号动车组</h4><p>350 km/h</p></div></div>
+                            <div class="swiper-slide"><img src="swiper-imgs/c919_1.jpg" alt="C919大飞机"><div class="sjs_cap"><h4>C919 大飞机</h4><p>2023 年商业首航</p></div></div>
+                            <div class="swiper-slide"><img src="swiper-imgs/fendouzhe_1.jpg" alt="奋斗者号"><div class="sjs_cap"><h4>奋斗者号</h4><p>10909 米深潜</p></div></div>
+                            <div class="swiper-slide"><img src="swiper-imgs/fast_1.jpg" alt="中国天眼"><div class="sjs_cap"><h4>中国天眼 FAST</h4><p>500 米口径</p></div></div>
+                            <div class="swiper-slide"><img src="swiper-imgs/adora_1.jpg" alt="爱达·魔都号"><div class="sjs_cap"><h4>爱达·魔都号</h4><p>2024 年 1 月首航</p></div></div>
+                        </div>
+                        <div class="swiper-pagination" id="sjsPagLab"></div>
+                        <div class="swiper-button-prev" id="sjsPrevLab"></div>
+                        <div class="swiper-button-next" id="sjsNextLab"></div>
+                    </div>
+                </div>
+
+                <!-- 控制台 -->
+                <div class="sjs_panel">
+                    <div class="sjs_presets" id="sjsPresets">
+                        <button type="button" data-preset="wall" aria-pressed="true">电影墙</button>
+                        <button type="button" data-preset="push">纯推入</button>
+                        <button type="button" data-preset="twist">侧旋</button>
+                        <button type="button" data-preset="book">翻书</button>
+                    </div>
+
+                    <!-- prev：已经翻过去那一张 -->
+                    <div class="sjs_group" data-side="prev">
+                        <h4>prev</h4>
+                        <div class="sjs_row">
+                            <label for="sjsPrevX">X 位移</label>
+                            <input type="range" id="sjsPrevX" min="-200" max="60" step="2" value="-38">
+                            <output id="sjsPrevXO">-38%</output>
+                        </div>
+                        <div class="sjs_row">
+                            <label for="sjsPrevZ">Z 纵深</label>
+                            <input type="range" id="sjsPrevZ" min="-800" max="200" step="10" value="-320">
+                            <output id="sjsPrevZO">-320</output>
+                        </div>
+                        <div class="sjs_row">
+                            <label for="sjsPrevR">倾斜角</label>
+                            <input type="range" id="sjsPrevR" min="-45" max="45" step="1" value="-8">
+                            <output id="sjsPrevRO">-8°</output>
+                        </div>
+                    </div>
+
+                    <!-- next：还没轮到那一张 -->
+                    <div class="sjs_group" data-side="next">
+                        <h4>next</h4>
+                        <div class="sjs_row">
+                            <label for="sjsNextX">X 位移</label>
+                            <input type="range" id="sjsNextX" min="0" max="200" step="2" value="100">
+                            <output id="sjsNextXO">100%</output>
+                        </div>
+                        <div class="sjs_row">
+                            <label for="sjsNextZ">Z 纵深</label>
+                            <input type="range" id="sjsNextZ" min="-800" max="200" step="10" value="120">
+                            <output id="sjsNextZO">120</output>
+                        </div>
+                        <div class="sjs_row">
+                            <label for="sjsNextS">缩放</label>
+                            <input type="range" id="sjsNextS" min="0.4" max="1" step="0.02" value="0.86">
+                            <output id="sjsNextSO">0.86</output>
+                        </div>
+                    </div>
+
+                    <pre class="sjs_code"><code id="sjsCodeOut"></code></pre>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 二、参数含义 -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>02</span><h2>每个滑杆在拧什么</h2></div>
+            <p>答辩时被追问"这个数改了会怎样"，照着下面答就行——这些都不是背来的，是刚才拖出来的。</p>
+
+            <div class="sjs_evidence">
+                <div class="sjs_ev">
+                    <h4>prev 管"已经翻过去那张"</h4>
+                    <p>它的 progress 是正数。写进去的位移、深度、角度，会按它离当前页有多远来打折扣：
+                        <code>translate</code> 是 <b>目标值 × 进度</b>，所以第一张刚退走时完全展开，越远越收敛。</p>
+                    <div class="sjs_big">
+                        prev: {<br>
+                        &nbsp;&nbsp;translate: [<em>-38%</em>, 0, <em>-320</em>],<br>
+                        &nbsp;&nbsp;rotate: [0, 0, <em>-8</em>],<br>
+                        &nbsp;&nbsp;shadow: true<br>
+                        }
+                    </div>
+                    <p>X 给负值 → 往左退；Z 给负值 → 往远处缩（透视下看起来更小）；<code>rotate[2]</code> 给负值 → 逆时针歪。</p>
+                </div>
+
+                <div class="sjs_ev">
+                    <h4>next 管"还没轮到那张"</h4>
+                    <p>它的 progress 是负数。同样按进度插值，只是方向相反：从右边推进来、从远处放大过来。
+                        把 <code>opacity</code> 调低，它就会先隐身再浮现。</p>
+                    <div class="sjs_big">
+                        next: {<br>
+                        &nbsp;&nbsp;translate: [<em>100%</em>, 0, <em>120</em>],<br>
+                        &nbsp;&nbsp;scale: <em>0.86</em>,<br>
+                        &nbsp;&nbsp;opacity: 0<br>
+                        }
+                    </div>
+                    <p>X 给正值 → 停在右侧等进场；Z 给正值 → 略靠前；<code>scale</code> 小于 1 → 进场时由小放大。</p>
+                </div>
+            </div>
+
+            <div class="sjs_note">
+                <b>为什么"电影墙"好看：</b>它同时用了三件事——退场那张<b>缩小 + 后退</b>营造纵深，
+                <b>歪 8 度</b>打断整齐感（电影选片墙上的海报不会是正的），
+                进场那张<b>从右侧推进并带缩放</b>，让人感觉"下一张正在被递过来"。
+                只做位移不做纵深，看起来就像普通的平推。
+            </div>
+        </section>
+
+        <!-- 三、百分比之谜 -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>03</span><h2>那个百分号，到底是相对谁</h2></div>
+            <p>这是我踩过的坑。第一版我以为它相对容器宽高，还把它写进了注释——后来实测发现是错的，这里留一份证据。</p>
+
+            <div class="sjs_evidence">
+                <div class="sjs_ev">
+                    <h4>实验设置</h4>
+                    <p>容器宽 <b>600px</b>，<code>slidesPerView: 3</code>，所以每张 slide 宽 <b>200px</b>。
+                        把 <code>translate</code> 的 X 设成 <code>'50%'</code>，然后读实际位移量。</p>
+                    <div class="sjs_big">
+                        容器宽 = 600px<br>
+                        slide 宽 = 200px<br>
+                        translate: ['<em>50%</em>', 0, 0]<br>
+                        → 实测位移 <b>100px</b>
+                    </div>
+                    <p>100px = 200 × 50%，也就是 <b>slide 的宽度</b>。如果相对容器，应该是 300px。</p>
+                </div>
+
+                <div class="sjs_ev">
+                    <h4>为什么是这样</h4>
+                    <p>Swiper 拼出来的字符串长这样：<code>calc(50% - 200px)</code>，然后赋给这张 slide 自己的
+                        <code>transform</code>。CSS 规范里，<code>translate</code> 的百分比基准是<b>元素自身的盒子尺寸</b>，
+                        所以它认的是 slide，不是容器。</p>
+                    <div class="sjs_big">
+                        translate3d(<em>calc(50% - 200px)</em>, 0, 0)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑<br>
+                        50% 按 slide 宽 200px 算 → 100px<br>
+                        再减 200px 的槽位偏移 → 净 -100px
+                    </div>
+                    <p>这也解释了为什么 <code>slidesPerView</code> 一改，同样的百分比写法效果会变——基准跟着 slide 走了。</p>
+                </div>
+            </div>
+
+            <div class="sjs_note">
+                <b>答辩原话：</b>"百分号相对的是这张 slide 自己的宽度，不是容器，也不是里面的图片。
+                容器 600、一屏三张时 slide 只有 200，写 50% 只位移 100px。
+                证据是 Swiper 把参数拼成了 <code>calc(50% - 200px)</code> 这种字符串，直接赋在 slide 的 transform 上。"
+            </div>
+        </section>
+
+        <!-- 四、答辩速答 -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>04</span><h2>三个必答问题</h2></div>
+            <p>老师在答辩里问得最多的三个，按顺序准备。</p>
+
+            <div class="sjs_evidence">
+                <div class="sjs_ev">
+                    <h4>Q1 · prev / next 的 transform 各控制什么？</h4>
+                    <p><code>prev</code> 控制"已经翻过去的那张"要退到哪、歪成什么样；
+                        <code>next</code> 控制"还没轮到的那张"待在哪、怎么进场。
+                        两者都是相对当前 slide 的姿态，按各自的 progress 插值。</p>
+                </div>
+                <div class="sjs_ev">
+                    <h4>Q2 · 改一个数值让卡片转 20 度？</h4>
+                    <p>把 <code>rotate</code> 第三项改成 <code>20</code>：<code>rotate: [0, 0, 20]</code>。
+                        单位是<b>度</b>，不写 <code>deg</code>。实测 matrix 解出来的角度正好 20.00°。
+                        绕 Z 轴转就是平面内旋转，最直观。</p>
+                </div>
+                <div class="sjs_ev">
+                    <h4>Q3 · 为什么换 effect 必须销毁重建？</h4>
+                    <p>effect 只在 <code>init</code> 阶段读一次参数，之后改 <code>params.effect</code> 不会重新挂载模块。
+                        所以要 <code>destroy()</code> 再 <code>new</code>，并且重建前要清掉 cube 残留的
+                        <code>.swiper-cube-shadow</code>，否则容器会被撑高。</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div class="sjs_wrap">
+        <footer>
+            <span>creative 调参台 · 申家硕</span>
+            <span>高级网页设计 · 2026-2027-1</span>
+        </footer>
+    </div>
+
+    <script>
+        // 当前参数状态：滑杆与预设都写进这个对象，再统一渲染
+        const sjs_state = {
+            prevX: -38, prevZ: -320, prevRot: -8,
+            nextX: 100, nextZ: 120, nextScale: 0.86
+        };
+
+        // 轮播实例（切效果时要销毁重建，所以用 let 保存）
+        let sjs_labSwiper = null;
+
+        /**
+         * 根据当前参数拼出 creativeEffect 配置
+         * 功能：把滑杆的数值组装成 Swiper 认识的 prev / next 对象，
+         *      X 位移用带百分号的字符串（相对 slide 宽度），Z 与角度用数字。
+         * @returns {Object} 可直接传给 creativeEffect 的配置
+         */
+        function sjs_buildCreative() {
+            return {
+                prev: {
+                    shadow: true,
+                    translate: [sjs_state.prevX + '%', 0, sjs_state.prevZ],
+                    rotate: [0, 0, sjs_state.prevRot]
+                },
+                next: {
+                    translate: [sjs_state.nextX + '%', 0, sjs_state.nextZ],
+                    scale: sjs_state.nextScale,
+                    opacity: 0
+                },
+                limitProgress: 2
+            };
+        }
+
+        /**
+         * 重建预览轮播
+         * 功能：creative 的参数只在初始化时读取，改滑杆必须销毁旧实例再建新的；
+         *      重建前一并清掉可能残留的 slide-shadow 节点，避免节点堆积。
+         * @returns {void}
+         */
+        function sjs_rebuild() {
+            if (sjs_labSwiper) {
+                sjs_labSwiper.destroy(true, true);
+                document.querySelectorAll('#sjsSwLab .swiper-slide-shadow').forEach(function (sjs_el) {
+                    sjs_el.remove();
+                });
+            }
+            sjs_labSwiper = new Swiper('#sjsSwLab', {
+                effect: 'creative',
+                creativeEffect: sjs_buildCreative(),
+                speed: 650,
+                loop: true,
+                grabCursor: true,
+                pagination: { el: '#sjsPagLab', clickable: true },
+                navigation: { prevEl: '#sjsPrevLab', nextEl: '#sjsNextLab' }
+            });
+        }
+
+        /**
+         * 刷新读数、代码块与一句话摘要
+         * 功能：把内部状态同步到界面——滑杆数值、生成出来的配置代码、
+         *      以及预览区右上角那行"这套配方在干什么"的短描述。
+         * @returns {void}
+         */
+        function sjs_paint() {
+            // 读数
+            document.getElementById('sjsPrevXO').textContent = sjs_state.prevX + '%';
+            document.getElementById('sjsPrevZO').textContent = sjs_state.prevZ;
+            document.getElementById('sjsPrevRO').textContent = sjs_state.prevRot + '°';
+            document.getElementById('sjsNextXO').textContent = sjs_state.nextX + '%';
+            document.getElementById('sjsNextZO').textContent = sjs_state.nextZ;
+            document.getElementById('sjsNextSO').textContent = sjs_state.nextScale.toFixed(2);
+
+            // 同步滑杆位置（点预设时滑杆要跟着走）
+            document.getElementById('sjsPrevX').value = sjs_state.prevX;
+            document.getElementById('sjsPrevZ').value = sjs_state.prevZ;
+            document.getElementById('sjsPrevR').value = sjs_state.prevRot;
+            document.getElementById('sjsNextX').value = sjs_state.nextX;
+            document.getElementById('sjsNextZ').value = sjs_state.nextZ;
+            document.getElementById('sjsNextS').value = sjs_state.nextScale;
+
+            // 生成代码
+            const sjs_c = sjs_buildCreative();
+            document.getElementById('sjsCodeOut').textContent =
+                "creativeEffect: {\n" +
+                "  prev: {\n" +
+                "    shadow: true,\n" +
+                "    translate: ['" + sjs_c.prev.translate[0] + "', 0, " + sjs_c.prev.translate[2] + "],\n" +
+                "    rotate: [0, 0, " + sjs_c.prev.rotate[2] + "]\n" +
+                "  },\n" +
+                "  next: {\n" +
+                "    translate: ['" + sjs_c.next.translate[0] + "', 0, " + sjs_c.next.translate[2] + "],\n" +
+                "    scale: " + sjs_c.next.scale + ",\n" +
+                "    opacity: 0\n" +
+                "  }\n" +
+                "}";
+
+            // 一句话摘要：按当前数值描述这套配方的观感
+            const sjs_z = sjs_state.prevZ < -200 ? '明显后退' : (sjs_state.prevZ < 0 ? '略后退' : '不后退');
+            const sjs_r = Math.abs(sjs_state.prevRot) >= 5 ? '带 ' + Math.abs(sjs_state.prevRot) + '° 倾斜' : '不倾斜';
+            document.getElementById('sjsFormula').textContent =
+                '退场 ' + sjs_z + ' · ' + sjs_r + ' · 进场缩放 ' + sjs_state.nextScale.toFixed(2);
+        }
+
+        // 四套预设：只改数值，其余逻辑复用
+        const sjs_PRESETS = {
+            wall: { prevX: -38, prevZ: -320, prevRot: -8, nextX: 100, nextZ: 120, nextScale: 0.86 },
+            push: { prevX: -100, prevZ: -400, prevRot: 0, nextX: 100, nextZ: 0, nextScale: 1 },
+            twist: { prevX: -60, prevZ: -240, prevRot: -22, nextX: 70, nextZ: 60, nextScale: 0.9 },
+            book: { prevX: -12, prevZ: -60, prevRot: -32, nextX: 12, nextZ: -60, nextScale: 0.96 }
+        };
+
+        /**
+         * 应用一套预设
+         * 功能：把预设数值写进状态、同步按钮高亮、重绘画布与代码。
+         * @param {string} sjs_key 预设名（wall / push / twist / book）
+         * @returns {void}
+         */
+        function sjs_applyPreset(sjs_key) {
+            Object.assign(sjs_state, sjs_PRESETS[sjs_key]);
+            document.querySelectorAll('#sjsPresets button').forEach(function (sjs_b) {
+                sjs_b.setAttribute('aria-pressed', sjs_b.dataset.preset === sjs_key ? 'true' : 'false');
+            });
+            sjs_paint();
+            sjs_rebuild();
+        }
+
+        /**
+         * 绑定所有滑杆
+         * 功能：滑杆输入时更新状态并重绘；为避免拖动过程中反复重建实例造成卡顿，
+         *      预览只在松手（change）时重建，拖动期间先更新读数与代码。
+         * @returns {void}
+         */
+        function sjs_bindSliders() {
+            const sjs_map = [
+                ['sjsPrevX', 'prevX', 'int'],
+                ['sjsPrevZ', 'prevZ', 'int'],
+                ['sjsPrevR', 'prevRot', 'int'],
+                ['sjsNextX', 'nextX', 'int'],
+                ['sjsNextZ', 'nextZ', 'int'],
+                ['sjsNextS', 'nextScale', 'float']
+            ];
+            sjs_map.forEach(function (sjs_m) {
+                const sjs_el = document.getElementById(sjs_m[0]);
+                // input：拖动过程中实时更新读数与代码
+                sjs_el.addEventListener('input', function () {
+                    sjs_state[sjs_m[1]] = sjs_m[2] === 'float' ? parseFloat(sjs_el.value) : parseInt(sjs_el.value, 10);
+                    sjs_paint();
+                });
+                // change：松手时才重建轮播，保证拖动流畅
+                sjs_el.addEventListener('change', function () {
+                    sjs_rebuild();
+                });
+            });
+
+            document.querySelectorAll('#sjsPresets button').forEach(function (sjs_b) {
+                sjs_b.addEventListener('click', function () {
+                    sjs_applyPreset(sjs_b.dataset.preset);
+                });
+            });
+        }
+
+        sjs_paint();
+        sjs_rebuild();
+        sjs_bindSliders();
+    </script>
+
+</body>
+
+</html>

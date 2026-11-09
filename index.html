@@ -564,6 +564,20 @@
             transition: transform .2s ease;
         }
 
+        /* 同一张卡片里的第二个入口做次级处理，避免两个链接抢视线 */
+        .gate-link + .gate-link {
+            margin-top: 0;
+            padding-top: 6px;
+            border-top: 0;
+            font-weight: 500;
+            font-size: 12.4px;
+            color: var(--ink-faint);
+        }
+
+        .gate-link + .gate-link:hover {
+            color: var(--accent);
+        }
+
         .gate-link:hover .go {
             transform: translateX(3px);
         }
@@ -1140,7 +1154,7 @@
                         <h2>三关进阶</h2>
                         <p>Swiper 讲解版第六节布置的三个任务，全部完成并在作业页中可操作。</p>
                     </div>
-                    <span class="counter">3 关 · 全部完成</span>
+                    <span class="counter">3 关 · 全部完成 · 各配独立页面</span>
                 </div>
 
                 <div class="gates">
@@ -1159,7 +1173,8 @@
                             <li>第 2 轮把「可点击跳转」写清楚，复测通过</li>
                             <li>往返记录见 <a href="sjs_prompt.md">sjs_prompt.md</a></li>
                         </ul>
-                        <a class="gate-link" href="swiper-task.html#wyGate1">看这一关的说明 <span class="go">→</span></a>
+                        <a class="gate-link" href="sjs-task1.html">进入两轮对照实验台 <span class="go">→</span></a>
+                        <a class="gate-link" href="swiper-task.html#wyGate1">在作业页查看 <span class="go">→</span></a>
                     </article>
 
                     <!-- 第二关：creative 仿写 -->
@@ -1175,7 +1190,8 @@
                             <li><code>prev</code> 控制已翻过去那张的退场姿态</li>
                             <li><code>next</code> 控制下一张的进场姿态</li>
                         </ul>
-                        <a class="gate-link" href="swiper-task.html#wyGate2">看这一关的说明 <span class="go">→</span></a>
+                        <a class="gate-link" href="sjs-task2.html">打开 creative 调参台 <span class="go">→</span></a>
+                        <a class="gate-link" href="swiper-task.html#wyGate2">在作业页查看 <span class="go">→</span></a>
                     </article>
 
                     <!-- 第三关：综合创作 -->
@@ -1191,7 +1207,8 @@
                             <li>展品：已加入四台演示，16:9 横向配图</li>
                             <li>超纲能力：<code>keyboard</code> 键盘方向键控制</li>
                         </ul>
-                        <a class="gate-link" href="swiper-task.html#wyGate3">看这一关的说明 <span class="go">→</span></a>
+                        <a class="gate-link" href="sjs-task3.html">进入键盘控制实验室 <span class="go">→</span></a>
+                        <a class="gate-link" href="swiper-task.html#wyGate3">在作业页查看 <span class="go">→</span></a>
                     </article>
 
                 </div>
