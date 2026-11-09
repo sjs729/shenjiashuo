@@ -226,3 +226,10 @@ https://yitianti.github.io/yangtt/ 这个网站是其他同学的 他做的比�
 - 模型：DeepSeek-V4.1-Flash
 - 提示词内容：
 帮我发布到GitHub上面
+
+## 2026-11-09 14:45:00 · 发布记录
+- 模型：DeepSeek-V4.1-Flash
+- 仓库：`sjs729/shenjiashuo`（main 分支，Pages legacy 构建，根目录）
+- 提交：5f9e321
+- 站点：https://sjs729.github.io/shenjiashuo/
+- 验收：8 个入口全部 200；首页 11 卡片 / 3 关 / 6 个入口链接；任务一点圆点读数正确；任务二 6 滑杆 + 4 预设可用；任务三缩略图联动同步；提示词页 36 条记录
