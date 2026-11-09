@@ -131,3 +131,10 @@ new Swiper('#wySw4', {
 ```
 - 验证结果：点第 3 个圆点，`realIndex` 从 4 跳到 2，跳转成立；其余四项需求复测均通过。
 - 结论：两项配置差一个 `clickable: true`，就能决定圆点是"摆设"还是"遥控器"。
+
+## 2026-11-09 11:20:00 · 提交记录
+- 模型：DeepSeek-V4.1-Flash
+- 动作：三关补齐后推送到 GitHub，仓库 `sjs729/shenjiashuo`，main 分支
+- 线上地址：https://sjs729.github.io/shenjiashuo/
+- 作业页地址：https://sjs729.github.io/shenjiashuo/swiper-task.html
+- 验证：七个 effect 全部可切、键盘方向键可翻页、四页图片全部加载、提示词记录可访问
