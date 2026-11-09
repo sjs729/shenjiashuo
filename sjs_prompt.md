@@ -160,6 +160,6 @@ new Swiper('#wySw4', {
 ## 2026-11-09 11:52:00 · 勘误
 - 模型：DeepSeek-V4.1-Flash
 - 问题：作业页原写「creativeEffect 的百分比相对容器宽高」「keyboard 只对已聚焦容器生效」，两处均与实际不符
-- 实测结论 1：百分比相对**slide 自身宽度**。容器 600px、slidesPerView:3 时 slide 宽 200px，`translate: ['50%',0,0]` 位移 100px
-- 实测结论 2：keyboard 的 keydown 监听挂在 **document** 上，焦点停在 body、轮播在视口内时方向键仍可翻页；真正门槛是 `keyboard.onlyInViewport`（默认 true）
+- 实测结论 1：百分比相对 slide 自身宽度。容器 600px、slidesPerView:3 时 slide 宽 200px，translate ['50%',0,0] 位移 100px
+- 实测结论 2：keyboard 的 keydown 监听挂在 document 上，焦点停在 body、轮播在视口内时方向键仍可翻页；真正门槛是 keyboard.onlyInViewport（默认 true）
 - 已修正页面文案与注释
