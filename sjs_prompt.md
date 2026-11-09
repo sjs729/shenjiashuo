@@ -138,3 +138,9 @@ new Swiper('#wySw4', {
 - 线上地址：https://sjs729.github.io/shenjiashuo/
 - 作业页地址：https://sjs729.github.io/shenjiashuo/swiper-task.html
 - 验证：七个 effect 全部可切、键盘方向键可翻页、四页图片全部加载、提示词记录可访问
+
+## 2026-11-09 11:32:25
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+这个老师会抽查问题 老师都会问什么 以及答案是什么
+（附截图：讲解版三关的答辩抽问与答辩四连问）
