@@ -499,190 +499,86 @@
             color: var(--ink);
         }
 
-        /* ---------------- 提示词记录（内嵌） ---------------- */
-        .sjs_md-tools {
+        /* ---------------- 提示词记录入口 ---------------- */
+        .sjs_entry {
             display: flex;
             align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 14px;
-        }
-
-        .sjs_md-tools .sjs_count {
-            font-size: 12.5px;
-            color: var(--ink-faint);
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        }
-
-        .sjs_md-tools button {
-            font-family: inherit;
-            font-size: 12.6px;
-            color: var(--ink-soft);
-            background: var(--card);
-            border: 1px solid var(--line);
-            border-radius: 999px;
-            padding: 5px 14px;
-            cursor: pointer;
-            transition: all .18s ease;
-        }
-
-        .sjs_md-tools button:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .sjs_md-tools a {
-            font-size: 12.6px;
-            color: var(--ink-faint);
-            border-bottom: 1px dotted var(--line);
-        }
-
-        .sjs_md-tools a:hover {
-            color: var(--accent);
-        }
-
-        /* 记录正文：默认收起到一定高度，点"展开全部"再看全 */
-        /* 外壳负责圆角与边框，内层负责滚动，渐隐挂在外壳上 */
-        .sjs_md-shell {
-            position: relative;
+            gap: 16px;
             background: var(--card);
             border: 1px solid var(--line);
             border-radius: var(--radius);
+            padding: 18px 22px;
             box-shadow: var(--shadow-sm);
-            overflow: hidden;
+            color: inherit;
+            transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
         }
 
-        .sjs_md {
-            padding: 26px 30px 30px;
-            max-height: 620px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            transition: max-height .3s ease;
+        .sjs_entry:hover {
+            transform: translateY(-2px);
+            border-color: #cfd6e4;
+            box-shadow: 0 4px 8px rgba(22, 32, 46, .05), 0 18px 36px -22px rgba(22, 32, 46, .4);
         }
 
-        /* 展开时解除高度限制：data-open 挂在外壳上，选择器要跟着改 */
-        .sjs_md-shell[data-open="1"] .sjs_md {
-            max-height: none;
-        }
-
-        /* 底边渐隐：提示"下面还有内容"，展开后自动消失 */
-        .sjs_md-shell::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: 56px;
-            background: linear-gradient(transparent, var(--card) 82%);
-            pointer-events: none;
-            transition: opacity .25s ease;
-        }
-
-        .sjs_md-shell[data-open="1"]::after {
-            opacity: 0;
-        }
-
-        .sjs_md h1 {
-            font-size: 20px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--ink);
-            margin-bottom: 4px;
-        }
-
-        /* 每条记录：左侧蓝线 + 日期等宽数字，像实验记录本 */
-        .sjs_md h2 {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
-            font-size: 14.5px;
-            font-weight: 700;
-            letter-spacing: 0;
-            margin: 26px 0 8px;
-            padding: 7px 0 7px 13px;
-            border-left: 3px solid var(--accent);
-            background: linear-gradient(90deg, var(--accent-soft), transparent 62%);
-            border-radius: 0 6px 6px 0;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .sjs_md h2:first-of-type {
-            margin-top: 14px;
-        }
-
-        .sjs_md h3 {
-            font-size: 13.5px;
-            color: var(--ink-soft);
-            margin: 16px 0 6px;
-        }
-
-        .sjs_md p {
-            font-size: 13.6px;
-            color: var(--ink-soft);
-            margin: 6px 0;
-        }
-
-        .sjs_md ul {
-            list-style: none;
-            margin: 8px 0 10px;
-        }
-
-        .sjs_md ul li {
-            position: relative;
-            padding-left: 16px;
-            font-size: 13.4px;
-            color: var(--ink-soft);
-            margin: 4px 0;
-        }
-
-        .sjs_md ul li::before {
-            content: "";
-            position: absolute;
-            left: 2px;
-            top: 10px;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: var(--accent);
-            opacity: .5;
-        }
-
-        .sjs_md code {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            font-size: 12.4px;
-            color: var(--accent);
+        /* 左侧的文件类型方块，用等宽字体，和表格里的代码样式呼应 */
+        .sjs_entry-icon {
+            flex: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
             background: var(--accent-soft);
-            border-radius: 4px;
-            padding: 1px 5px;
-        }
-
-        .sjs_md pre {
-            background: #10182a;
-            border-radius: 9px;
-            padding: 14px 16px;
-            overflow-x: auto;
-            margin: 10px 0;
-        }
-
-        .sjs_md pre code {
-            background: none;
-            color: #e6edff;
-            padding: 0;
-            font-size: 12.4px;
-            line-height: 1.75;
-        }
-
-        .sjs_md strong {
-            color: var(--ink);
-            font-weight: 700;
-        }
-
-        .sjs_md-empty {
-            padding: 18px 0;
-            font-size: 13.6px;
-            color: var(--ink-faint);
-        }
-
-        .sjs_md-empty a {
             color: var(--accent);
-            font-weight: 600;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .5px;
+        }
+
+        .sjs_entry-body {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .sjs_entry-body b {
+            font-size: 15px;
+            color: var(--ink);
+        }
+
+        .sjs_entry-body span {
+            font-size: 13px;
+            color: var(--ink-soft);
+        }
+
+        /* 文件路径那行：需要按内容收窄，否则会被 flex 拉成整条色带 */
+        .sjs_entry-body code {
+            align-self: flex-start;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 11.8px;
+            color: var(--ink-faint);
+            background: none;
+            padding: 0;
+        }
+
+        .sjs_entry-go {
+            flex: none;
+            font-size: 18px;
+            color: var(--ink-faint);
+            transition: transform .22s ease, color .22s ease;
+        }
+
+        .sjs_entry:hover .sjs_entry-go {
+            color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .sjs_entry-alt {
+            margin-top: 12px !important;
+            font-size: 12.8px !important;
+            color: var(--ink-faint) !important;
         }
 
         footer {
@@ -934,26 +830,24 @@
             </table>
         </section>
 
-        <!-- 05 · 提示词记录（内嵌 sjs_prompt.md） -->
+        <!-- 05 · 提示词记录入口（点击跳转到记录页，不在本页内嵌全文） -->
         <section class="sjs_sec">
-            <div class="sjs_sec-head"><span>05</span><h2>全部提示词记录</h2></div>
-            <p>
-                讲解版要求"给提示词留有访问入口"，所以把整份 <code>sjs_prompt.md</code> 直接内嵌在本页末尾——
-                从第一条命名规则到本轮修改，逐条按时间追加，不覆盖历史。记录更新后刷新本页即可看到。
+            <div class="sjs_sec-head"><span>05</span><h2>提示词记录</h2></div>
+            <p>讲解版要求"给提示词留有访问入口"。本页用过的两轮提示词原文、以及整个项目的历史记录，都收在记录页里。</p>
+
+            <a class="sjs_entry" href="sjs_prompt.html">
+                <span class="sjs_entry-icon">MD</span>
+                <span class="sjs_entry-body">
+                    <b>全部提示词记录</b>
+                    <span>从 2026-10-22 的第一条命名规则起，逐条按时间追加，不覆盖历史</span>
+                    <code>sjs_prompt.md</code>
+                </span>
+                <span class="sjs_entry-go">→</span>
+            </a>
+
+            <p class="sjs_entry-alt">
+                也可以直接打开原始文件：<a href="sjs_prompt.md">sjs_prompt.md</a>
             </p>
-
-            <div class="sjs_md-tools">
-                <span class="sjs_count" id="sjsMdCount">读取中…</span>
-                <button type="button" id="sjsMdToggle">展开全部</button>
-                <a href="sjs_prompt.md">打开原始 Markdown</a>
-                <a href="sjs_prompt.html">在独立页阅读</a>
-            </div>
-
-            <div class="sjs_md-shell" id="sjsMdShell" data-open="0">
-                <article class="sjs_md" id="sjsMd">
-                    <p class="sjs_md-empty">正在读取 sjs_prompt.md …</p>
-                </article>
-            </div>
         </section>
 
     </main>
@@ -1044,166 +938,6 @@
 
         sjs_initDemos();
         sjs_watchClicks();
-
-        /**
-         * 转义 HTML 特殊字符
-         * 功能：先把尖括号、& 转成实体，避免记录里的代码片段被当成标签解析；
-         *      这是"先转义再拼标签"的关键，不做的话页面结构会被自己写的示例破坏。
-         * @param {string} sjs_str 原始文本
-         * @returns {string} 转义后的文本
-         */
-        function sjs_escape(sjs_str) {
-            return sjs_str
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
-        }
-
-        /**
-         * 处理行内标记
-         * 功能：在已转义的文本上还原 `代码` 与 **加粗**；
-         *      先处理代码再处理加粗，避免代码里的星号被误判。
-         * @param {string} sjs_str 已转义的文本
-         * @returns {string} 带行内标签的 HTML
-         */
-        function sjs_inline(sjs_str) {
-            return sjs_str
-                .replace(/`([^`]+)`/g, '<code>$1</code>')
-                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-        }
-
-        /**
-         * 把 Markdown 渲染成 HTML
-         * 功能：只实现本记录用到的语法——一至三级标题、无序列表、围栏代码块、普通段落；
-         *      围栏内的内容原样保留，不再参与行内解析。
-         * @param {string} sjs_md Markdown 原文
-         * @returns {string} 渲染后的 HTML
-         */
-        function sjs_renderMarkdown(sjs_md) {
-            const sjs_lines = sjs_md.replace(/\r\n/g, '\n').split('\n');
-            const sjs_out = [];
-            let sjs_inCode = false;
-            let sjs_inList = false;
-            let sjs_para = [];
-
-            // 结束当前段落
-            const sjs_flush = function () {
-                if (sjs_para.length) {
-                    sjs_out.push('<p>' + sjs_inline(sjs_escape(sjs_para.join(' '))) + '</p>');
-                    sjs_para = [];
-                }
-            };
-            // 结束当前列表
-            const sjs_closeList = function () {
-                if (sjs_inList) {
-                    sjs_out.push('</ul>');
-                    sjs_inList = false;
-                }
-            };
-
-            sjs_lines.forEach(function (sjs_line) {
-                // 围栏代码块
-                if (/^```/.test(sjs_line)) {
-                    if (sjs_inCode) {
-                        sjs_out.push('</code></pre>');
-                        sjs_inCode = false;
-                    } else {
-                        sjs_flush();
-                        sjs_closeList();
-                        sjs_out.push('<pre><code>');
-                        sjs_inCode = true;
-                    }
-                    return;
-                }
-                if (sjs_inCode) {
-                    sjs_out.push(sjs_escape(sjs_line));
-                    return;
-                }
-                // 空行切分
-                if (!sjs_line.trim()) {
-                    sjs_flush();
-                    sjs_closeList();
-                    return;
-                }
-                // 标题
-                const sjs_h = sjs_line.match(/^(#{1,3})\s+(.*)$/);
-                if (sjs_h) {
-                    sjs_flush();
-                    sjs_closeList();
-                    const sjs_lv = sjs_h[1].length;
-                    sjs_out.push('<h' + sjs_lv + '>' + sjs_inline(sjs_escape(sjs_h[2])) + '</h' + sjs_lv + '>');
-                    return;
-                }
-                // 无序列表
-                const sjs_li = sjs_line.match(/^-\s+(.*)$/);
-                if (sjs_li) {
-                    sjs_flush();
-                    if (!sjs_inList) {
-                        sjs_out.push('<ul>');
-                        sjs_inList = true;
-                    }
-                    sjs_out.push('<li>' + sjs_inline(sjs_escape(sjs_li[1])) + '</li>');
-                    return;
-                }
-                // 普通段落
-                sjs_closeList();
-                sjs_para.push(sjs_line.trim());
-            });
-
-            sjs_flush();
-            sjs_closeList();
-            if (sjs_inCode) sjs_out.push('</code></pre>');
-            return sjs_out.join('\n');
-        }
-
-        /**
-         * 读取并内嵌提示词记录
-         * 功能：请求同目录的 sjs_prompt.md → 渲染 → 填入容器，并更新条数与"展开全部"按钮；
-         *      读取失败（file:// 直开）时给出提示，不让读者面对一片空白。
-         * @returns {void}
-         */
-        function sjs_loadPromptLog() {
-            const sjs_box = document.getElementById('sjsMd');
-            const sjs_count = document.getElementById('sjsMdCount');
-            const sjs_toggle = document.getElementById('sjsMdToggle');
-
-            fetch('sjs_prompt.md', { cache: 'no-store' })
-                .then(function (sjs_res) {
-                    if (!sjs_res.ok) throw new Error('HTTP ' + sjs_res.status);
-                    return sjs_res.text();
-                })
-                .then(function (sjs_md) {
-                    const sjs_n = (sjs_md.match(/^##\s+/gm) || []).length;
-                    sjs_box.innerHTML = sjs_renderMarkdown(sjs_md);
-                    sjs_count.textContent = '共 ' + sjs_n + ' 条记录 · sjs_prompt.md';
-                })
-                .catch(function () {
-                    // 本地 file:// 下 fetch 被拦，提示改用另外两个入口
-                    sjs_box.innerHTML = '<p class="sjs_md-empty">当前以本地文件方式打开，浏览器不允许脚本读取同目录的 Markdown。' +
-                        '请点上方"打开原始 Markdown"直接查看，或访问线上版本。</p>';
-                    sjs_count.textContent = '正文未能加载';
-                    sjs_toggle.hidden = true;
-                });
-        }
-
-        /**
-         * 绑定"展开全部 / 收起"按钮
-         * 功能：记录默认收起在固定高度，按钮切换 data-open 控制是否解除高度限制，
-         *      同时改写按钮文字，避免出现两个都叫"展开"的状态。
-         * @returns {void}
-         */
-        function sjs_bindMdToggle() {
-            const sjs_shell = document.getElementById('sjsMdShell');
-            const sjs_btn = document.getElementById('sjsMdToggle');
-            sjs_btn.addEventListener('click', function () {
-                const sjs_open = sjs_shell.getAttribute('data-open') === '1';
-                sjs_shell.setAttribute('data-open', sjs_open ? '0' : '1');
-                sjs_btn.textContent = sjs_open ? '展开全部' : '收起';
-            });
-        }
-
-        sjs_loadPromptLog();
-        sjs_bindMdToggle();
     </script>
 
 </body>
