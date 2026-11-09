@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<!--
+  作者：申家硕
+  建立时间：2026-11-09
+  使用模型：DeepSeek-V4.1-Flash
+  功能名称：提示词记录阅读页（sjs_prompt.md 的网页入口）
+  简介：把 sjs_prompt.md 渲染成可读页面，供课堂答辩时直接翻看每一轮提示词与 AI 回答；
+        页面运行时读取同目录的 Markdown 原始文件，因此记录更新后无需改动本页。
+        读取失败时（例如以 file:// 打开）给出提示并保留原始文件链接。
+-->
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提示词记录 · sjs_prompt.md | 申家硕</title>
+    <meta name="description" content="申家硕《高级网页设计》课堂实践的提示词记录，包含每次任务的提示词原文、使用的模型与时间。">
+    <style>
+        /* ==========================================================
+           提示词记录阅读页
+           沿用首页的纸张底色与蓝色油墨，保持同一套版式语言
+           ========================================================== */
+
+        :root {
+            --ink: #16202e;
+            --ink-soft: #40506a;
+            --ink-faint: #7c8aa3;
+            --paper: #f6f4ef;
+            --card: #ffffff;
+            --line: #e4e0d8;
+            --accent: #1f4fd8;
+            --accent-soft: #e8eefe;
+            --warm: #d97a3c;
+            --radius: 16px;
+            --shadow-sm: 0 1px 2px rgba(22, 32, 46, .05), 0 6px 18px -12px rgba(22, 32, 46, .18);
+            --maxw: 860px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+                "Microsoft YaHei", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
+            color: var(--ink);
+            background: var(--paper);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            color: var(--accent);
+        }
+
+        /* ---------------- 顶部条 ---------------- */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: saturate(180%) blur(14px);
+            -webkit-backdrop-filter: saturate(180%) blur(14px);
+            background: rgba(246, 244, 239, .82);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .topbar .wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            height: 62px;
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: var(--maxw);
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+
+        .brand .mark {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--accent), #4f7ff0);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .brand small {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--ink-faint);
+            letter-spacing: .6px;
+        }
+
+        .back {
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid var(--line);
+            background: var(--card);
+            border-radius: 999px;
+            padding: 7px 16px;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .back:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ---------------- 标题区 ---------------- */
+        .head {
+            padding: 52px 0 26px;
+        }
+
+        .head h1 {
+            font-size: clamp(28px, 4.4vw, 40px);
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+
+        .head p {
+            margin-top: 12px;
+            color: var(--ink-soft);
+            font-size: 15px;
+        }
+
+        .head .meta {
+            margin-top: 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 12.5px;
+            color: var(--ink-faint);
+        }
+
+        .head .meta span {
+            border: 1px solid var(--line);
+            background: var(--card);
+            border-radius: 999px;
+            padding: 4px 12px;
+        }
+
+        /* ---------------- 正文 ---------------- */
+        .doc {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 34px 38px 40px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 40px;
+        }
+
+        .doc h1 {
+            font-size: 24px;
+            letter-spacing: -.4px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid var(--ink);
+            margin-bottom: 8px;
+        }
+
+        /* 每一条记录用小标题加左侧油墨线，像分栏的笔记本 */
+        .doc h2 {
+            font-size: 17px;
+            letter-spacing: -.2px;
+            margin: 34px 0 10px;
+            padding: 8px 0 8px 14px;
+            border-left: 3px solid var(--accent);
+            background: linear-gradient(90deg, var(--accent-soft), transparent 65%);
+            border-radius: 0 6px 6px 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .doc h2:first-of-type {
+            margin-top: 18px;
+        }
+
+        .doc h3 {
+            font-size: 15px;
+            margin: 20px 0 8px;
+            color: var(--ink-soft);
+        }
+
+        .doc p {
+            margin: 8px 0;
+            font-size: 14.6px;
+            color: var(--ink-soft);
+        }
+
+        .doc ul {
+            list-style: none;
+            margin: 10px 0 12px;
+        }
+
+        .doc ul li {
+            position: relative;
+            padding-left: 18px;
+            font-size: 14.4px;
+            color: var(--ink-soft);
+            margin: 5px 0;
+        }
+
+        .doc ul li::before {
+            content: "";
+            position: absolute;
+            left: 2px;
+            top: 11px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: .55;
+        }
+
+        .doc code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12.8px;
+            color: var(--accent);
+            background: var(--accent-soft);
+            border-radius: 4px;
+            padding: 1px 5px;
+        }
+
+        .doc pre {
+            background: #10182a;
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin: 12px 0;
+            overflow-x: auto;
+        }
+
+        .doc pre code {
+            background: none;
+            color: #e6edff;
+            padding: 0;
+            font-size: 12.8px;
+            line-height: 1.75;
+        }
+
+        .doc strong {
+            color: var(--ink);
+            font-weight: 700;
+        }
+
+        /* ---------------- 状态提示 ---------------- */
+        .notice {
+            margin: 18px 0 0;
+            padding: 14px 18px;
+            border: 1px dashed #e0b98f;
+            background: #fffaf3;
+            border-radius: 12px;
+            font-size: 13.6px;
+            color: #7c5e10;
+            line-height: 1.85;
+        }
+
+        .notice[hidden] {
+            display: none;
+        }
+
+        .notice a {
+            color: var(--warm);
+            font-weight: 600;
+        }
+
+        footer {
+            padding: 0 0 56px;
+            color: var(--ink-faint);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        @media (max-width: 640px) {
+            .doc {
+                padding: 24px 20px 28px;
+            }
+
+            .wrap {
+                padding: 0 16px;
+            }
+
+            .head {
+                padding: 36px 0 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 顶部条 -->
+    <header class="topbar">
+        <div class="wrap">
+            <div class="brand">
+                <span class="mark">高</span>
+                <span>提示词记录
+                    <small>sjs_prompt.md</small>
+                </span>
+            </div>
+            <a class="back" href="index.html">← 返回首页</a>
+        </div>
+    </header>
+
+    <!-- 标题区 -->
+    <div class="wrap">
+        <div class="head">
+            <h1>提示词记录</h1>
+            <p>本项目每一次任务的提示词原文、使用的模型与时间，按时间顺序追加，不覆盖历史内容。页面直接读取同目录的 <code>sjs_prompt.md</code>，记录更新后刷新即可。</p>
+            <div class="meta">
+                <span>文件：sjs_prompt.md</span>
+                <span>模型：DeepSeek-V4.1-Flash</span>
+                <span>提交：GitHub Pages</span>
+            </div>
+        </div>
+
+        <!-- 正文容器：由脚本把 Markdown 渲染进来 -->
+        <article class="doc" id="sjs_doc">
+            <p>正在读取 sjs_prompt.md …</p>
+        </article>
+
+        <!-- 读取失败时的兜底提示 -->
+        <div class="notice" id="sjs_notice" hidden>
+            当前以本地文件方式打开，浏览器出于安全限制不允许脚本读取同目录的 Markdown 文件，
+            因此正文无法在此渲染。可以直接打开原始文件查看：
+            <a href="sjs_prompt.md">sjs_prompt.md</a>；
+            或访问线上版本（GitHub Pages 会自动渲染本页内容）。
+        </div>
+    </div>
+
+    <footer>提示词记录 · 高级网页设计 · 申家硕 · 2026-2027-1</footer>
+
+    <script>
+        /**
+         * 转义 HTML 特殊字符
+         * 功能：把 Markdown 原文里的尖括号、& 等转成实体，避免被当成标签解析，
+         *      这是"先转义再拼标签"的关键一步，防止记录里的代码片段破坏页面结构。
+         * @param {string} sjs_str 原始文本
+         * @returns {string} 转义后的文本
+         */
+        function sjs_escape(sjs_str) {
+            return sjs_str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        /**
+         * 处理行内标记
+         * 功能：在已经转义过的文本上还原 `代码` 与 **加粗** 两种标记，
+         *      顺序上先代码后加粗，避免代码里的星号被误当成加粗。
+         * @param {string} sjs_str 已转义的文本
+         * @returns {string} 带行内标签的 HTML
+         */
+        function sjs_inline(sjs_str) {
+            return sjs_str
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        }
+
+        /**
+         * 把 Markdown 转成 HTML
+         * 功能：只实现本记录实际用到的语法——一级/二级/三级标题、无序列表、
+         *      围栏代码块与普通段落；空行用来切分段落。
+         *      代码块内部的文本不再参与行内解析，保证示例代码原样呈现。
+         * @param {string} sjs_md Markdown 原文
+         * @returns {string} 渲染后的 HTML 字符串
+         */
+        function sjs_renderMarkdown(sjs_md) {
+            const sjs_lines = sjs_md.replace(/\r\n/g, '\n').split('\n');
+            const sjs_out = [];
+            let sjs_inCode = false;
+            let sjs_inList = false;
+            let sjs_paragraph = [];
+
+            // 结束当前段落：把攒下的普通行合并成一个 <p>
+            const sjs_flushParagraph = function () {
+                if (sjs_paragraph.length) {
+                    sjs_out.push('<p>' + sjs_inline(sjs_escape(sjs_paragraph.join(' '))) + '</p>');
+                    sjs_paragraph = [];
+                }
+            };
+            // 结束当前列表
+            const sjs_closeList = function () {
+                if (sjs_inList) {
+                    sjs_out.push('</ul>');
+                    sjs_inList = false;
+                }
+            };
+
+            sjs_lines.forEach(function (sjs_line) {
+                // 围栏代码块：``` 开头与结尾之间原样保留
+                if (/^```/.test(sjs_line)) {
+                    if (sjs_inCode) {
+                        sjs_out.push('</code></pre>');
+                        sjs_inCode = false;
+                    } else {
+                        sjs_flushParagraph();
+                        sjs_closeList();
+                        sjs_out.push('<pre><code>');
+                        sjs_inCode = true;
+                    }
+                    return;
+                }
+                if (sjs_inCode) {
+                    sjs_out.push(sjs_escape(sjs_line));
+                    return;
+                }
+
+                // 空行：段落与列表的天然分隔
+                if (!sjs_line.trim()) {
+                    sjs_flushParagraph();
+                    sjs_closeList();
+                    return;
+                }
+
+                // 标题
+                const sjs_h = sjs_line.match(/^(#{1,3})\s+(.*)$/);
+                if (sjs_h) {
+                    sjs_flushParagraph();
+                    sjs_closeList();
+                    const sjs_level = sjs_h[1].length;
+                    sjs_out.push('<h' + sjs_level + '>' + sjs_inline(sjs_escape(sjs_h[2])) + '</h' + sjs_level + '>');
+                    return;
+                }
+
+                // 无序列表项
+                const sjs_li = sjs_line.match(/^-\s+(.*)$/);
+                if (sjs_li) {
+                    sjs_flushParagraph();
+                    if (!sjs_inList) {
+                        sjs_out.push('<ul>');
+                        sjs_inList = true;
+                    }
+                    sjs_out.push('<li>' + sjs_inline(sjs_escape(sjs_li[1])) + '</li>');
+                    return;
+                }
+
+                // 其余按段落累积
+                sjs_closeList();
+                sjs_paragraph.push(sjs_line.trim());
+            });
+
+            sjs_flushParagraph();
+            sjs_closeList();
+            if (sjs_inCode) sjs_out.push('</code></pre>');
+            return sjs_out.join('\n');
+        }
+
+        /**
+         * 读取并渲染 sjs_prompt.md
+         * 功能：向同目录请求 Markdown 原文 → 渲染 → 写入正文容器；
+         *      读取失败（如 file:// 协议）时显示兜底提示，页面不至于空白。
+         * @returns {void}
+         */
+        function sjs_loadPromptLog() {
+            const sjs_doc = document.getElementById('sjs_doc');
+            const sjs_notice = document.getElementById('sjs_notice');
+
+            fetch('sjs_prompt.md', { cache: 'no-store' })
+                .then(function (sjs_res) {
+                    if (!sjs_res.ok) throw new Error('HTTP ' + sjs_res.status);
+                    return sjs_res.text();
+                })
+                .then(function (sjs_md) {
+                    // 记录条数即二级标题数量，顺手显示在标题区，方便答辩时对照
+                    const sjs_count = (sjs_md.match(/^##\s+/gm) || []).length;
+                    sjs_doc.innerHTML = sjs_renderMarkdown(sjs_md);
+                    const sjs_meta = document.querySelector('.head .meta');
+                    if (sjs_meta) {
+                        const sjs_tag = document.createElement('span');
+                        sjs_tag.textContent = '共 ' + sjs_count + ' 条记录';
+                        sjs_meta.appendChild(sjs_tag);
+                    }
+                })
+                .catch(function () {
+                    // 本地直开时 fetch 会被拦：正文换成说明，避免停在"正在读取"
+                    sjs_doc.innerHTML = '<p>正文未能在此环境加载。</p>';
+                    sjs_notice.hidden = false;
+                });
+        }
+
+        // 页面就绪后开始读取
+        document.addEventListener('DOMContentLoaded', sjs_loadPromptLog);
+    </script>
+
+</body>
+
+</html>

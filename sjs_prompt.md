@@ -163,3 +163,14 @@ new Swiper('#wySw4', {
 - 实测结论 1：百分比相对 slide 自身宽度。容器 600px、slidesPerView:3 时 slide 宽 200px，translate ['50%',0,0] 位移 100px
 - 实测结论 2：keyboard 的 keydown 监听挂在 document 上，焦点停在 body、轮播在视口内时方向键仍可翻页；真正门槛是 keyboard.onlyInViewport（默认 true）
 - 已修正页面文案与注释
+
+## 2026-11-09 12:59:16
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+帮我做一个prompt.md的入口 并且名字要改成sjs_prompt.md 然后单独弄一个板块就跟其他的板块一样 弄一个入口就行
+
+## 2026-11-09 13:10:00 · 新增提示词记录入口
+- 模型：DeepSeek-V4.1-Flash
+- 动作：新建 `sjs_prompt.html` 作为 `sjs_prompt.md` 的阅读页（运行时 fetch 原文并渲染 Markdown），首页新增独立「提示词记录」板块与导航项
+- 原因：`.md` 在浏览器里会被当成下载（GitHub Pages 返回 text/markdown），老师点开看不到内容
+- 兜底：以 `file://` 直接打开时浏览器禁止 fetch，页面给出提示并链接到原始文件
