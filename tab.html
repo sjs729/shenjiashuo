@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<!--
+  作者：申家硕
+  建立时间：2026-11-02
+  使用模型：DeepSeek-V4.1-Flash
+  功能名称：新闻栏目选项卡
+  简介：四个新闻栏目共用一个可复用的选项卡组件，默认选中「国内新闻」，切换逻辑单独存放在 js/tab.js 中。
+-->
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f0f1ed">
+    <title>新闻栏目选项卡 | 申家硕</title>
+    <meta name="description" content="国内新闻、省内新闻、国际新闻、最热新闻四个栏目，使用可复用的 Tab 选项卡切换。">
+    <style>
+        :root {
+            --sjs_paper: #f0f1ed;
+            --sjs_ink: #171a17;
+            --sjs_ink_soft: #4b5049;
+            --sjs_ink_faint: #7c8178;
+            --sjs_rule: #d2d5ca;
+            --sjs_accent: #1d3fbf;
+            --sjs_display: "Bodoni 72", "Didot", "Iowan Old Style", "Songti SC", Georgia, serif;
+            --sjs_body: "Avenir Next", "Avenir", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            --sjs_ease: cubic-bezier(.2, .7, .2, 1);
+            --sjs_maxw: 780px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--sjs_body);
+            color: var(--sjs_ink);
+            background-color: var(--sjs_paper);
+            background-image: radial-gradient(rgba(23, 26, 23, .055) .5px, transparent .6px);
+            background-size: 4px 4px;
+            line-height: 1.75;
+            padding: 0 clamp(20px, 5vw, 44px);
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        a:focus-visible {
+            outline: 2px solid var(--sjs_accent);
+            outline-offset: 4px;
+        }
+
+        /* 顶部信息条 */
+        .sjs_topbar {
+            max-width: var(--sjs_maxw);
+            margin: 0 auto;
+            padding: 24px 0 16px;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            border-bottom: 1px solid var(--sjs_rule);
+        }
+
+        .sjs_signature {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: .04em;
+        }
+
+        .sjs_signature_course {
+            font-size: 11.5px;
+            font-weight: 400;
+            letter-spacing: .07em;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_back {
+            font-size: 12px;
+            color: var(--sjs_ink_soft);
+            border-bottom: 1px solid var(--sjs_rule);
+            padding-bottom: 1px;
+            transition: color .25s var(--sjs_ease), border-color .25s var(--sjs_ease);
+        }
+
+        .sjs_back:hover {
+            color: var(--sjs_accent);
+            border-bottom-color: var(--sjs_accent);
+        }
+
+        /* 页面主体 */
+        .sjs_shell {
+            max-width: var(--sjs_maxw);
+            margin: 0 auto;
+            padding: clamp(34px, 6vw, 54px) 0 64px;
+        }
+
+        .sjs_title {
+            font-family: var(--sjs_display);
+            font-weight: 600;
+            font-size: clamp(38px, 7vw, 56px);
+            line-height: 1.15;
+            letter-spacing: -.01em;
+        }
+
+        .sjs_intro {
+            margin-top: 8px;
+            font-size: 13.5px;
+            color: var(--sjs_ink_faint);
+            max-width: 30em;
+        }
+
+        /* 选项卡容器 */
+        .sjs_tabs {
+            margin-top: clamp(28px, 5vw, 40px);
+        }
+
+        .sjs_tablist {
+            display: flex;
+            gap: clamp(20px, 4vw, 40px);
+            border-bottom: 1px solid var(--sjs_rule);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .sjs_tablist::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sjs_tab {
+            position: relative;
+            flex: 0 0 auto;
+            padding: 4px 0 14px;
+            background: none;
+            border: 0;
+            font-family: inherit;
+            font-size: clamp(14px, 2.4vw, 15.5px);
+            letter-spacing: .04em;
+            color: var(--sjs_ink_faint);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: color .25s var(--sjs_ease);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 选中项下划线：宽度从 0 展开 */
+        .sjs_tab::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -1px;
+            width: 0;
+            height: 2px;
+            background: var(--sjs_accent);
+            transition: width .28s var(--sjs_ease);
+        }
+
+        .sjs_tab:hover {
+            color: var(--sjs_ink_soft);
+        }
+
+        .sjs_tab.sjs_is_active {
+            color: var(--sjs_ink);
+        }
+
+        .sjs_tab.sjs_is_active::after {
+            width: 100%;
+        }
+
+        .sjs_tab:focus-visible {
+            outline: 2px solid var(--sjs_accent);
+            outline-offset: 4px;
+        }
+
+        /* 内容面板 */
+        .sjs_panel {
+            padding-top: clamp(26px, 4vw, 36px);
+        }
+
+        .sjs_panel.sjs_is_active {
+            animation: sjs_panel_in .32s var(--sjs_ease) both;
+        }
+
+        @keyframes sjs_panel_in {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .sjs_headline {
+            font-family: var(--sjs_display);
+            font-weight: 600;
+            font-size: clamp(22px, 3.6vw, 28px);
+            line-height: 1.5;
+            letter-spacing: 0;
+            max-width: 20em;
+        }
+
+        .sjs_summary {
+            margin-top: 12px;
+            font-size: 14.5px;
+            line-height: 1.9;
+            color: var(--sjs_ink_soft);
+            max-width: 36em;
+        }
+
+        .sjs_meta {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 16px;
+            font-size: 11.5px;
+            letter-spacing: .05em;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_list {
+            list-style: none;
+            margin-top: 26px;
+            border-top: 1px solid var(--sjs_rule);
+        }
+
+        .sjs_list li {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--sjs_rule);
+            font-size: 13.5px;
+        }
+
+        .sjs_list_title {
+            color: var(--sjs_ink_soft);
+            transition: color .2s var(--sjs_ease);
+        }
+
+        .sjs_list li:hover .sjs_list_title {
+            color: var(--sjs_ink);
+        }
+
+        .sjs_list_time {
+            flex: 0 0 auto;
+            font-size: 11.5px;
+            letter-spacing: .05em;
+            color: var(--sjs_ink_faint);
+        }
+
+        /* 页脚 */
+        .sjs_footer {
+            max-width: var(--sjs_maxw);
+            margin: 0 auto;
+            padding: 18px 0 48px;
+            border-top: 1px solid var(--sjs_rule);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 10px 24px;
+            font-size: 12px;
+            color: var(--sjs_ink_faint);
+        }
+
+        .sjs_footer_links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .sjs_footer_link {
+            color: var(--sjs_ink_soft);
+            border-bottom: 1px solid var(--sjs_rule);
+            padding-bottom: 1px;
+            transition: color .25s var(--sjs_ease), border-color .25s var(--sjs_ease);
+        }
+
+        .sjs_footer_link:hover {
+            color: var(--sjs_accent);
+            border-bottom-color: var(--sjs_accent);
+        }
+
+        @media (max-width: 520px) {
+            .sjs_signature_course {
+                display: none;
+            }
+
+            .sjs_summary {
+                font-size: 14px;
+            }
+
+            .sjs_list li {
+                font-size: 13px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .sjs_tab,
+            .sjs_tab::after,
+            .sjs_list_title,
+            .sjs_back,
+            .sjs_footer_link {
+                transition: none;
+            }
+
+            .sjs_panel.sjs_is_active {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="sjs_topbar">
+        <a class="sjs_signature" href="index.html">
+            <span>申家硕</span>
+            <span class="sjs_signature_course">高级网页设计</span>
+        </a>
+        <a class="sjs_back" href="index.html">返回首页</a>
+    </header>
+
+    <main class="sjs_shell">
+        <h1 class="sjs_title">新闻</h1>
+        <p class="sjs_intro">四个栏目共用一套切换逻辑，页面只负责结构，行为全部交给 js/tab.js。</p>
+
+        <!-- 选项卡组件：在任意容器上加 data-sjs-tabs 即可复用 -->
+        <div class="sjs_tabs" data-sjs-tabs>
+            <!-- 选项卡按钮 -->
+            <div class="sjs_tablist" role="tablist" aria-label="新闻栏目">
+                <button class="sjs_tab sjs_is_active" type="button" role="tab" id="sjs_tab_domestic"
+                    aria-selected="true" aria-controls="sjs_panel_domestic" data-sjs-tab="domestic">国内新闻</button>
+                <button class="sjs_tab" type="button" role="tab" id="sjs_tab_province" aria-selected="false"
+                    aria-controls="sjs_panel_province" data-sjs-tab="province" tabindex="-1">省内新闻</button>
+                <button class="sjs_tab" type="button" role="tab" id="sjs_tab_world" aria-selected="false"
+                    aria-controls="sjs_panel_world" data-sjs-tab="world" tabindex="-1">国际新闻</button>
+                <button class="sjs_tab" type="button" role="tab" id="sjs_tab_hot" aria-selected="false"
+                    aria-controls="sjs_panel_hot" data-sjs-tab="hot" tabindex="-1">最热新闻</button>
+            </div>
+
+            <!-- 内容面板：默认只显示国内新闻 -->
+            <section class="sjs_panel sjs_is_active" id="sjs_panel_domestic" role="tabpanel"
+                aria-labelledby="sjs_tab_domestic" data-sjs-panel="domestic">
+                <h2 class="sjs_headline">城市更新转向精细化，老街区开始微改造</h2>
+                <p class="sjs_summary">
+                    从大拆大建到修补织补，多地试点以街巷为单位更新：保留原有的生活肌理，
+                    先补齐公共空间与无障碍设施，再逐户协商改造方案。
+                </p>
+                <p class="sjs_meta">
+                    <time datetime="2026-11-02">2026-11-02</time>
+                    <span>记者 申家硕</span>
+                </p>
+                <ul class="sjs_list">
+                    <li>
+                        <span class="sjs_list_title">三条地铁线路完成信号系统升级</span>
+                        <span class="sjs_list_time">08:40</span>
+                    </li>
+                    <li>
+                        <span class="sjs_list_title">社区食堂试点扩至十二个街道</span>
+                        <span class="sjs_list_time">10:15</span>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="sjs_panel" id="sjs_panel_province" role="tabpanel" aria-labelledby="sjs_tab_province"
+                data-sjs-panel="province" hidden>
+                <h2 class="sjs_headline">省内高速完成数字化改造，试点无感通行</h2>
+                <p class="sjs_summary">
+                    首批六条高速公路接入统一调度平台，节假日拥堵预警从小时级缩短到分钟级，
+                    救援车辆也能按实时路况自动规划路线。
+                </p>
+                <p class="sjs_meta">
+                    <time datetime="2026-11-02">2026-11-02</time>
+                    <span>记者 申家硕</span>
+                </p>
+                <ul class="sjs_list">
+                    <li>
+                        <span class="sjs_list_title">省级图书馆新馆开放夜间阅读区</span>
+                        <span class="sjs_list_time">09:20</span>
+                    </li>
+                    <li>
+                        <span class="sjs_list_title">秋收进度过八成，农机调度平台上线</span>
+                        <span class="sjs_list_time">11:05</span>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="sjs_panel" id="sjs_panel_world" role="tabpanel" aria-labelledby="sjs_tab_world"
+                data-sjs-panel="world" hidden>
+                <h2 class="sjs_headline">气候会议进入第二轮磋商，减排路径成焦点</h2>
+                <p class="sjs_summary">
+                    与会各方围绕资金与技术转移展开讨论，发展中国家呼吁建立更稳定的支持机制，
+                    并希望减排目标与本国发展阶段相匹配。
+                </p>
+                <p class="sjs_meta">
+                    <time datetime="2026-11-02">2026-11-02</time>
+                    <span>记者 申家硕</span>
+                </p>
+                <ul class="sjs_list">
+                    <li>
+                        <span class="sjs_list_title">北欧两国联合发布海上风电走廊计划</span>
+                        <span class="sjs_list_time">07:55</span>
+                    </li>
+                    <li>
+                        <span class="sjs_list_title">全球粮食价格指数连续第三个月回落</span>
+                        <span class="sjs_list_time">12:30</span>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="sjs_panel" id="sjs_panel_hot" role="tabpanel" aria-labelledby="sjs_tab_hot"
+                data-sjs-panel="hot" hidden>
+                <h2 class="sjs_headline">本周热度榜：三个话题为什么被反复讨论</h2>
+                <p class="sjs_summary">
+                    从城市夜校到老旧小区加装电梯，热度背后是同一类需求：公共服务的可达性。
+                    讨论越多，越说明这些小事离日常生活很近。
+                </p>
+                <p class="sjs_meta">
+                    <time datetime="2026-11-02">2026-11-02</time>
+                    <span>记者 申家硕</span>
+                </p>
+                <ul class="sjs_list">
+                    <li>
+                        <span class="sjs_list_title">话题一：夜校课程为何一座难求</span>
+                        <span class="sjs_list_time">13:10</span>
+                    </li>
+                    <li>
+                        <span class="sjs_list_title">话题二：加装电梯的协商难题</span>
+                        <span class="sjs_list_time">15:45</span>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </main>
+
+    <footer class="sjs_footer">
+        <p>选项卡逻辑位于 js/tab.js，可在其他页面复用。</p>
+        <div class="sjs_footer_links">
+            <a class="sjs_footer_link" href="index.html">返回首页</a>
+        </div>
+    </footer>
+
+    <script src="js/tab.js"></script>
+</body>
+
+</html>

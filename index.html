@@ -338,6 +338,16 @@
             min-height: 48px;
         }
 
+        /* 卡片描述里出现的路径与文件名，用等宽字体标出 */
+        .card .desc code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12.8px;
+            color: var(--accent);
+            background: var(--accent-soft);
+            border-radius: 5px;
+            padding: 1px 6px;
+        }
+
         .links {
             margin-top: 18px;
             border-top: 1px dashed var(--line);
@@ -723,6 +733,7 @@
                     以及用 CSS3 结构伪类选择器配合渐变、变形与关键帧动画做的一组方块效果，
                     加上用 SVG symbol 图标配合一小段 JavaScript 做的底部标签栏，
                     还有 JavaScript 对象的属性、遍历与引用赋值练习，
+                    以及用 Swiper 组件库做的一组轮播交互（分页器、箭头、自动播放与六种切换效果），
                     都会以超链接形式收录在本页中，方便随堂演示与课后回看。
                 </p>
                 <dl class="meta reveal d4">
@@ -740,7 +751,7 @@
                     </div>
                     <div>
                         <dt>收录模块</dt>
-                        <dd>9 个</dd>
+                        <dd>10 个</dd>
                     </div>
                 </dl>
             </div>
@@ -754,7 +765,7 @@
                         <h2>课堂目录</h2>
                         <p>点击卡片中的任一链接，即可在本机浏览器中打开对应练习页面。</p>
                     </div>
-                    <span class="counter">共 10 个页面 · 9 个模块</span>
+                    <span class="counter">共 11 个页面 · 10 个模块</span>
                 </div>
 
                 <div class="cards">
@@ -947,6 +958,26 @@
                         </div>
                     </article>
 
+                    <!-- 模块十：Swiper 轮播组件 -->
+                    <article class="card reveal d4">
+                        <div class="card-top">
+                            <span class="no">模块 10</span>
+                            <span class="tag">Swiper</span>
+                        </div>
+                        <h3>Swiper 轮播组件</h3>
+                        <p class="desc">用 Swiper 让一组「大国重器」照片动起来：从最小可拖动的轮播起步，装上可点击的圆点分页器与左右箭头，再交给 autoplay 自己翻页（拖动之后不停止），最后用 destroy + new 重建实例，做七种效果的实时切换（含课堂没讲的 <code>creative</code> 电影墙）。演示四还加了第六件展品「爱达·魔都号」与键盘 <code>←</code> <code>→</code> 控制。组件库已下载到本地 <code>swiper/</code> 目录，离线也能运行。</p>
+                        <div class="links">
+                            <a href="swiper-task.html">
+                                <span class="file-icon">HTML</span>
+                                <span class="t">
+                                    <b>轮播组件四步练习</b>
+                                    <code>swiper-task.html</code>
+                                </span>
+                                <span class="go">→</span>
+                            </a>
+                        </div>
+                    </article>
+
                 </div>
             </div>
         </section>
@@ -962,17 +993,17 @@
                 </div>
                 <div class="planned">
                     <div class="plan">
-                        <span class="ph-no">模块 10 / 规划中</span>
+                        <span class="ph-no">模块 11 / 规划中</span>
                         <h4>响应式适配</h4>
                         <p>媒体查询与多设备适配。</p>
                     </div>
                     <div class="plan">
-                        <span class="ph-no">模块 11 / 规划中</span>
+                        <span class="ph-no">模块 12 / 规划中</span>
                         <h4>JavaScript 交互</h4>
                         <p>JavaScript 基础、DOM 操作与事件。</p>
                     </div>
                     <div class="plan">
-                        <span class="ph-no">模块 12 / 规划中</span>
+                        <span class="ph-no">模块 13 / 规划中</span>
                         <h4>综合实践项目</h4>
                         <p>整合所学内容，完成一个完整的站点页面。</p>
                     </div>
