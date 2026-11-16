@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<!--
+  作者：申家硕
+  学号：24001011009
+  建立时间：2026-11-16
+  使用模型：DeepSeek-V4.1-Flash
+  功能名称：任务四 · 摇一摇抽今日菜谱
+  简介：监听 devicemotion，用 accelerationIncludingGravity 算合成加速度，超过阈值 18 判定摇动，
+        触发后进入 1.5s 冷却；支持 iOS 的权限申请按钮；无传感器或未授权时显示降级方案，
+        并提供"点我抽一次"的按钮兜底。
+-->
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- 手机页面必备① -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务四 · 摇一摇抽菜谱 | 申家硕 24001011009</title>
+    <style>
+        /* 手机页面必备② */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --sjs_ink: #1b1410;
+            --sjs_soft: #5c4a42;
+            --sjs_faint: #9c8880;
+            --sjs_paper: #fdf9f4;
+            --sjs_card: #ffffff;
+            --sjs_line: #ecdfd4;
+            --sjs_accent: #d1541f;
+            --sjs_good: #1f7a4d;
+            --sjs_radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+                "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
+            color: var(--sjs_ink);
+            background: var(--sjs_paper);
+            line-height: 1.75;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: var(--sjs_accent);
+            text-decoration: none;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: .86em;
+            color: var(--sjs_accent);
+            background: rgba(209, 84, 31, .08);
+            border-radius: 4px;
+            padding: 1px 5px;
+        }
+
+        /* 顶部条 */
+        .sjs_top {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            backdrop-filter: saturate(180%) blur(14px);
+            -webkit-backdrop-filter: saturate(180%) blur(14px);
+            background: rgba(253, 249, 244, .88);
+            border-bottom: 1px solid var(--sjs_line);
+        }
+
+        .sjs_wrap {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .sjs_top .sjs_wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            height: 54px;
+        }
+
+        .sjs_brand {
+            font-weight: 700;
+            font-size: 13.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sjs_brand i {
+            flex: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 7px;
+            display: grid;
+            place-items: center;
+            background: var(--sjs_ink);
+            color: #fff;
+            font-style: normal;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .sjs_back {
+            font-size: 12.5px;
+            font-weight: 600;
+            border: 1px solid var(--sjs_line);
+            background: var(--sjs_card);
+            border-radius: 999px;
+            padding: 5px 12px;
+            color: var(--sjs_soft);
+            white-space: nowrap;
+        }
+
+        /* 标题区 */
+        .sjs_head {
+            padding: 26px 0 6px;
+        }
+
+        .sjs_kicker {
+            font-size: 10.5px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--sjs_accent);
+            font-weight: 700;
+        }
+
+        .sjs_head h1 {
+            margin-top: 8px;
+            font-family: Georgia, "Songti SC", "SimSun", serif;
+            font-size: clamp(25px, 7vw, 34px);
+            line-height: 1.25;
+            letter-spacing: -.6px;
+        }
+
+        .sjs_head p {
+            margin-top: 10px;
+            font-size: 13.8px;
+            color: var(--sjs_soft);
+        }
+
+        /* ---------------- 摇一摇舞台 ---------------- */
+        .sjs_stage {
+            position: relative;
+            margin-top: 16px;
+            border-radius: var(--sjs_radius);
+            background: linear-gradient(160deg, #2a1810, #4a2415 55%, #6b3220);
+            padding: 26px 20px;
+            color: #f7e6d8;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        /* 摇动时的抖动动画，给一点物理反馈 */
+        .sjs_stage[data-shake="1"] {
+            animation: sjs_shake .42s cubic-bezier(.36, .07, .19, .97);
+        }
+
+        @keyframes sjs_shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            15% {
+                transform: translateX(-7px) rotate(-.6deg);
+            }
+
+            30% {
+                transform: translateX(6px) rotate(.5deg);
+            }
+
+            45% {
+                transform: translateX(-5px) rotate(-.4deg);
+            }
+
+            60% {
+                transform: translateX(4px) rotate(.3deg);
+            }
+
+            80% {
+                transform: translateX(-2px);
+            }
+        }
+
+        .sjs_stage .sjs_icon {
+            font-size: 42px;
+            line-height: 1;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .sjs_stage .sjs_t1 {
+            font-size: 15px;
+            color: #f0d5c2;
+        }
+
+        .sjs_stage .sjs_t2 {
+            font-size: 12px;
+            color: #b99781;
+            margin-top: 6px;
+        }
+
+        /* 摇出的结果 */
+        .sjs_result {
+            margin-top: 18px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid rgba(255, 255, 255, .14);
+            padding: 16px 14px;
+            min-height: 74px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .sjs_result .sjs_dish {
+            font-family: Georgia, "Songti SC", "SimSun", serif;
+            font-size: 24px;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+
+        .sjs_result .sjs_note {
+            font-size: 12.2px;
+            color: #c8a894;
+        }
+
+        /* 弹出动画 */
+        .sjs_result[data-pop="1"] {
+            animation: sjs_pop .42s cubic-bezier(.2, .9, .3, 1.2);
+        }
+
+        @keyframes sjs_pop {
+            0% {
+                transform: scale(.86);
+                opacity: .4;
+            }
+
+            60% {
+                transform: scale(1.04);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* ---------------- 状态提示 ---------------- */
+        .sjs_alert {
+            margin-top: 12px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-size: 12.8px;
+            line-height: 1.8;
+            display: none;
+        }
+
+        .sjs_alert[data-on="1"] {
+            display: block;
+        }
+
+        /* 不支持 / 无权限：走降级提示 */
+        .sjs_alert[data-kind="warn"] {
+            background: #fffaf3;
+            border: 1px dashed #e0b98f;
+            color: #7c5e10;
+        }
+
+        /* 正常状态：绿色 */
+        .sjs_alert[data-kind="ok"] {
+            background: rgba(31, 122, 77, .07);
+            border: 1px solid rgba(31, 122, 77, .25);
+            color: #1f6b47;
+        }
+
+        /* 按钮 */
+        .sjs_btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .sjs_btns button {
+            flex: 1;
+            min-width: 130px;
+            font-family: inherit;
+            font-size: 14px;
+            color: #fff;
+            background: var(--sjs_accent);
+            border: 1px solid transparent;
+            border-radius: 999px;
+            padding: 11px 16px;
+            cursor: pointer;
+            transition: transform .12s ease, opacity .12s ease;
+        }
+
+        .sjs_btns button:active {
+            transform: scale(.97);
+            opacity: .9;
+        }
+
+        .sjs_btns button[data-ghost="1"] {
+            background: var(--sjs_card);
+            color: var(--sjs_soft);
+            border-color: var(--sjs_line);
+        }
+
+        /* 加速度读数 */
+        .sjs_meter {
+            margin-top: 12px;
+            padding: 11px 14px;
+            background: var(--sjs_card);
+            border: 1px solid var(--sjs_line);
+            border-radius: 12px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+            color: var(--sjs_faint);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3px 12px;
+        }
+
+        .sjs_meter b {
+            color: var(--sjs_ink);
+        }
+
+        /* 力度条，直观看出离阈值多远 */
+        .sjs_bar {
+            margin-top: 8px;
+            grid-column: 1 / -1;
+            height: 6px;
+            border-radius: 3px;
+            background: #efe6de;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .sjs_bar span {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0%;
+            background: linear-gradient(90deg, #e8a020, var(--sjs_accent));
+            border-radius: 3px;
+            transition: width .12s linear;
+        }
+
+        /* 说明区 */
+        .sjs_sec {
+            padding: 26px 0 4px;
+        }
+
+        .sjs_sec-head {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .sjs_sec-head span {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 11px;
+            color: var(--sjs_accent);
+        }
+
+        .sjs_sec-head h3 {
+            font-family: Georgia, "Songti SC", "SimSun", serif;
+            font-size: 19px;
+        }
+
+        .sjs_sec > p {
+            font-size: 13.6px;
+            color: var(--sjs_soft);
+            margin-bottom: 12px;
+        }
+
+        .sjs_note {
+            background: var(--sjs_card);
+            border: 1px solid var(--sjs_line);
+            border-left: 3px solid var(--sjs_accent);
+            border-radius: 0 12px 12px 0;
+            padding: 14px 16px;
+            font-size: 13.4px;
+            color: var(--sjs_soft);
+            margin-bottom: 10px;
+        }
+
+        .sjs_note h4 {
+            font-size: 13.8px;
+            color: var(--sjs_ink);
+            margin-bottom: 5px;
+        }
+
+        .sjs_note code {
+            font-size: 12.2px;
+        }
+
+        .sjs_code {
+            background: #1a120e;
+            border-radius: 12px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+
+        .sjs_code code {
+            background: none;
+            color: #f5e7dc;
+            padding: 0;
+            font-size: 12.2px;
+            line-height: 1.8;
+            white-space: pre;
+        }
+
+        footer {
+            margin-top: 30px;
+            border-top: 1px solid var(--sjs_line);
+            padding: 16px 0 38px;
+            font-size: 11.8px;
+            color: var(--sjs_faint);
+            text-align: center;
+            line-height: 1.9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 顶部条 -->
+    <header class="sjs_top">
+        <div class="sjs_wrap">
+            <div class="sjs_brand"><i>申</i> 任务四 · 摇一摇</div>
+            <a class="sjs_back" href="index.html">← 首页</a>
+        </div>
+    </header>
+
+    <main class="sjs_wrap">
+
+        <!-- 标题区 -->
+        <div class="sjs_head">
+            <div class="sjs_kicker">Task 04 · Devicemotion</div>
+            <h1>摇一摇，<br>抽今日菜谱</h1>
+            <p>连续摇动手机触发。一次摇动只触发一次，之后进入 1.5 秒冷却。</p>
+        </div>
+
+        <!-- 摇一摇舞台 -->
+        <div class="sjs_stage" id="sjs_stage">
+            <span class="sjs_icon">📳</span>
+            <div class="sjs_t1" id="sjs_t1">摇一摇手机，抽今日菜谱</div>
+            <div class="sjs_t2" id="sjs_t2">阈值 18 · 冷却 1.5 秒</div>
+
+            <div class="sjs_result" id="sjs_result">
+                <span class="sjs_dish" id="sjs_dish">—</span>
+                <span class="sjs_note" id="sjs_that">还没摇过</span>
+            </div>
+        </div>
+
+        <!-- 状态提示 -->
+        <div class="sjs_alert" id="sjs_alert" data-kind="warn">
+            <span id="sjs_alertText"></span>
+        </div>
+
+        <!-- 按钮 -->
+        <div class="sjs_btns">
+            <button type="button" id="sjs_btnPerm" data-ghost="1">申请传感器权限</button>
+            <button type="button" id="sjs_btnRoll">点我抽一次</button>
+        </div>
+
+        <!-- 读数 -->
+        <div class="sjs_meter">
+            <span>合成加速度 <b id="sjs_r-acc">—</b></span>
+            <span>状态 <b id="sjs_r-state">待机</b></span>
+            <span>事件次数 <b id="sjs_r-count">0</b></span>
+            <span>冷却 <b id="sjs_r-cool">就绪</b></span>
+            <div class="sjs_bar"><span id="sjs_barFill"></span></div>
+        </div>
+
+        <!-- 说明 -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>01</span><h3>为什么要做降级</h3></div>
+            <p>答辩要求写出理由。这不是"可选优化"，而是<b>必经分支</b>。</p>
+
+            <div class="sjs_note">
+                <h4>三个硬事实</h4>
+                ① 电脑浏览器<b>没有加速度计</b>，<code>devicemotion</code> 要么不触发、要么给的三个值全是 <code>null</code>；<br>
+                ② iOS 13+ 出于隐私，必须<b>用户点击后</b>调用 <code>DeviceMotionEvent.requestPermission()</code>，
+                不能在页面加载时自动申请；<br>
+                ③ 用户可能直接点"拒绝"，之后这个页面<b>永远收不到数据</b>。
+                三条里任意一条成立，页面就会静默失效——不写降级就是白屏。
+            </div>
+
+            <div class="sjs_note">
+                <h4>本页的降级策略</h4>
+                检测不到 <code>devicemotion</code>、或 3 秒内没有收到任何数据、或权限被拒，
+                就显示提示并把"点我抽一次"按钮变成主路径。
+                <b>功能不打折，只是换一种触发方式。</b>
+            </div>
+        </section>
+
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>02</span><h3>两个 API 的区别</h3></div>
+            <p>答辩第四问会问这个，别混。</p>
+
+            <div class="sjs_note">
+                <h4><code>accelerationIncludingGravity</code> vs <code>acceleration</code></h4>
+                <b>前者含重力</b>：手机平放桌上不动，Z 轴也约等于 9.8，因为它在测重力。<br>
+                <b>后者不含重力</b>：静止时三个轴都接近 0，只有真正被加速时才非零。
+                <br><br>
+                所以：<b>判断"摇一摇"用前者更稳</b>——静止时基线固定（约 9.8），
+                摇动的峰值一眼能看出；用后者虽然静止时更干净，但部分安卓机直接把该字段置为 <code>null</code>，
+                兼容性反而差。
+            </div>
+
+            <div class="sjs_note">
+                <h4>为什么还要算"合成加速度"</h4>
+                三个轴分别是 x / y / z，摇动方向不确定。取<br>
+                <code>Math.sqrt(x² + y² + z²)</code><br>
+                才是"整体受力大小"，与方向无关。这就是阈值判断的依据。
+            </div>
+        </section>
+
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>03</span><h3>冷却为什么必须加</h3></div>
+            <p>不加冷却，<b>一次摇动会触发十几次</b>——因为 <code>devicemotion</code> 是持续高频触发的。</p>
+
+            <div class="sjs_note">
+                <h4>现象</h4>
+                甩一下手机，<code>devicemotion</code> 可能连续触发 30～60 次，
+                每次都超过阈值。如果每次超阈值都抽一次，你会看到菜名疯狂闪动，最后停在某个随机结果上。
+            </div>
+
+            <div class="sjs_note">
+                <h4>做法</h4>
+                记录上次触发的<b>时间戳</b>，本次超阈值时先看间隔：
+                小于 1.5 秒就<b>直接返回</b>，不抽也不改状态。
+                这和任务二"防止连滑跳两张"是同一个思路——<b>用时间做节流</b>。
+            </div>
+        </section>
+
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>04</span><h3>核心代码</h3></div>
+
+            <pre class="sjs_code"><code>// ① iOS 13+ 必须由用户点击触发权限申请
+btnPerm.addEventListener('click', async function () {
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    const state = await DeviceMotionEvent.requestPermission();
+    if (state !== 'granted') { showFallback('权限被拒绝'); return; }
+  }
+  startListen();
+});
+
+// ② 监听加速度
+window.addEventListener('devicemotion', function (e) {
+  const a = e.accelerationIncludingGravity;
+  if (!a) return;                                   // 部分设备给 null
+
+  // ③ 合成加速度：与摇动方向无关
+  const total = Math.sqrt(a.x*a.x + a.y*a.y + a.z*a.z);
+
+  // ④ 冷却：1.5 秒内只认第一次
+  if (total &gt; 18 &amp;&amp; Date.now() - lastShake &gt; 1500) {
+    lastShake = Date.now();
+    roll();                                         // 抽一道菜
+  }
+});</code></pre>
+        </section>
+
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>05</span><h3>怎么在电脑上验证</h3></div>
+            <p>电脑没有传感器，但可以用 Chrome DevTools 伪造加速度数据。</p>
+
+            <div class="sjs_note">
+                <h4>步骤</h4>
+                ① F12 → 右上角三个点 → More tools → <b>Sensors</b>；<br>
+                ② 找到 <b>Accelerometer</b>，从 "No override" 改成 "Custom"；<br>
+                ③ 在 X / Y / Z 里填一组大数值（比如各填 30），
+                合成加速度 √(30²+30²+30²) ≈ 52，远超阈值 18；<br>
+                ④ 页面会自动抽一道菜，并进入 1.5 秒冷却。
+                <br><br>
+                <b>注意：</b>伪造的是持续值，所以"摇一次"会变成"持续满足条件"——
+                正好用来验证冷却是否生效：如果菜名没有连续闪动，说明冷却起作用了。
+            </div>
+        </section>
+
+        <!-- ============================================================
+             演示视频位（待插入）
+             录好手机实拍后，把文件放到本目录，再把下面这段注释换成真正的
+             <video> 标签即可：
+
+             <video controls playsinline preload="metadata"
+                    style="width:100%;border-radius:14px;background:#000"
+                    src="demo-sensor.mp4"></video>
+
+             建议文件名：demo-sensor.mp4（横屏录制，30 秒以内即可）
+             ============================================================ -->
+
+    </main>
+
+    <footer>
+        移动端常用事件 · 任务四 摇一摇抽今日菜谱<br>
+        申家硕 24001011009 · 高级网页设计 · 2026-2027-1
+    </footer>
+
+    <script>
+        // ==============================================================
+        //  任务四：摇一摇
+        //  devicemotion + 合成加速度 + 阈值 18 + 1.5s 冷却 + 完整降级
+        // ==============================================================
+
+        const sjs_stage = document.getElementById('sjs_stage');
+        const sjs_dish = document.getElementById('sjs_dish');
+        const sjs_that = document.getElementById('sjs_that');
+        const sjs_result = document.getElementById('sjs_result');
+        const sjs_alert = document.getElementById('sjs_alert');
+        const sjs_alertText = document.getElementById('sjs_alertText');
+        const sjs_t1 = document.getElementById('sjs_t1');
+        const sjs_t2 = document.getElementById('sjs_t2');
+
+        const sjs_THRESHOLD = 18;     // 合成加速度阈值
+        const sjs_COOLDOWN = 1500;    // 冷却时间（ms）
+
+        // 菜谱池
+        const sjs_DISHES = [
+            { name: '麻婆豆腐', note: '川菜 · 麻辣鲜香' },
+            { name: '白切鸡', note: '粤菜 · 原汁原味' },
+            { name: '松鼠鳜鱼', note: '苏菜 · 外酥里嫩' },
+            { name: '佛跳墙', note: '闽菜 · 坛启荤香' },
+            { name: '西湖醋鱼', note: '浙菜 · 酸甜适口' },
+            { name: '剁椒鱼头', note: '湘菜 · 鲜辣开胃' },
+            { name: '葱烧海参', note: '鲁菜 · 浓油赤酱' },
+            { name: '臭鳜鱼', note: '徽菜 · 闻臭吃香' },
+            { name: '东坡肉', note: '浙菜 · 酥而不碎' },
+            { name: '宫保鸡丁', note: '川菜 · 荔枝口味' }
+        ];
+
+        let sjs_lastShake = 0;        // 上次触发的时间戳
+        let sjs_eventCount = 0;       // devicemotion 触发次数
+        let sjs_listening = false;    // 是否已开始监听
+        let sjs_gotData = false;      // 是否真的收到过有效数据
+        let sjs_dogTimer = null;      // 3 秒看门狗，收不到数据就降级
+
+        /**
+         * 显示状态提示
+         * 功能：把提示条打开并设置文案与类型，用于权限、降级、就绪三种情况。
+         * @param {string} sjs_kind warn 或 ok
+         * @param {string} sjs_text 提示文字
+         * @returns {void}
+         */
+        function sjs_showAlert(sjs_kind, sjs_text) {
+            sjs_alert.setAttribute('data-kind', sjs_kind);
+            sjs_alert.setAttribute('data-on', '1');
+            sjs_alertText.textContent = sjs_text;
+        }
+
+        /**
+         * 隐藏提示条
+         * @returns {void}
+         */
+        function sjs_hideAlert() {
+            sjs_alert.setAttribute('data-on', '0');
+        }
+
+        /**
+         * 抽一道菜并做弹出动画
+         * 功能：随机取一条，更新菜名与说明，加一次 pop 动画；
+         *      同时更新舞台上的提示文字与冷却读数。
+         * @returns {void}
+         */
+        function sjs_roll() {
+            const sjs_item = sjs_DISHES[Math.floor(Math.random() * sjs_DISHES.length)];
+
+            sjs_dish.textContent = sjs_item.name;
+            sjs_that.textContent = sjs_item.note;
+
+            // 重新触发动画：先去掉属性，强制重排后再加
+            sjs_result.setAttribute('data-pop', '0');
+            void sjs_result.offsetWidth;
+            sjs_result.setAttribute('data-pop', '1');
+
+            // 舞台也抖一下，模拟"摇"的反馈
+            sjs_stage.setAttribute('data-shake', '1');
+            setTimeout(function () {
+                sjs_stage.setAttribute('data-shake', '0');
+            }, 460);
+
+            document.getElementById('sjs_r-state').textContent = '已抽中';
+        }
+
+        /**
+         * 更新读数与力度条
+         * 功能：把合成加速度写出来，并按阈值折算成百分比填进进度条，
+         *      让"还差多少才触发"一眼可见。
+         * @param {number} sjs_total 合成加速度
+         * @param {boolean} sjs_inCool 是否处于冷却中
+         * @returns {void}
+         */
+        function sjs_paintMeter(sjs_total, sjs_inCool) {
+            document.getElementById('sjs_r-acc').textContent = sjs_total.toFixed(1);
+            document.getElementById('sjs_r-count').textContent = String(sjs_eventCount);
+            document.getElementById('sjs_r-cool').textContent = sjs_inCool ? '冷却中' : '就绪';
+
+            // 以阈值的 2 倍为满格，阈值处正好一半
+            const sjs_pct = Math.min(100, (sjs_total / (sjs_THRESHOLD * 2)) * 100);
+            document.getElementById('sjs_barFill').style.width = sjs_pct + '%';
+        }
+
+        /**
+         * 处理一次加速度事件
+         * 功能：算合成加速度 → 判断阈值 → 判断冷却 → 抽菜；
+         *      这是整个任务的核心分支，答辩时按这个顺序讲。
+         * @param {DeviceMotionEvent} sjs_e 事件对象
+         * @returns {void}
+         */
+        function sjs_onMotion(sjs_e) {
+            sjs_eventCount++;
+
+            // 部分设备的该字段可能为 null（尤其是桌面浏览器）
+            const sjs_a = sjs_e.accelerationIncludingGravity;
+            if (!sjs_a || sjs_a.x == null) return;
+
+            sjs_gotData = true;
+
+            // 合成加速度：与摇动方向无关
+            const sjs_total = Math.sqrt(
+                sjs_a.x * sjs_a.x + sjs_a.y * sjs_a.y + sjs_a.z * sjs_a.z
+            );
+
+            const sjs_now = Date.now();
+            const sjs_inCool = sjs_now - sjs_lastShake < sjs_COOLDOWN;
+
+            sjs_paintMeter(sjs_total, sjs_inCool);
+
+            // 阈值 + 冷却双判断
+            if (sjs_total > sjs_THRESHOLD && !sjs_inCool) {
+                sjs_lastShake = sjs_now;
+                sjs_roll();
+            }
+        }
+
+        /**
+         * 开始监听加速度
+         * 功能：挂上 devicemotion 监听，并启动 3 秒看门狗——
+         *      如果 3 秒内一次有效数据都没收到，就判定为"设备不支持"并降级。
+         * @returns {void}
+         */
+        function sjs_start() {
+            if (sjs_listening) return;
+            sjs_listening = true;
+
+            window.addEventListener('devicemotion', sjs_onMotion);
+
+            // 看门狗：3 秒还没有有效数据 → 降级
+            clearTimeout(sjs_dogTimer);
+            sjs_dogTimer = setTimeout(function () {
+                if (!sjs_gotData) {
+                    sjs_showAlert('warn',
+                        '当前设备收不到加速度数据（电脑或平板常见）。' +
+                        '已切换到降级方案：点下面的「点我抽一次」即可。');
+                    sjs_t1.textContent = '摇一摇不可用';
+                    sjs_t2.textContent = '请在手机上打开，或点下方按钮抽取';
+                    document.getElementById('sjs_r-state').textContent = '不支持';
+                } else {
+                    sjs_showAlert('ok', '传感器已就绪，摇动手机即可抽取。');
+                }
+            }, 3000);
+        }
+
+        /**
+         * 申请传感器权限并开始监听
+         * 功能：iOS 13+ 需要用户手势触发 requestPermission；
+         *      支持该 API 就申请，不支持（安卓 / 旧版）直接开始监听。
+         * @returns {Promise<void>}
+         */
+        async function sjs_requestPermission() {
+            // 完全不支持 devicemotion 的设备，直接降级，不必申请
+            if (!('DeviceMotionEvent' in window)) {
+                sjs_showAlert('warn', '当前浏览器不支持 devicemotion 事件，请使用手机浏览器打开。');
+                document.getElementById('sjs_r-state').textContent = '不支持';
+                return;
+            }
+
+            // iOS 13+ 的权限接口
+            if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                try {
+                    const sjs_state = await DeviceMotionEvent.requestPermission();
+                    if (sjs_state !== 'granted') {
+                        sjs_showAlert('warn', '传感器权限被拒绝。可以在浏览器设置里重新允许，或点下方按钮抽取。');
+                        document.getElementById('sjs_r-state').textContent = '无权限';
+                        return;
+                    }
+                } catch (sjs_err) {
+                    // 非用户手势触发时会抛错，这里给出可操作的提示
+                    sjs_showAlert('warn', '权限申请失败（需要点击按钮触发）。请点「申请传感器权限」重试。');
+                    document.getElementById('sjs_r-state').textContent = '申请失败';
+                    return;
+                }
+            }
+
+            sjs_hideAlert();
+            sjs_start();
+        }
+
+        // ---------- 按钮 ----------
+        document.getElementById('sjs_btnPerm').addEventListener('click', function () {
+            sjs_requestPermission();
+        });
+
+        // 降级路径：手动抽一次，同样受冷却保护，避免连点刷屏
+        document.getElementById('sjs_btnRoll').addEventListener('click', function () {
+            const sjs_now = Date.now();
+            if (sjs_now - sjs_lastShake < 400) return;   // 防连点
+            sjs_lastShake = sjs_now;
+            sjs_roll();
+        });
+
+        /**
+         * 判断是否为需要显式授权的 iOS 13+
+         * 功能：不能只检测 requestPermission 是否存在——Chrome 里这个函数也存在，
+         *      直接调用会抛错。必须结合 UA 判断，才走对分支。
+         * @returns {boolean} 是否需要用户点击申请权限
+         */
+        function sjs_needPermission() {
+            const sjs_ua = navigator.userAgent;
+            const sjs_isIOS = /iPad|iPhone|iPod/.test(sjs_ua) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            return sjs_isIOS && typeof DeviceMotionEvent.requestPermission === 'function';
+        }
+
+        // ---------- 启动 ----------
+        if (!('DeviceMotionEvent' in window)) {
+            // 完全没有该 API：降级
+            sjs_showAlert('warn', '当前浏览器不支持 devicemotion，请用手机浏览器打开，或使用下方的降级按钮。');
+            document.getElementById('sjs_r-state').textContent = '不支持';
+        } else if (sjs_needPermission()) {
+            // iOS：必须用户点按钮才能申请
+            sjs_showAlert('warn', 'iPhone 需要先点下方「申请传感器权限」，允许后才能摇一摇。');
+        } else {
+            // 安卓 / 桌面：直接监听，由 3 秒看门狗判断有没有数据
+            sjs_start();
+        }
+    </script>
+
+</body>
+
+</html>

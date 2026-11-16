@@ -915,7 +915,7 @@
                     </div>
                     <div>
                         <dt>收录模块</dt>
-                        <dd>10 个</dd>
+                        <dd>13 个</dd>
                     </div>
                 </dl>
             </div>
@@ -929,7 +929,7 @@
                         <h2>课堂目录</h2>
                         <p>点击卡片中的任一链接，即可在本机浏览器中打开对应练习页面。</p>
                     </div>
-                    <span class="counter">共 11 个页面 · 10 个模块</span>
+                    <span class="counter">共 17 个页面 · 13 个模块</span>
                 </div>
 
                 <div class="cards">
@@ -1142,6 +1142,90 @@
                         </div>
                     </article>
 
+                    <!-- 模块十一：诗词卡片（本地接口驱动） -->
+                    <article class="card reveal d1">
+                        <div class="card-top">
+                            <span class="no">模块 11</span>
+                            <span class="tag">接口 + 数据</span>
+                        </div>
+                        <h3>诗词卡片 · 上图下文</h3>
+                        <p class="desc">页面不写死内容，打开时用 <code>fetch</code> 向本地数据服务器请求 <code>/api/poems</code>，把 <code>db/db.json</code> 里 <code>poems</code> 的图片、标题、正文渲染成上图下文卡片。服务器 <code>db/server.js</code> 跑在 3004 端口，顺带代理远端图片，避开图床防盗链。</p>
+                        <div class="links">
+                            <a href="sjs-poems.html">
+                                <span class="file-icon">HTML</span>
+                                <span class="t">
+                                    <b>诗词卡片（需先启动服务器）</b>
+                                    <code>sjs-poems.html</code>
+                                </span>
+                                <span class="go">→</span>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- 模块十二：JSON 到 fetch 三档进阶 -->
+                    <article class="card reveal d2">
+                        <div class="card-top">
+                            <span class="no">模块 12</span>
+                            <span class="tag">接口 + 交互</span>
+                        </div>
+                        <h3>JSON 到 fetch · 三档进阶</h3>
+                        <p class="desc">课堂案例的三档任务做在同一页：<b>任务一</b>跑通 fetch 全链路并写 catch 分支；<b>任务二</b>把数据扩到 6 首、加 <code>/api/authors</code> 第二接口、用 <code>Promise.all</code> 并发取回两份数据；<b>任务三</b>加关键字搜索（命中标题/正文/作者并高亮）与按标题长度三态排序。附答辩四问的自查答案。</p>
+                        <div class="links">
+                            <a href="sjs-fetch.html">
+                                <span class="file-icon">HTML</span>
+                                <span class="t">
+                                    <b>三档进阶任务台（需先启动服务器）</b>
+                                    <code>sjs-fetch.html</code>
+                                </span>
+                                <span class="go">→</span>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- 模块十三：移动端触摸事件四关 -->
+                    <article class="card reveal d3">
+                        <div class="card-top">
+                            <span class="no">模块 13</span>
+                            <span class="tag">移动端 · 触摸</span>
+                        </div>
+                        <h3>移动端常用事件 · 四关</h3>
+                        <p class="desc">从「看清事件」到「做出手势」。<b>一</b>事件侦探：探针区实时记录 touchstart/move/end 顺序并自动填表；<b>二</b>手势卡片：40px 阈值、300ms 冷却、touch-action: pan-y 保住纵向滚动；<b>三</b>图片查看器：双指缩放 1～4x 以两指中点为基准，实测基准点位移漂移为 0；<b>四</b>摇一摇：合成加速度阈值 18、1.5s 冷却、无传感器时完整降级。</p>
+                        <div class="links">
+                            <a href="mobile-detective.html">
+                                <span class="file-icon">HTML</span>
+                                <span class="t">
+                                    <b>任务一 · 事件侦探</b>
+                                    <code>mobile-detective.html</code>
+                                </span>
+                                <span class="go">→</span>
+                            </a>
+                            <a href="mobile-gesture.html">
+                                <span class="file-icon">HTML</span>
+                                <span class="t">
+                                    <b>任务二 · 中华美食手势卡片</b>
+                                    <code>mobile-gesture.html</code>
+                                </span>
+                                <span class="go">→</span>
+                            </a>
+                            <a href="mobile-zoom.html">
+                                <span class="file-icon">HTML</span>
+                                <span class="t">
+                                    <b>任务三 · 图片查看器</b>
+                                    <code>mobile-zoom.html</code>
+                                </span>
+                                <span class="go">→</span>
+                            </a>
+                            <a href="mobile-sensor.html">
+                                <span class="file-icon">HTML</span>
+                                <span class="t">
+                                    <b>任务四 · 摇一摇抽菜谱</b>
+                                    <code>mobile-sensor.html</code>
+                                </span>
+                                <span class="go">→</span>
+                            </a>
+                        </div>
+                    </article>
+
                 </div>
             </div>
         </section>
@@ -1269,17 +1353,17 @@
                 </div>
                 <div class="planned">
                     <div class="plan">
-                        <span class="ph-no">模块 11 / 规划中</span>
+                        <span class="ph-no">模块 14 / 规划中</span>
                         <h4>响应式适配</h4>
                         <p>媒体查询与多设备适配。</p>
                     </div>
                     <div class="plan">
-                        <span class="ph-no">模块 12 / 规划中</span>
+                        <span class="ph-no">模块 15 / 规划中</span>
                         <h4>JavaScript 交互</h4>
                         <p>JavaScript 基础、DOM 操作与事件。</p>
                     </div>
                     <div class="plan">
-                        <span class="ph-no">模块 13 / 规划中</span>
+                        <span class="ph-no">模块 16 / 规划中</span>
                         <h4>综合实践项目</h4>
                         <p>整合所学内容，完成一个完整的站点页面。</p>
                     </div>

@@ -233,3 +233,125 @@ https://yitianti.github.io/yangtt/ 这个网站是其他同学的 他做的比�
 - 提交：5f9e321
 - 站点：https://sjs729.github.io/shenjiashuo/
 - 验收：8 个入口全部 200；首页 11 卡片 / 3 关 / 6 个入口链接；任务一点圆点读数正确；任务二 6 滑杆 + 4 预设可用；任务三缩略图联动同步；提示词页 36 条记录
+
+## 2026-11-12 13:47:19
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+给我新建一个html文件，显示上图下文的结构，图片和文字通过本地启动服务器获取当前文件夹下面的db里面db.json的poems里面的图片，title和content。并给我生成server.js数据服务器文件，server.js放在db文件夹中。其中端口号为3004。
+
+## 2026-11-12 14:10:00 · 实现记录
+- 模型：DeepSeek-V4.1-Flash
+- 新建 `sjs-poems.html`：上图下文卡片网格，fetch `/api/poems` 渲染 pic/title/content，含加载/失败/空数据三态与重新拉取
+- 新建 `db/server.js`：express 5，端口 3004，接口 `/api/poems`、`/api/poems/:index`、`/api/pic/:index`、`/api/health`，并托管上级目录静态资源
+- 关键问题：db.json 的 pic 指向 Gitee，实测返回 302 到带签名地址，浏览器直接 `<img>` 加载失败（四张全空白）。改为 server.js 代理取图并缓存，接口返回的 pic 改写为同源 `/api/pic/N`
+- 首页新增模块 11 卡片，计数改为 12 页 / 11 模块，占位序号顺延为 12/13/14
+
+## 2026-11-12 14:04:55
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+https://spontaneous-valkyrie-4e4229.netlify.app/json-fetch-lesson
+这个网站里面有三个任务 你帮我做一下并且放到我的代码里面 新开一个板块
+
+## 2026-11-12 14:30:00 · 三档进阶实现
+- 模型：DeepSeek-V4.1-Flash
+- 参考：https://spontaneous-valkyrie-4e4229.netlify.app/json-fetch-lesson 的课堂任务三档
+- 新建 `sjs-fetch.html`：任务一 fetch 两段式 + catch 兜底；任务二 Promise.all 并发取 poems 与 authors；任务三 关键字搜索（含高亮）+ 标题长度三态排序；附答辩四问
+- 改 `db/db.json`：poems 由 4 条扩到 6 条（新增静夜思/李白、春晓/孟浩然），每条补 author 与 dynasty；新增 authors 数组 6 位
+- 改 `db/server.js`：新增 `/api/authors`；`/api/poems` 改为保留原对象全部字段再替换 pic（原先手挑字段会丢掉 author，已修复）；health 增加 authors 计数
+- 首页新增模块 12 卡片，计数 13 页 / 12 模块，占位顺延 13/14/15
+
+## 2026-11-12 14:20:00
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+任务二效果的代码就是 transform吗
+
+## 2026-11-12 14:25:00
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+重新总结一下prev / next 的 transform 这部分的代码在哪里 并且跟我讲解一下 还有任务三新加的swiper的代码 这两个问题的代码 并且解析代码
+
+## 2026-11-12 14:27:46
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+prev / next 的 transform 这部分的代码在哪里 任务二的 并且跟我讲解一下
+
+## 2026-11-12 14:31:00
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+function sjs_buildCreative() {...} 简介的讲一下每一行的代码是干嘛的
+
+## 2026-11-12 14:33:00
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+任务三新加的swiper的代码 这两个问题的代码 并且解析代码
+
+## 2026-11-12 14:41:25
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+你能帮我在需要讲解的代码下面的五十行注解需要讲解的代码的每行的注释吗 你理解不理解这句话的意思
+（确认选项：页面里加可见的「逐行注解」块）
+- 执行：在两段需要讲解的代码下方各加一个约 50 行的逐行注解区
+
+## 2026-11-16 13:27:45
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+https://spontaneous-valkyrie-4e4229.netlify.app/mobile-events-lesson
+你读取一下这个网站 列出来都要做什么 先别着急做 等我说让你开始做 你再开始做
+
+## 2026-11-16 13:39:29
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+这个是要做到手机上面吗
+
+## 2026-11-16 13:52:00
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+要求是sjs_不要用wy_
+- 执行：将 mobile-detective.html 全部 wy_ 前缀改为 sjs_（CSS 类、id、JS 变量、CSS 自定义属性）
+
+## 2026-11-16 13:55:00 · 任务一完成
+- 模型：DeepSeek-V4.1-Flash
+- 文件：`mobile-detective.html`（全部 sjs_ 前缀）
+- 验证：用 CDP 派发真实 touch 事件，五种操作全部记录正确
+  - 单击：touchstart → touchend → click，0 次 move
+  - 向上拖：touchmove ×9
+  - 左滑：touchmove ×12
+  - 双指：2 根手指，touchmove ×5
+  - 长按：600ms 判定生效
+- 确认顺序：touchstart → touchmove×N → touchend → click（click 在最后）
+
+## 2026-11-16 14:05:00 · 任务二完成
+- 模型：DeepSeek-V4.1-Flash
+- 文件：`mobile-gesture.html`（sjs_ 前缀）
+- 验证（CDP 真实触摸）：
+  - 30px 短滑不切换（阈值 40px 生效）
+  - 100px 左滑 → 1→2→3→4 逐张正常
+  - 第 1 张右滑提示「已经是第一张了」，第 4 张左滑提示「已经是最后一张了」
+  - 快速连滑两次只前进 1 张（300ms 冷却生效）
+  - 卡片内纵向 150px 滑动不切换（touch-action: pan-y 生效）
+- 踩坑：第一次测试时卡片被滚动到视口外（y=-452），触摸点没落在元素上导致全部失败，非代码问题
+
+## 2026-11-16 14:35:00 · 任务三完成
+- 模型：DeepSeek-V4.1-Flash
+- 文件：`mobile-zoom.html`（sjs_ 前缀）
+- 核心验证：以偏离中心 80px 的点为基准双指缩放到 2.33x，基准点在图片内的相对位置漂移 **x:0, y:0**（完全不跳）
+- 修掉两个真 bug：
+  1. 位移坐标系原点算错——transform 是 `translate(-50%,-50%) translate(tx,ty)`，原点在容器中心而非左上角，公式漏减中心导致 X 轴漂移 0.166
+  2. `sjs_limit()` 用 `clientHeight`（不含 transform 缩放）算边界，导致放大后纵向可拖范围恒为 0；改为乘 scale，并把图片改为撑满容器（object-fit: cover），1x 无留白
+- 其他验证：单指拖动、1x 不可拖、双击 1x↔2x、三连点只算一次双击
+
+## 2026-11-16 14:00:00 · 四个任务全部完成
+- 模型：DeepSeek-V4.1-Flash
+- 文件（全部 sjs_ 前缀，文件头含姓名/学号/建立时间/使用模型/功能名称）：
+  - `mobile-detective.html` 任务一 事件侦探（探针 + 自动填表 + 三问答 + 轨迹草图）
+  - `mobile-gesture.html` 任务二 手势卡片（阈值 40px / 冷却 300ms / pan-y）
+  - `mobile-zoom.html` 任务三 图片查看器（1-4x 双指 / 双击 / 拖动 / 边界回弹）
+  - `mobile-sensor.html` 任务四 摇一摇（阈值 18 / 冷却 1.5s / 权限 / 降级）
+- 任务四验证（合成 devicemotion）：静止 9.8 不触发、摇动 52 抽中、冷却期内不换菜、手动按钮可用且防连点
+- 修掉：iOS 判定误用 requestPermission 存在性（Chrome 也有该函数），改为 UA + 平台判断
+- 首页新增「模块 13 · 移动端常用事件 · 四关」，计数 17 页 / 13 模块
+
+## 2026-11-16 14:10:00
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+移动端课堂实践提交形式：任务一-任务四，完成之后发布到github或者netlify，其中任务一、任务二不需要提交手机端操作视频，任务一按要求操纵并提交三个思考问题几对应答案，任务二：写出效果即可，发布后能看到，任务三、任务四：写出效果并插入手机实体演示视频（再拿一个设备录制）录制视频我来录制 其他的要求都满足了吗

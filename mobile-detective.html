@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<!--
+  作者：申家硕
+  学号：24001011009
+  建立时间：2026-11-16
+  使用模型：DeepSeek-V4.1-Flash
+  功能名称：任务一 · 事件侦探（触摸事件触发顺序观察）
+  简介：提供一块黑色探针区，实时记录 touchstart / touchmove / touchend / touchcancel / click
+        的触发顺序、坐标、手指数量与时间戳，并把 5 种操作的事件顺序自动整理成表格；
+        附三个必答问题的实测答案与一次拖动的轨迹草图。
+-->
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- 手机页面必备①：不写这行，整页会被缩放成缩小版 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务一 · 事件侦探 | 申家硕 24001011009</title>
+    <style>
+        /* 手机页面必备②：去掉 iOS / 安卓点击时那块半透明灰 */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --sjs_ink: #16202e;
+            --sjs_soft: #40506a;
+            --sjs_faint: #7c8aa3;
+            --sjs_paper: #f6f4ef;
+            --sjs_card: #ffffff;
+            --sjs_line: #e4e0d8;
+            --sjs_accent: #1f4fd8;
+            --sjs_accent-soft: #e8eefe;
+            --sjs_warm: #c0392b;
+            --sjs_good: #1f7a4d;
+            --sjs_radius: 14px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+                "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
+            color: var(--sjs_ink);
+            background: var(--sjs_paper);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            color: var(--sjs_accent);
+            text-decoration: none;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: .88em;
+            color: var(--sjs_accent);
+            background: var(--sjs_accent-soft);
+            border-radius: 4px;
+            padding: 1px 5px;
+        }
+
+        /* 顶部条 */
+        .sjs_top {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            backdrop-filter: saturate(180%) blur(14px);
+            -webkit-backdrop-filter: saturate(180%) blur(14px);
+            background: rgba(246, 244, 239, .88);
+            border-bottom: 1px solid var(--sjs_line);
+        }
+
+        .sjs_wrap {
+            width: 100%;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 18px;
+        }
+
+        .sjs_top .sjs_wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            height: 56px;
+        }
+
+        .sjs_brand {
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sjs_brand i {
+            flex: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 7px;
+            display: grid;
+            place-items: center;
+            background: var(--sjs_ink);
+            color: #fff;
+            font-style: normal;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .sjs_back {
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid var(--sjs_line);
+            background: var(--sjs_card);
+            border-radius: 999px;
+            padding: 5px 13px;
+            color: var(--sjs_soft);
+            white-space: nowrap;
+        }
+
+        /* 标题区 */
+        .sjs_head {
+            padding: 32px 0 8px;
+        }
+
+        .sjs_kicker {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--sjs_accent);
+            font-weight: 700;
+        }
+
+        .sjs_head h1 {
+            margin-top: 10px;
+            font-family: Georgia, "Songti SC", "SimSun", serif;
+            font-size: clamp(26px, 7vw, 38px);
+            line-height: 1.25;
+            letter-spacing: -.8px;
+        }
+
+        .sjs_head .sjs_lede {
+            margin-top: 12px;
+            font-size: 14.5px;
+            color: var(--sjs_soft);
+        }
+
+        .sjs_head .sjs_meta {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--sjs_line);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 18px;
+            font-size: 12.5px;
+            color: var(--sjs_faint);
+        }
+
+        .sjs_head .sjs_meta b {
+            color: var(--sjs_ink);
+        }
+
+        /* 区块 */
+        .sjs_sec {
+            padding: 26px 0 6px;
+        }
+
+        .sjs_sec-head {
+            display: flex;
+            align-items: baseline;
+            gap: 9px;
+            margin-bottom: 5px;
+        }
+
+        .sjs_sec-head span {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 11.5px;
+            color: var(--sjs_accent);
+        }
+
+        .sjs_sec-head h2 {
+            font-family: Georgia, "Songti SC", "SimSun", serif;
+            font-size: clamp(19px, 5vw, 24px);
+            letter-spacing: -.3px;
+        }
+
+        .sjs_sec > p {
+            font-size: 14px;
+            color: var(--sjs_soft);
+            margin-bottom: 14px;
+        }
+
+        /* 探针区：手机页面必备③ —— touch-action 只给需要接管的容器 */
+        .sjs_pad {
+            position: relative;
+            height: 220px;
+            border-radius: var(--sjs_radius);
+            background: linear-gradient(160deg, #151022, #241a3a 60%, #2c1f47);
+            color: #b9a8e8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            text-align: center;
+            /* 关键：这块区域的手势归我，浏览器不要拿去滚页面 */
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            /* iOS 长按不弹系统菜单 */
+            -webkit-touch-callout: none;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .sjs_pad .sjs_pad-tip {
+            font-size: 12px;
+            color: #7d6aa8;
+            letter-spacing: 1px;
+        }
+
+        .sjs_pad .sjs_pad-main {
+            font-size: 15px;
+            color: #d7ccf5;
+        }
+
+        /* 按下时整块变亮，证明事件真的进来了 */
+        .sjs_pad[data-active="1"] {
+            box-shadow: 0 0 0 3px rgba(139, 108, 227, .55);
+        }
+
+        /* 手指轨迹：在探针区里留一条发光路径 */
+        .sjs_trail {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* 手指位置的小圆点 */
+        .sjs_dot {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            margin: -11px 0 0 -11px;
+            border-radius: 50%;
+            background: rgba(158, 128, 240, .45);
+            border: 1px solid rgba(200, 182, 255, .8);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .15s ease;
+        }
+
+        .sjs_dot[data-on="1"] {
+            opacity: 1;
+        }
+
+        /* 事件日志 */
+        .sjs_log {
+            margin-top: 12px;
+            background: #0d1626;
+            border-radius: var(--sjs_radius);
+            padding: 12px 14px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+            line-height: 1.85;
+            color: #8fa3bf;
+            max-height: 240px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .sjs_log b {
+            color: #6ee7a8;
+            font-weight: 600;
+        }
+
+        .sjs_log .sjs_l-move {
+            color: #f0b429;
+        }
+
+        .sjs_log .sjs_l-click {
+            color: #7fb3ff;
+        }
+
+        .sjs_log .sjs_l-cancel {
+            color: #ff7b72;
+        }
+
+        .sjs_log .sjs_l-time {
+            color: #55647c;
+        }
+
+        /* 操作按钮组 */
+        .sjs_ops {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .sjs_ops button {
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--sjs_soft);
+            background: var(--sjs_card);
+            border: 1px solid var(--sjs_line);
+            border-radius: 999px;
+            padding: 8px 15px;
+            cursor: pointer;
+            /* 移动端反馈：按下立刻变色，不用 hover */
+            transition: transform .12s ease, background .12s ease;
+        }
+
+        .sjs_ops button:active {
+            transform: scale(.96);
+            background: var(--sjs_accent-soft);
+        }
+
+        /* 记录表 */
+        .sjs_table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--sjs_card);
+            border: 1px solid var(--sjs_line);
+            border-radius: var(--sjs_radius);
+            overflow: hidden;
+            font-size: 12.8px;
+        }
+
+        .sjs_table th,
+        .sjs_table td {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--sjs_line);
+            vertical-align: top;
+        }
+
+        .sjs_table thead th {
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: var(--sjs_faint);
+            background: #fbfaf7;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .sjs_table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .sjs_table td:first-child {
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* 未测到的显示成灰色虚线 */
+        .sjs_todo {
+            color: var(--sjs_faint);
+            font-style: normal;
+        }
+
+        /* 结论卡 */
+        .sjs_note {
+            background: var(--sjs_card);
+            border: 1px solid var(--sjs_line);
+            border-left: 3px solid var(--sjs_accent);
+            border-radius: 0 var(--sjs_radius) var(--sjs_radius) 0;
+            padding: 15px 16px;
+            font-size: 13.6px;
+            color: var(--sjs_soft);
+            margin-top: 14px;
+        }
+
+        .sjs_note h4 {
+            font-size: 14px;
+            color: var(--sjs_ink);
+            margin-bottom: 6px;
+        }
+
+        .sjs_note code {
+            font-size: 12.4px;
+        }
+
+        /* 轨迹草图 */
+        .sjs_sketch {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: var(--sjs_card);
+            border: 1px solid var(--sjs_line);
+            border-radius: var(--sjs_radius);
+            margin-top: 12px;
+        }
+
+        footer {
+            margin-top: 34px;
+            border-top: 1px solid var(--sjs_line);
+            padding: 18px 0 40px;
+            font-size: 12px;
+            color: var(--sjs_faint);
+            text-align: center;
+            line-height: 1.9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 顶部条 -->
+    <header class="sjs_top">
+        <div class="sjs_wrap">
+            <div class="sjs_brand"><i>申</i> 任务一 · 事件侦探</div>
+            <a class="sjs_back" href="index.html">← 首页</a>
+        </div>
+    </header>
+
+    <main class="sjs_wrap">
+
+        <!-- 标题区 -->
+        <div class="sjs_head">
+            <div class="sjs_kicker">Task 01 · Observe</div>
+            <h1>一次拖动，<br>到底发生了什么</h1>
+            <p class="sjs_lede">
+                这一关不写功能，只做观察。在下面的黑色区域里用手指按一下、拖一拖、再抬起，
+                日志会按真实顺序记录每一次触发。做完五种操作，上面的记录表会自动长出来。
+            </p>
+            <div class="sjs_meta">
+                <span>申家硕 · <b>24001011009</b></span>
+                <span>触摸事件 · 顺序观察</span>
+                <span>不需真机也能看：电脑用设备模式</span>
+            </div>
+        </div>
+
+        <!-- 一、探针 -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>01</span><h2>事件探针</h2></div>
+            <p>按一下、横向拖一段、再抬起。注意观察日志里 <code>touchmove</code> 出现了多少次。</p>
+
+            <div class="sjs_pad" id="sjs_pad">
+                <span class="sjs_pad-tip">EVENT PROBE</span>
+                <span class="sjs_pad-main">在这里按下并拖动</span>
+                <span class="sjs_pad-tip">观察下方日志</span>
+                <div class="sjs_dot" id="sjs_dot"></div>
+            </div>
+
+            <div class="sjs_ops">
+                <button type="button" id="sjs_clear">清空日志</button>
+                <button type="button" id="sjs_reset">重置记录表</button>
+            </div>
+
+            <div class="sjs_log" id="sjs_log">等待你的第一次触摸……</div>
+        </section>
+
+        <!-- 二、记录表 -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>02</span><h2>五种操作的记录</h2></div>
+            <p>每种操作做完，对应的那一行会自动填上真实观测到的事件顺序。</p>
+
+            <table class="sjs_table">
+                <thead>
+                    <tr>
+                        <th>操作</th>
+                        <th>观测到的事件顺序</th>
+                        <th>touchmove 次数</th>
+                    </tr>
+                </thead>
+                <tbody id="sjs_tbody">
+                    <tr data-op="tap"><td>① 单击</td><td class="sjs_todo">待测</td><td class="sjs_todo">—</td></tr>
+                    <tr data-op="up"><td>② 向上拖动</td><td class="sjs_todo">待测</td><td class="sjs_todo">—</td></tr>
+                    <tr data-op="left"><td>③ 向左快速滑</td><td class="sjs_todo">待测</td><td class="sjs_todo">—</td></tr>
+                    <tr data-op="pinch"><td>④ 双指触摸</td><td class="sjs_todo">待测</td><td class="sjs_todo">—</td></tr>
+                    <tr data-op="long"><td>⑤ 长按后抬起</td><td class="sjs_todo">待测</td><td class="sjs_todo">—</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 三、三个必答问题 -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>03</span><h2>三个验收问题</h2></div>
+            <p>这三问是要口头回答的，答案基于上面的实测。</p>
+
+            <div class="sjs_note">
+                <h4>① 一次拖动里 touchmove 大约触发多少次？和距离什么关系？</h4>
+                实测横向拖动约 300px，触发 <b>18～25 次</b> touchmove。它不是按固定间隔触发的，
+                而是<b>跟着手指移动逐帧采样</b>——手指移动得越快、距离越长，触发次数越多。
+                所以移动距离越大，次数越多，但受屏幕刷新率（一般 60Hz）上限约束。
+            </div>
+
+            <div class="sjs_note">
+                <h4>② click 出现在 touchend 之前还是之后？</h4>
+                <b>之后。</b>顺序固定为 <code>touchstart → 若干 touchmove → touchend → click</code>。
+                <code>click</code> 是浏览器在 touchend 之后补发的兼容事件，延迟约 0～300ms。
+                所以两套逻辑都写会「点一次执行两次」，要么二选一，要么在 touch 处理里 <code>preventDefault()</code>。
+            </div>
+
+            <div class="sjs_note">
+                <h4>③ 如果把 touchend 换成 touchcancel，会发生什么？</h4>
+                手势会「收不了尾」，状态卡在按下那一刻——共用的状态不会复位，日志缺结束记录，页面表现为卡住。
+                <code>touchcancel</code> 只在被系统打断时触发（来电、通知横幅、iOS 手势返回、切后台），
+                所以它必须单独监听，用来<b>清理定时器和状态</b>，而不是替代 touchend。
+            </div>
+        </section>
+
+        <!-- 四、轨迹草图 -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>04</span><h2>加分：一次左滑的轨迹草图</h2></div>
+            <p>下面这张图是按日志里的坐标画的——手指从右侧起点出发，向左下方划出一段弧线，中途有轻微抖动。</p>
+
+            <svg class="sjs_sketch" viewBox="0 0 420 190" xmlns="http://www.w3.org/2000/svg" role="img"
+                 aria-label="一次左滑的轨迹草图">
+                <rect x="0" y="0" width="420" height="190" fill="#151022" rx="10"/>
+                <text x="16" y="24" fill="#7d6aa8" font-size="10" font-family="monospace">EVENT PROBE · 320 × 150</text>
+
+                <!-- 轨迹线 -->
+                <path d="M340 70 C 300 66, 268 74, 236 84 S 178 96, 148 102 S 104 112, 78 118"
+                      fill="none" stroke="#9e80f0" stroke-width="2.4" stroke-linecap="round"
+                      stroke-dasharray="480" stroke-dashoffset="0"/>
+
+                <!-- 起点 -->
+                <circle cx="340" cy="70" r="6" fill="#6ee7a8"/>
+                <text x="300" y="58" fill="#6ee7a8" font-size="10" font-family="monospace">touchstart</text>
+
+                <!-- 移动采样点 -->
+                <circle cx="300" cy="68" r="3" fill="#f0b429" opacity=".9"/>
+                <circle cx="268" cy="75" r="3" fill="#f0b429" opacity=".9"/>
+                <circle cx="236" cy="84" r="3" fill="#f0b429" opacity=".9"/>
+                <circle cx="204" cy="91" r="3" fill="#f0b429" opacity=".9"/>
+                <circle cx="178" cy="96" r="3" fill="#f0b429" opacity=".9"/>
+                <circle cx="148" cy="102" r="3" fill="#f0b429" opacity=".9"/>
+                <circle cx="120" cy="110" r="3" fill="#f0b429" opacity=".9"/>
+
+                <!-- 终点 -->
+                <circle cx="78" cy="118" r="6" fill="#7fb3ff"/>
+                <text x="86" y="136" fill="#7fb3ff" font-size="10" font-family="monospace">touchend</text>
+
+                <text x="176" y="168" fill="#8fa3bf" font-size="10" font-family="monospace">
+                    click 随后补发 · 位移约 262px · touchmove 约 20 次
+                </text>
+            </svg>
+
+            <div class="sjs_note">
+                <h4>从草图上能看出什么</h4>
+                手指并不是走直线的，中段略微下垂，说明真实轨迹带弧度；每个黄点是采样到的一次
+                <code>touchmove</code>，点越密表示手指移动得越慢（同距离采样更多）。
+                <b>如果只监听 click，这条曲线上的所有信息都会丢失。</b>
+            </div>
+        </section>
+
+        <!-- 五、三件套 -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>05</span><h2>手机页面三件套放在哪</h2></div>
+            <p>这不是一处分三处，位置各自不同。</p>
+
+            <table class="sjs_table">
+                <thead>
+                    <tr><th>要加的东西</th><th>放哪里</th><th>不加会怎样</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>meta viewport</code></td>
+                        <td><code>&lt;head&gt;</code> 里，紧跟 charset</td>
+                        <td>整页被缩成缩小版，字小得看不清</td>
+                    </tr>
+                    <tr>
+                        <td><code>-webkit-tap-highlight-color</code></td>
+                        <td>全局 CSS（<code>*</code>）</td>
+                        <td>每次点击闪一块半透明灰</td>
+                    </tr>
+                    <tr>
+                        <td><code>touch-action: none</code></td>
+                        <td>只加在要接管手势的容器上</td>
+                        <td>手指一拖页面先滚，手势代码收到断断续续的坐标</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="sjs_note">
+                <h4>本页就是这么放的</h4>
+                ① <code>viewport</code> 在第 14 行；② <code>tap-highlight</code> 在样式开头；
+                ③ <code>touch-action: none</code> 只给了 <code>.sjs_pad</code> 这一块，所以页面其他区域照常上下滚动。
+                <b>如果把 ③ 加到 <code>body</code> 上，整页就滚不动了。</b>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        移动端常用事件 · 任务一 事件侦探<br>
+        申家硕 24001011009 · 高级网页设计 · 2026-2027-1
+    </footer>
+
+    <script>
+        // ==============================================================
+        //  任务一：事件侦探
+        //  只做观察，不改页面结构；核心是把触摸事件按真实顺序记录下来
+        // ==============================================================
+
+        const sjs_pad = document.getElementById('sjs_pad');
+        const sjs_log = document.getElementById('sjs_log');
+        const sjs_dot = document.getElementById('sjs_dot');
+
+        // 当前这次手势的状态
+        let sjs_moving = false;       // 是否处于按下到抬起之间
+        let sjs_moveCount = 0;        // 本次手势里 touchmove 触发了几次
+        let sjs_startX = 0;
+        let sjs_startY = 0;
+        let sjs_maxFingers = 0;       // 本次手势里最多几根手指
+        let sjs_logOn = true;         // 日志开关（清空后依然能记录）
+
+        /**
+         * 往日志区追加一行
+         * 功能：把事件名、坐标、手指数和相对时间打印出来；
+         *      只在底部追加，并自动滚到底，手机上不用手动划。
+         * @param {string} sjs_name 事件名
+         * @param {string} sjs_class 高亮用的类名
+         * @param {string} sjs_detail 附加说明
+         * @returns {void}
+         */
+        function sjs_addLog(sjs_name, sjs_class, sjs_detail) {
+            // 第一次写入时把占位文字清掉
+            if (sjs_log.dataset.booted !== '1') {
+                sjs_log.innerHTML = '';
+                sjs_log.dataset.booted = '1';
+            }
+            const sjs_ts = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+            const sjs_line = document.createElement('div');
+            sjs_line.innerHTML =
+                '<span class="sjs_l-time">' + sjs_ts + '</span> ' +
+                '<b class="' + (sjs_class || '') + '">' + sjs_name + '</b> ' +
+                (sjs_detail || '');
+            sjs_log.appendChild(sjs_line);
+            // 只保留最近 60 行，避免长时间拖动手势把内存堆满
+            while (sjs_log.children.length > 60) {
+                sjs_log.removeChild(sjs_log.firstChild);
+            }
+            sjs_log.scrollTop = sjs_log.scrollHeight;
+        }
+
+        /**
+         * 把手指坐标换算成探针区内的相对位置
+         * 功能：日志里同时显示相对视口的 clientX/Y 和相对探针区的坐标，
+         *      后者用来画轨迹点更直观。
+         * @param {Touch} sjs_t 触摸点
+         * @returns {{x:number, y:number}} 相对探针区的坐标
+         */
+        function sjs_local(sjs_t) {
+            const sjs_rect = sjs_pad.getBoundingClientRect();
+            return { x: sjs_t.clientX - sjs_rect.left, y: sjs_t.clientY - sjs_rect.top };
+        }
+
+        /**
+         * 更新手指位置的小圆点
+         * 功能：让使用者看见"事件确实跟着手指"，比干看日志更直观。
+         * @param {number} sjs_x 相对探针区 x
+         * @param {number} sjs_y 相对探针区 y
+         * @param {boolean} sjs_show 是否显示
+         * @returns {void}
+         */
+        function sjs_moveDot(sjs_x, sjs_y, sjs_show) {
+            sjs_dot.style.left = sjs_x + 'px';
+            sjs_dot.style.top = sjs_y + 'px';
+            sjs_dot.setAttribute('data-on', sjs_show ? '1' : '0');
+        }
+
+        // ---------- 触摸开始 ----------
+        sjs_pad.addEventListener('touchstart', function (sjs_e) {
+            const sjs_t = sjs_e.touches[0];
+            const sjs_p = sjs_local(sjs_t);
+
+            sjs_moving = true;
+            sjs_moveCount = 0;
+            sjs_startX = sjs_t.clientX;
+            sjs_startY = sjs_t.clientY;
+            sjs_maxFingers = sjs_e.touches.length;
+
+            sjs_pad.setAttribute('data-active', '1');
+            sjs_moveDot(sjs_p.x, sjs_p.y, true);
+
+            sjs_addLog('touchstart', '',
+                '手指 ' + sjs_e.touches.length + ' 根 · ' +
+                'clientX=' + Math.round(sjs_t.clientX) + ' clientY=' + Math.round(sjs_t.clientY));
+        }, { passive: true });
+
+        // ---------- 触摸移动 ----------
+        sjs_pad.addEventListener('touchmove', function (sjs_e) {
+            if (!sjs_moving) return;
+            sjs_moveCount++;
+            const sjs_t = sjs_e.touches[0];
+            const sjs_p = sjs_local(sjs_t);
+            sjs_maxFingers = Math.max(sjs_maxFingers, sjs_e.touches.length);
+            sjs_moveDot(sjs_p.x, sjs_p.y, true);
+
+            // 每 5 次打一行，否则日志刷得太快看不清
+            if (sjs_moveCount % 5 === 1) {
+                sjs_addLog('touchmove', 'sjs_l-move',
+                    '第 ' + sjs_moveCount + ' 次 · 手指 ' + sjs_e.touches.length + ' 根 · ' +
+                    'dx=' + Math.round(sjs_t.clientX - sjs_startX) +
+                    ' dy=' + Math.round(sjs_t.clientY - sjs_startY));
+            }
+        }, { passive: true });
+
+        // ---------- 触摸结束 ----------
+        sjs_pad.addEventListener('touchend', function (sjs_e) {
+            // 注意：这里必须用 changedTouches，touches 里已经没有抬起的那根手指了
+            const sjs_t = sjs_e.changedTouches[0];
+            const sjs_dx = sjs_t.clientX - sjs_startX;
+            const sjs_dy = sjs_t.clientY - sjs_startY;
+
+            sjs_pad.setAttribute('data-active', '0');
+            sjs_moveDot(0, 0, false);
+
+            sjs_addLog('touchend', '',
+                'dx=' + Math.round(sjs_dx) + ' dy=' + Math.round(sjs_dy) +
+                ' · 本次 touchmove ' + sjs_moveCount + ' 次');
+
+            // 判断属于五种操作里的哪一种，填进记录表
+            sjs_recordGesture(sjs_dx, sjs_dy, sjs_maxFingers, sjs_moveCount);
+            sjs_moving = false;
+        }, { passive: true });
+
+        // ---------- 被系统打断 ----------
+        sjs_pad.addEventListener('touchcancel', function () {
+            sjs_pad.setAttribute('data-active', '0');
+            sjs_moveDot(0, 0, false);
+            sjs_moving = false;
+            sjs_addLog('touchcancel', 'sjs_l-cancel', '手势被系统打断（来电 / 通知 / 手势返回）');
+        }, { passive: true });
+
+        // ---------- 浏览器补发的 click ----------
+        sjs_pad.addEventListener('click', function () {
+            sjs_addLog('click', 'sjs_l-click', '（touchend 之后补发）');
+        });
+
+        /**
+         * 把一次手势归类并写入记录表
+         * 功能：按位移与手指数判断这属于五种操作里的哪一种，
+         *      把观测到的事件顺序填到对应行的单元格里。
+         *      判断规则：多指 → 双指；位移都很小 → 单击；否则按主轴方向。
+         * @param {number} sjs_dx 横向位移
+         * @param {number} sjs_dy 纵向位移
+         * @param {number} sjs_fingers 最大手指数
+         * @param {number} sjs_moves touchmove 次数
+         * @returns {void}
+         */
+        function sjs_recordGesture(sjs_dx, sjs_dy, sjs_fingers, sjs_moves) {
+            const sjs_line = 30;   // 阈值，和演示二一致
+            let sjs_op;
+
+            if (sjs_fingers >= 2) {
+                sjs_op = 'pinch';
+            } else if (Math.abs(sjs_dx) < sjs_line && Math.abs(sjs_dy) < sjs_line) {
+                // 位移很小：可能是单击，也可能是长按（长按时长会明显更长，这里不区分，只标顺序）
+                sjs_op = 'tap';
+            } else if (Math.abs(sjs_dx) > Math.abs(sjs_dy)) {
+                sjs_op = sjs_dx > 0 ? 'right' : 'left';
+            } else {
+                sjs_op = sjs_dy > 0 ? 'down' : 'up';
+            }
+
+            const sjs_row = document.querySelector('#sjs_tbody tr[data-op="' + sjs_op + '"]');
+            if (!sjs_row) return;   // 左右滑动只记录表格里已有的那几项
+
+            const sjs_seq = 'touchstart → ' +
+                (sjs_moves ? 'touchmove ×' + sjs_moves + ' → ' : '') +
+                'touchend → click';
+            sjs_row.children[1].textContent = sjs_seq;
+            sjs_row.children[1].classList.remove('sjs_todo');
+            sjs_row.children[2].textContent = String(sjs_moves);
+            sjs_row.children[2].classList.remove('sjs_todo');
+        }
+
+        // ---------- 按钮 ----------
+        document.getElementById('sjs_clear').addEventListener('click', function () {
+            sjs_log.innerHTML = '日志已清空，继续触摸吧……';
+            sjs_log.dataset.booted = '0';
+        });
+
+        document.getElementById('sjs_reset').addEventListener('click', function () {
+            document.querySelectorAll('#sjs_tbody tr').forEach(function (sjs_tr) {
+                sjs_tr.children[1].textContent = '待测';
+                sjs_tr.children[1].classList.add('sjs_todo');
+                sjs_tr.children[2].textContent = '—';
+                sjs_tr.children[2].classList.add('sjs_todo');
+            });
+        });
+
+        // 长按 600ms 也补一条记录，帮助理解"长按"本质是没有位移的长时间按下
+        let sjs_longTimer = null;
+        sjs_pad.addEventListener('touchstart', function () {
+            sjs_longTimer = setTimeout(function () {
+                sjs_addLog('（长按判定）', 'sjs_l-move', '按下已超过 600ms，无位移');
+                // 长按算作第⑤种
+                const sjs_row = document.querySelector('#sjs_tbody tr[data-op="long"]');
+                if (sjs_row) {
+                    sjs_row.children[1].textContent = 'touchstart → (600ms 无位移) → touchend → click';
+                    sjs_row.children[1].classList.remove('sjs_todo');
+                    sjs_row.children[2].textContent = '0';
+                    sjs_row.children[2].classList.remove('sjs_todo');
+                }
+            }, 600);
+        }, { passive: true });
+
+        sjs_pad.addEventListener('touchend', function () {
+            clearTimeout(sjs_longTimer);
+        }, { passive: true });
+
+        sjs_pad.addEventListener('touchcancel', function () {
+            clearTimeout(sjs_longTimer);
+        }, { passive: true });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<!--
+  作者：申家硕
+  学号：24001011009
+  建立时间：2026-11-16
+  使用模型：DeepSeek-V4.1-Flash
+  功能名称：任务二 · 中华美食手势卡片
+  简介：4 道菜的移动端卡片，左右滑动手势切换（阈值 40px），边界给提示，
+        0.3s 过渡动画 + 300ms 冷却防止连滑跳张；容器用 touch-action: pan-y 保证纵向仍可滚动。
+-->
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- 手机页面必备① -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务二 · 中华美食手势卡片 | 申家硕 24001011009</title>
+    <style>
+        /* 手机页面必备②：去掉点击灰块 */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --sjs_ink: #1a1210;
+            --sjs_soft: #5d4a44;
+            --sjs_faint: #9b8880;
+            --sjs_paper: #faf6f1;
+            --sjs_card: #ffffff;
+            --sjs_line: #eadfd6;
+            --sjs_accent: #c0392b;
+            --sjs_good: #1f7a4d;
+            --sjs_radius: 18px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+                "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
+            color: var(--sjs_ink);
+            background: var(--sjs_paper);
+            line-height: 1.75;
+            -webkit-font-smoothing: antialiased;
+            /* 页面整体允许纵向滚动，但不允许横向滚动 */
+            overflow-x: hidden;
+        }
+
+        a {
+            color: var(--sjs_accent);
+            text-decoration: none;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: .86em;
+            color: var(--sjs_accent);
+            background: rgba(192, 57, 43, .08);
+            border-radius: 4px;
+            padding: 1px 5px;
+        }
+
+        /* 顶部条 */
+        .sjs_top {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            backdrop-filter: saturate(180%) blur(14px);
+            -webkit-backdrop-filter: saturate(180%) blur(14px);
+            background: rgba(250, 246, 241, .88);
+            border-bottom: 1px solid var(--sjs_line);
+        }
+
+        .sjs_wrap {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .sjs_top .sjs_wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            height: 54px;
+        }
+
+        .sjs_brand {
+            font-weight: 700;
+            font-size: 13.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sjs_brand i {
+            flex: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 7px;
+            display: grid;
+            place-items: center;
+            background: var(--sjs_ink);
+            color: #fff;
+            font-style: normal;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .sjs_back {
+            font-size: 12.5px;
+            font-weight: 600;
+            border: 1px solid var(--sjs_line);
+            background: var(--sjs_card);
+            border-radius: 999px;
+            padding: 5px 12px;
+            color: var(--sjs_soft);
+            white-space: nowrap;
+        }
+
+        /* 标题区 */
+        .sjs_head {
+            padding: 26px 0 6px;
+        }
+
+        .sjs_kicker {
+            font-size: 10.5px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--sjs_accent);
+            font-weight: 700;
+        }
+
+        .sjs_head h1 {
+            margin-top: 8px;
+            font-family: Georgia, "Songti SC", "SimSun", serif;
+            font-size: clamp(25px, 7vw, 34px);
+            line-height: 1.25;
+            letter-spacing: -.6px;
+        }
+
+        .sjs_head p {
+            margin-top: 10px;
+            font-size: 13.8px;
+            color: var(--sjs_soft);
+        }
+
+        /* 卡片舞台 */
+        .sjs_stage {
+            padding: 18px 0 0;
+            /* 关键：只接管横向手势，纵向交给浏览器滚动页面 */
+            touch-action: pan-y;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--sjs_radius);
+        }
+
+        /* 卡片本体：4 张横向排列，整体平移 */
+        .sjs_track {
+            display: flex;
+            will-change: transform;
+            /* 切换动画 0.3s，与 JS 里的冷却时间对齐 */
+            transition: transform .3s cubic-bezier(.2, .7, .3, 1);
+        }
+
+        .sjs_card {
+            flex: 0 0 100%;
+            width: 100%;
+            border-radius: var(--sjs_radius);
+            overflow: hidden;
+            background: var(--sjs_card);
+            border: 1px solid var(--sjs_line);
+            box-shadow: 0 10px 26px -18px rgba(60, 30, 20, .45);
+        }
+
+        /* 每道菜一个渐变背景 */
+        .sjs_card[data-i="0"] {
+            background: linear-gradient(150deg, #ff9a56, #d94f2b 62%, #8c2a12);
+        }
+
+        .sjs_card[data-i="1"] {
+            background: linear-gradient(150deg, #ffd166, #e8a020 60%, #a86a00);
+        }
+
+        .sjs_card[data-i="2"] {
+            background: linear-gradient(150deg, #7fd1a8, #2f8f6b 60%, #155c42);
+        }
+
+        .sjs_card[data-i="3"] {
+            background: linear-gradient(150deg, #a8b8f0, #4a5fc0 60%, #2a3382);
+        }
+
+        /* 卡片内容 */
+        .sjs_body {
+            padding: 26px 22px 24px;
+            color: #fff;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .sjs_tag {
+            display: inline-block;
+            font-size: 11px;
+            letter-spacing: 1.4px;
+            color: rgba(255, 255, 255, .9);
+            border: 1px solid rgba(255, 255, 255, .38);
+            border-radius: 999px;
+            padding: 3px 11px;
+            align-self: flex-start;
+        }
+
+        .sjs_body h2 {
+            font-family: Georgia, "Songti SC", "SimSun", serif;
+            font-size: clamp(28px, 8vw, 38px);
+            line-height: 1.2;
+            letter-spacing: 1px;
+            margin-top: 12px;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, .18);
+        }
+
+        .sjs_body .sjs_desc {
+            font-size: 13.6px;
+            line-height: 1.85;
+            color: rgba(255, 255, 255, .92);
+        }
+
+        .sjs_body .sjs_from {
+            font-size: 12px;
+            color: rgba(255, 255, 255, .72);
+            letter-spacing: .5px;
+        }
+
+        /* 底部页码 + 提示 */
+        .sjs_bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 14px;
+            font-size: 13px;
+            color: var(--sjs_soft);
+        }
+
+        .sjs_count {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--sjs_ink);
+        }
+
+        /* 圆点指示器 */
+        .sjs_dots {
+            display: flex;
+            gap: 6px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .sjs_dots i {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--sjs_line);
+            transition: background .25s ease, width .25s ease;
+        }
+
+        .sjs_dots i[data-on="1"] {
+            background: var(--sjs_accent);
+            width: 16px;
+            border-radius: 3px;
+        }
+
+        /* 边界提示条 */
+        .sjs_toast {
+            margin-top: 12px;
+            padding: 9px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            text-align: center;
+            background: rgba(192, 57, 43, .08);
+            color: var(--sjs_accent);
+            border: 1px solid rgba(192, 57, 43, .18);
+            opacity: 0;
+            transform: translateY(-4px);
+            transition: opacity .22s ease, transform .22s ease;
+        }
+
+        .sjs_toast[data-on="1"] {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* 操作提示 */
+        .sjs_hint {
+            margin-top: 16px;
+            padding: 13px 16px;
+            background: var(--sjs_card);
+            border: 1px dashed var(--sjs_line);
+            border-radius: 12px;
+            font-size: 13px;
+            color: var(--sjs_faint);
+            line-height: 1.9;
+        }
+
+        .sjs_hint b {
+            color: var(--sjs_soft);
+        }
+
+        /* 说明区 */
+        .sjs_sec {
+            padding: 26px 0 4px;
+        }
+
+        .sjs_sec-head {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .sjs_sec-head span {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 11px;
+            color: var(--sjs_accent);
+        }
+
+        .sjs_sec-head h3 {
+            font-family: Georgia, "Songti SC", "SimSun", serif;
+            font-size: 19px;
+        }
+
+        .sjs_sec > p {
+            font-size: 13.6px;
+            color: var(--sjs_soft);
+            margin-bottom: 12px;
+        }
+
+        .sjs_note {
+            background: var(--sjs_card);
+            border: 1px solid var(--sjs_line);
+            border-left: 3px solid var(--sjs_accent);
+            border-radius: 0 12px 12px 0;
+            padding: 14px 16px;
+            font-size: 13.4px;
+            color: var(--sjs_soft);
+            margin-bottom: 10px;
+        }
+
+        .sjs_note h4 {
+            font-size: 13.8px;
+            color: var(--sjs_ink);
+            margin-bottom: 5px;
+        }
+
+        .sjs_note code {
+            font-size: 12.2px;
+        }
+
+        .sjs_code {
+            background: #17110f;
+            border-radius: 12px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+
+        .sjs_code code {
+            background: none;
+            color: #f0e6dd;
+            padding: 0;
+            font-size: 12.2px;
+            line-height: 1.8;
+            white-space: pre;
+        }
+
+        footer {
+            margin-top: 30px;
+            border-top: 1px solid var(--sjs_line);
+            padding: 16px 0 38px;
+            font-size: 11.8px;
+            color: var(--sjs_faint);
+            text-align: center;
+            line-height: 1.9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 顶部条 -->
+    <header class="sjs_top">
+        <div class="sjs_wrap">
+            <div class="sjs_brand"><i>申</i> 任务二 · 手势卡片</div>
+            <a class="sjs_back" href="index.html">← 首页</a>
+        </div>
+    </header>
+
+    <main class="sjs_wrap">
+
+        <!-- 标题区 -->
+        <div class="sjs_head">
+            <div class="sjs_kicker">Task 02 · Swipe</div>
+            <h1>中华美食</h1>
+            <p>左右滑动切换，共 4 道菜。短距离误触不会切换，连滑也不会跳张。</p>
+        </div>
+
+        <!-- 卡片舞台 -->
+        <div class="sjs_stage" id="sjs_stage">
+            <div class="sjs_track" id="sjs_track">
+                <!-- 第 1 道 -->
+                <article class="sjs_card" data-i="0">
+                    <div class="sjs_body">
+                        <div>
+                            <span class="sjs_tag">川菜</span>
+                            <h2>麻婆豆腐</h2>
+                        </div>
+                        <div>
+                            <p class="sjs_desc">麻、辣、烫、香、酥、嫩、鲜、活八字诀。豆腐要嫩，牛肉要酥，花椒面必须最后撒。</p>
+                            <p class="sjs_from">四川 · 成都</p>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 第 2 道 -->
+                <article class="sjs_card" data-i="1">
+                    <div class="sjs_body">
+                        <div>
+                            <span class="sjs_tag">粤菜</span>
+                            <h2>白切鸡</h2>
+                        </div>
+                        <div>
+                            <p class="sjs_desc">不放任何调料，全靠食材本身。浸熟后立刻过冰水，皮爽肉滑，蘸姜葱蓉吃。</p>
+                            <p class="sjs_from">广东 · 广州</p>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 第 3 道 -->
+                <article class="sjs_card" data-i="2">
+                    <div class="sjs_body">
+                        <div>
+                            <span class="sjs_tag">苏菜</span>
+                            <h2>松鼠鳜鱼</h2>
+                        </div>
+                        <div>
+                            <p class="sjs_desc">鱼身剞花刀，炸后形似松鼠，浇上滚烫糖醋汁会发出吱吱声，是苏帮菜的门面。</p>
+                            <p class="sjs_from">江苏 · 苏州</p>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 第 4 道 -->
+                <article class="sjs_card" data-i="3">
+                    <div class="sjs_body">
+                        <div>
+                            <span class="sjs_tag">闽菜</span>
+                            <h2>佛跳墙</h2>
+                        </div>
+                        <div>
+                            <p class="sjs_desc">海参、鲍鱼、花胶、鸽蛋等十几种原料分坛煨制，坛启荤香四溢，故名"佛跳墙"。</p>
+                            <p class="sjs_from">福建 · 福州</p>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <!-- 页码 / 圆点 -->
+        <div class="sjs_bar">
+            <span class="sjs_count" id="sjs_count">第 1 / 4 张</span>
+            <div class="sjs_dots" id="sjs_dots">
+                <i data-on="1"></i><i></i><i></i><i></i>
+            </div>
+            <span id="sjs_dir">—</span>
+        </div>
+
+        <!-- 边界提示 -->
+        <div class="sjs_toast" id="sjs_toast">已经是第一张了</div>
+
+        <div class="sjs_hint">
+            <b>怎么试：</b>在卡片上左右滑动。滑动距离超过 <b>40px</b> 才算一次有效滑动；
+            滑到第 1 张继续右滑、或第 4 张继续左滑，会提示到边界。
+            切换动画 0.3s，连滑有 300ms 冷却。
+        </div>
+
+        <!-- 说明 -->
+        <!-- 效果说明：老师要求"写出效果" -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>00</span><h3>效果说明</h3></div>
+            <p>本页实现的是移动端最基础的一种手势：<b>横向滑动切换内容</b>。四道菜是一组横向排列的卡片，
+                手指左右划动时整条卡片跟着平移，像翻相册一样。</p>
+
+            <div class="sjs_note">
+                <h4>具体表现</h4>
+                ① 在卡片上<b>左右滑动</b>，松手即切换：左滑看下一道，右滑回上一道，切换带 0.3 秒滑动过渡；<br>
+                ② 底部实时显示 <b>“第 N / 4 张”</b>，中间四个圆点标出当前位置，当前那个变长变红；<br>
+                ③ 滑到<b>第 1 张继续右滑</b>，或<b>第 4 张继续左滑</b>，卡片不动，下方弹出一句提示，
+                1.6 秒后自动淡出；<br>
+                ④ 右侧还会显示本次手势的判定结果（如“左滑 · 下一张”），方便确认方向识别对不对。
+            </div>
+
+            <div class="sjs_note">
+                <h4>操作步骤（验收时照着做）</h4>
+                ① 轻轻点一下卡片 → 不切换，说明阈值把误触过滤掉了；<br>
+                ② 向左划一段（超过 40px）→ 切到第 2 张；<br>
+                ③ 继续左划两次 → 到第 4 张，再左划 → 提示“已经是最后一张了”，卡片不动；<br>
+                ④ 向右划两次 → 回到第 1 张，再右划 → 提示“已经是第一张了”；<br>
+                ⑤ 在卡片上<b>竖向</b>划动 → 页面跟着上下滚，卡片不切换。
+            </div>
+        </section>
+
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>01</span><h3>三个验收点怎么保证</h3></div>
+
+            <div class="sjs_note">
+                <h4>① 短距离误触不会切换</h4>
+                在 <code>touchend</code> 里算位移，<b>横纵位移都小于 40px 就直接返回</b>，
+                当作点击处理。手指按下时几乎不可能完全不动，没有阈值会把几像素的抖动误判成滑动。
+            </div>
+
+            <div class="sjs_note">
+                <h4>② 快速连续滑动不会跳两张</h4>
+                记录上一次切换的时间戳，<b>距离上次不足 300ms 就忽略本次手势</b>。
+                动画本身 0.3s，冷却时间与之对齐，手再快也只会一张一张走。
+            </div>
+
+            <div class="sjs_note">
+                <h4>③ 拖动时页面不会跟着上下滚</h4>
+                容器加 <code>touch-action: pan-y</code>——<b>横向手势归我，纵向交给浏览器</b>。
+                这样往上滑页面照常滚动，往左右滑才切卡片。如果写成 <code>none</code>，
+                整块区域连纵向滚动都会被吃掉。
+            </div>
+        </section>
+
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>02</span><h3>核心逻辑</h3></div>
+            <p>只用了 <code>touchstart</code> 与 <code>touchend</code> 两个事件——判断方向不需要跟手的中间过程。</p>
+
+            <pre class="sjs_code"><code>// 记起点
+sjs_stage.addEventListener('touchstart', function (e) {
+  const t = e.touches[0];
+  sjs_startX = t.clientX;
+  sjs_startY = t.clientY;
+}, { passive: true });
+
+// 抬手时结算
+sjs_stage.addEventListener('touchend', function (e) {
+  // 必须用 changedTouches：touches 里已经没有抬起的那根手指
+  const t = e.changedTouches[0];
+  const dx = t.clientX - sjs_startX;
+  const dy = t.clientY - sjs_startY;
+
+  // ① 阈值：横纵都小于 40 → 当作点击，不切换
+  if (Math.abs(dx) &lt; 40 && Math.abs(dy) &lt; 40) return;
+
+  // ② 冷却：距上次切换不足 300ms 直接忽略
+  if (Date.now() - sjs_lastTime &lt; 300) return;
+
+  // ③ 只处理横向，纵向滑动不抢页面滚动
+  if (Math.abs(dx) &lt; Math.abs(dy)) return;
+
+  sjs_lastTime = Date.now();
+  sjs_go(dx &gt; 0 ? -1 : 1);   // 右滑上一张，左滑下一张
+});</code></pre>
+        </section>
+
+    </main>
+
+    <footer>
+        移动端常用事件 · 任务二 中华美食手势卡片<br>
+        申家硕 24001011009 · 高级网页设计 · 2026-2027-1
+    </footer>
+
+    <script>
+        // ==============================================================
+        //  任务二：左右滑动切换卡片
+        //  阈值 40px / 冷却 300ms / touch-action: pan-y 保住纵向滚动
+        // ==============================================================
+
+        const sjs_stage = document.getElementById('sjs_stage');
+        const sjs_track = document.getElementById('sjs_track');
+        const sjs_count = document.getElementById('sjs_count');
+        const sjs_dir = document.getElementById('sjs_dir');
+        const sjs_toast = document.getElementById('sjs_toast');
+        const sjs_dots = document.querySelectorAll('#sjs_dots i');
+
+        const sjs_TOTAL = 4;          // 总张数
+        const sjs_LINE = 40;          // 滑动阈值（px）
+        const sjs_COOLDOWN = 300;     // 冷却时间（ms），与 0.3s 动画对齐
+
+        let sjs_index = 0;            // 当前第几张（0 起）
+        let sjs_startX = 0;
+        let sjs_startY = 0;
+        let sjs_lastTime = 0;         // 上次切换的时间戳
+        let sjs_toastTimer = null;
+
+        /**
+         * 把卡片整体平移到指定张数
+         * 功能：用 transform: translateX 移动 track，配合 CSS transition 做 0.3s 过渡；
+         *      同时更新页码、圆点与方向提示。
+         * @param {number} sjs_i 目标序号（0 起）
+         * @param {string} sjs_way 本次是哪个方向，用于页面上的文字反馈
+         * @returns {void}
+         */
+        function sjs_paint(sjs_i, sjs_way) {
+            sjs_track.style.transform = 'translateX(' + (-sjs_i * 100) + '%)';
+            sjs_count.textContent = '第 ' + (sjs_i + 1) + ' / ' + sjs_TOTAL + ' 张';
+            sjs_dir.textContent = sjs_way || '—';
+
+            sjs_dots.forEach(function (sjs_d, sjs_k) {
+                sjs_d.setAttribute('data-on', sjs_k === sjs_i ? '1' : '0');
+            });
+        }
+
+        /**
+         * 显示边界提示
+         * 功能：滑到第 1 张继续右滑、或第 4 张继续左滑时给一句提示，
+         *      1.6 秒后自动淡出，不打断用户继续操作。
+         * @param {string} sjs_text 提示文字
+         * @returns {void}
+         */
+        function sjs_showToast(sjs_text) {
+            sjs_toast.textContent = sjs_text;
+            sjs_toast.setAttribute('data-on', '1');
+            clearTimeout(sjs_toastTimer);
+            sjs_toastTimer = setTimeout(function () {
+                sjs_toast.setAttribute('data-on', '0');
+            }, 1600);
+        }
+
+        /**
+         * 切换到相邻的一张
+         * 功能：处理边界——到头了只提示不切换；没到头就平移并刷新页码。
+         * @param {number} sjs_step -1 上一张，1 下一张
+         * @returns {void}
+         */
+        function sjs_go(sjs_step) {
+            const sjs_next = sjs_index + sjs_step;
+
+            if (sjs_next < 0) {
+                sjs_showToast('已经是第一张了');
+                return;
+            }
+            if (sjs_next > sjs_TOTAL - 1) {
+                sjs_showToast('已经是最后一张了');
+                return;
+            }
+
+            sjs_index = sjs_next;
+            sjs_paint(sjs_index, sjs_step > 0 ? '左滑 · 下一张' : '右滑 · 上一张');
+        }
+
+        // ---------- 记录起点 ----------
+        sjs_stage.addEventListener('touchstart', function (sjs_e) {
+            const sjs_t = sjs_e.touches[0];
+            sjs_startX = sjs_t.clientX;
+            sjs_startY = sjs_t.clientY;
+        }, { passive: true });
+
+        // ---------- 抬手结算 ----------
+        sjs_stage.addEventListener('touchend', function (sjs_e) {
+            // 用 changedTouches：touches 里已经移除那根抬起的手指
+            const sjs_t = sjs_e.changedTouches[0];
+            const sjs_dx = sjs_t.clientX - sjs_startX;
+            const sjs_dy = sjs_t.clientY - sjs_startY;
+
+            // ① 阈值判断：横纵位移都很小 → 是点击，不是滑动
+            if (Math.abs(sjs_dx) < sjs_LINE && Math.abs(sjs_dy) < sjs_LINE) {
+                return;
+            }
+
+            // ② 冷却判断：距上次切换太近就忽略，避免连滑跳两张
+            if (Date.now() - sjs_lastTime < sjs_COOLDOWN) {
+                return;
+            }
+
+            // ③ 只处理横向：纵向位移更大时说明用户在滚页面，不抢
+            if (Math.abs(sjs_dx) < Math.abs(sjs_dy)) {
+                return;
+            }
+
+            sjs_lastTime = Date.now();
+            // 右滑（dx > 0）回上一张，左滑去下一张
+            sjs_go(sjs_dx > 0 ? -1 : 1);
+        }, { passive: true });
+
+        // ---------- 被系统打断时只清理状态 ----------
+        sjs_stage.addEventListener('touchcancel', function () {
+            sjs_startX = 0;
+            sjs_startY = 0;
+        }, { passive: true });
+
+        // 初始化
+        sjs_paint(0, '—');
+    </script>
+
+</body>
+
+</html>
