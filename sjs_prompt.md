@@ -355,3 +355,21 @@ https://spontaneous-valkyrie-4e4229.netlify.app/mobile-events-lesson
 - 模型：DeepSeek-V4.1-Flash
 - 提示词内容：
 移动端课堂实践提交形式：任务一-任务四，完成之后发布到github或者netlify，其中任务一、任务二不需要提交手机端操作视频，任务一按要求操纵并提交三个思考问题几对应答案，任务二：写出效果即可，发布后能看到，任务三、任务四：写出效果并插入手机实体演示视频（再拿一个设备录制）录制视频我来录制 其他的要求都满足了吗
+
+## 2026-11-16 14:30:00 · 已发布
+- 模型：DeepSeek-V4.1-Flash
+- 提交：433bbed（通过 GitHub Trees API 提交，避开克隆超时）
+- 线上：https://sjs729.github.io/shenjiashuo/
+- 新增入口：https://sjs729.github.io/shenjiashuo/mobile-detective.html 等四个
+- 补充：任务二新增「00 效果说明」章节（具体表现 + 五步操作）；任务三、四预留视频位注释（demo-zoom.mp4 / demo-sensor.mp4）
+- 线上实测：双指缩放漂移 x:0 y:0；任务四降级提示、手动抽取、合成摇动（52.0）全部正常
+
+## 2026-11-16 14:35:00
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+我怎么用手机打开这个网站
+
+## 2026-11-16 14:32:15
+- 模型：DeepSeek-V4.1-Flash
+- 提示词内容：
+@/Users/mac/Desktop/24001011009-申家硕-任务三.mp4 @/Users/mac/Desktop/24001011009-申家硕-任务四.mp4 这是两个视频 你帮我放进去吧 并且需要上传

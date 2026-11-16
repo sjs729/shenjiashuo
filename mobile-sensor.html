@@ -430,6 +430,16 @@
             white-space: pre;
         }
 
+        /* 演示视频：竖屏录制，限制最大高度避免占满整屏 */
+        .sjs_video {
+            display: block;
+            width: 100%;
+            max-height: 70vh;
+            border-radius: var(--sjs_radius);
+            background: #000;
+            margin-top: 4px;
+        }
+
         footer {
             margin-top: 30px;
             border-top: 1px solid var(--sjs_line);
@@ -600,17 +610,25 @@ window.addEventListener('devicemotion', function (e) {
             </div>
         </section>
 
-        <!-- ============================================================
-             演示视频位（待插入）
-             录好手机实拍后，把文件放到本目录，再把下面这段注释换成真正的
-             <video> 标签即可：
+        <!-- 手机实拍演示视频 -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>06</span><h3>手机实拍演示</h3></div>
+            <p>用另一台设备录制的手机操作过程，重点看<b>一次摇动只触发一次</b>。</p>
 
-             <video controls playsinline preload="metadata"
-                    style="width:100%;border-radius:14px;background:#000"
-                    src="demo-sensor.mp4"></video>
+            <video class="sjs_video" id="sjs_video" controls playsinline preload="metadata"
+                   poster="" src="demo/demo-sensor.m4v">
+                你的浏览器不支持 video 标签，可直接下载：
+                <a href="demo/demo-sensor.m4v">demo-sensor.m4v</a>
+            </video>
 
-             建议文件名：demo-sensor.mp4（横屏录制，30 秒以内即可）
-             ============================================================ -->
+            <div class="sjs_note">
+                <h4>视频里能看到的四件事</h4>
+                ① 摇动手机后菜名弹出，并带一次弹出动画；<br>
+                ② 紧接着再摇，<b>菜名不变</b>——1.5 秒冷却挡住了一次摇动的后续帧；<br>
+                ③ 冷却结束后再摇，才会抽到新的菜；<br>
+                ④ 界面上方的加速度读数随摇动实时变化，可以对照阈值 18 看。
+            </div>
+        </section>
 
     </main>
 

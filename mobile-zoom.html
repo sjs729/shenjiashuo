@@ -353,6 +353,16 @@
             white-space: pre;
         }
 
+        /* 演示视频：竖屏录制，限制最大高度避免占满整屏 */
+        .sjs_video {
+            display: block;
+            width: 100%;
+            max-height: 70vh;
+            border-radius: var(--sjs_radius);
+            background: #000;
+            margin-top: 4px;
+        }
+
         footer {
             margin-top: 30px;
             border-top: 1px solid var(--sjs_line);
@@ -523,17 +533,25 @@ sjs_viewer.addEventListener('touchmove', function (e) {
             </div>
         </section>
 
-        <!-- ============================================================
-             演示视频位（待插入）
-             录好手机实拍后，把文件放到本目录，再把下面这段注释换成真正的
-             <video> 标签即可：
+        <!-- 手机实拍演示视频 -->
+        <section class="sjs_sec">
+            <div class="sjs_sec-head"><span>05</span><h3>手机实拍演示</h3></div>
+            <p>用另一台设备录制的手机操作过程，重点看两指缩放时<b>基准点是否跑偏</b>。</p>
 
-             <video controls playsinline preload="metadata"
-                    style="width:100%;border-radius:14px;background:#000"
-                    src="demo-zoom.mp4"></video>
+            <video class="sjs_video" id="sjs_video" controls playsinline preload="metadata"
+                   poster="" src="demo/demo-zoom.m4v">
+                你的浏览器不支持 video 标签，可直接下载：
+                <a href="demo/demo-zoom.m4v">demo-zoom.m4v</a>
+            </video>
 
-             建议文件名：demo-zoom.mp4（横屏录制，30 秒以内即可）
-             ============================================================ -->
+            <div class="sjs_note">
+                <h4>视频里能看到的四件事</h4>
+                ① 双指从中心向外张开，图片跟着放大，<b>两指中点始终留在原处</b>；<br>
+                ② 放大到 2x 后单指拖动，能看画面不同区域；<br>
+                ③ 拖到边缘会停住，不会拖出边界；<br>
+                ④ 双击在 1x 与 2x 之间切换，缩回 1x 时自动居中。
+            </div>
+        </section>
 
     </main>
 
