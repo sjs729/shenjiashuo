@@ -538,8 +538,9 @@ sjs_viewer.addEventListener('touchmove', function (e) {
             <div class="sjs_sec-head"><span>05</span><h3>手机实拍演示</h3></div>
             <p>用另一台设备录制的手机操作过程，重点看两指缩放时<b>基准点是否跑偏</b>。</p>
 
-            <video class="sjs_video" id="sjs_video" controls playsinline preload="metadata"
-                   poster="" src="demo/demo-zoom.m4v">
+            <!-- preload="none"：默认不下载，点播放才开始拉流，避免进页面就卡住 -->
+            <video class="sjs_video" id="sjs_video" controls playsinline preload="none"
+                   src="demo/demo-zoom.m4v">
                 你的浏览器不支持 video 标签，可直接下载：
                 <a href="demo/demo-zoom.m4v">demo-zoom.m4v</a>
             </video>

@@ -615,8 +615,9 @@ window.addEventListener('devicemotion', function (e) {
             <div class="sjs_sec-head"><span>06</span><h3>手机实拍演示</h3></div>
             <p>用另一台设备录制的手机操作过程，重点看<b>一次摇动只触发一次</b>。</p>
 
-            <video class="sjs_video" id="sjs_video" controls playsinline preload="metadata"
-                   poster="" src="demo/demo-sensor.m4v">
+            <!-- preload="none"：默认不下载，点播放才开始拉流 -->
+            <video class="sjs_video" id="sjs_video" controls playsinline preload="none"
+                   src="demo/demo-sensor.m4v">
                 你的浏览器不支持 video 标签，可直接下载：
                 <a href="demo/demo-sensor.m4v">demo-sensor.m4v</a>
             </video>
