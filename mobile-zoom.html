@@ -353,6 +353,23 @@
             white-space: pre;
         }
 
+        /* 视频加载提示 */
+        .sjs_alert {
+            margin-top: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 12.6px;
+            line-height: 1.8;
+            background: #fffaf3;
+            border: 1px dashed #e0b98f;
+            color: #7c5e10;
+            display: none;
+        }
+
+        .sjs_alert[data-on="1"] {
+            display: block;
+        }
+
         /* 演示视频：竖屏录制，限制最大高度避免占满整屏 */
         .sjs_video {
             display: block;
@@ -544,6 +561,8 @@ sjs_viewer.addEventListener('touchmove', function (e) {
                 你的浏览器不支持 video 标签，可直接下载：
                 <a href="demo/demo-zoom.m4v">demo-zoom.m4v</a>
             </video>
+
+            <div class="sjs_alert" id="sjs_vnote" data-on="0"></div>
 
             <div class="sjs_note">
                 <h4>视频里能看到的四件事</h4>
@@ -871,9 +890,40 @@ sjs_viewer.addEventListener('touchmove', function (e) {
             sjs_tip.textContent = '当前环境不支持触摸，请用手机打开';
         }
 
+        /**
+         * 给演示视频加加载提示
+         * 功能：GitHub Pages 从国内访问速度不稳定，大文件可能半天加载不出来；
+         *      超过 12 秒还没拿到元数据就提示用户，而不是让播放器一直转圈。
+         * @returns {void}
+         */
+        function sjs_watchVideo() {
+            const sjs_v = document.getElementById('sjs_video');
+            const sjs_note = document.getElementById('sjs_vnote');
+            if (!sjs_v || !sjs_note) return;
+
+            let sjs_ok = false;
+            sjs_v.addEventListener('loadedmetadata', function () {
+                sjs_ok = true;
+                sjs_note.setAttribute('data-on', '0');
+            });
+            sjs_v.addEventListener('error', function () {
+                sjs_note.textContent = '视频加载失败，可能是网络较慢。可以点这里直接下载查看。';
+                sjs_note.setAttribute('data-on', '1');
+            });
+
+            setTimeout(function () {
+                if (!sjs_ok) {
+                    sjs_note.textContent = '视频还在加载中（GitHub Pages 速度不稳定，文件约 2.4MB）。' +
+                        '可以稍等，或直接输入视频地址查看。';
+                    sjs_note.setAttribute('data-on', '1');
+                }
+            }, 12000);
+        }
+
         // 初始化
         sjs_apply(false);
         sjs_paintStatus(0, '待机');
+        sjs_watchVideo();
     </script>
 
 </body>

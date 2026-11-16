@@ -430,6 +430,23 @@
             white-space: pre;
         }
 
+        /* 视频加载提示 */
+        .sjs_alert {
+            margin-top: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 12.6px;
+            line-height: 1.8;
+            background: #fffaf3;
+            border: 1px dashed #e0b98f;
+            color: #7c5e10;
+            display: none;
+        }
+
+        .sjs_alert[data-on="1"] {
+            display: block;
+        }
+
         /* 演示视频：竖屏录制，限制最大高度避免占满整屏 */
         .sjs_video {
             display: block;
@@ -621,6 +638,8 @@ window.addEventListener('devicemotion', function (e) {
                 你的浏览器不支持 video 标签，可直接下载：
                 <a href="demo/demo-sensor.m4v">demo-sensor.m4v</a>
             </video>
+
+            <div class="sjs_alert" id="sjs_vnote" data-on="0"></div>
 
             <div class="sjs_note">
                 <h4>视频里能看到的四件事</h4>
@@ -863,6 +882,35 @@ window.addEventListener('devicemotion', function (e) {
             return sjs_isIOS && typeof DeviceMotionEvent.requestPermission === 'function';
         }
 
+
+        /**
+         * 给演示视频加加载提示
+         * 功能：网络慢时提示用户，而不是让播放器一直转圈。
+         * @returns {void}
+         */
+        function sjs_watchVideo() {
+            const sjs_v = document.getElementById('sjs_video');
+            const sjs_note = document.getElementById('sjs_vnote');
+            if (!sjs_v || !sjs_note) return;
+
+            let sjs_ok = false;
+            sjs_v.addEventListener('loadedmetadata', function () {
+                sjs_ok = true;
+                sjs_note.setAttribute('data-on', '0');
+            });
+            sjs_v.addEventListener('error', function () {
+                sjs_note.textContent = '视频加载失败，可能是网络较慢。可以点视频下方链接直接下载查看。';
+                sjs_note.setAttribute('data-on', '1');
+            });
+
+            setTimeout(function () {
+                if (!sjs_ok) {
+                    sjs_note.textContent = '视频还在加载中（GitHub Pages 速度不稳定，文件约 3.5MB）。可以稍等再点播放。';
+                    sjs_note.setAttribute('data-on', '1');
+                }
+            }, 12000);
+        }
+
         // ---------- 启动 ----------
         if (!('DeviceMotionEvent' in window)) {
             // 完全没有该 API：降级
@@ -875,6 +923,8 @@ window.addEventListener('devicemotion', function (e) {
             // 安卓 / 桌面：直接监听，由 3 秒看门狗判断有没有数据
             sjs_start();
         }
+
+        sjs_watchVideo();
     </script>
 
 </body>
