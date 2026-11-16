@@ -373,3 +373,12 @@ https://spontaneous-valkyrie-4e4229.netlify.app/mobile-events-lesson
 - 模型：DeepSeek-V4.1-Flash
 - 提示词内容：
 @/Users/mac/Desktop/24001011009-申家硕-任务三.mp4 @/Users/mac/Desktop/24001011009-申家硕-任务四.mp4 这是两个视频 你帮我放进去吧 并且需要上传
+
+## 2026-11-16 15:20:00 · 视频已插入并上线
+- 模型：DeepSeek-V4.1-Flash
+- 关键发现：原视频为 HEVC(hvc1) 编码，浏览器普遍不支持播放；已用 macOS 自带 avconvert 转 H.264(avc1)
+- 转码结果：demo/demo-zoom.m4v（480p，2.4MB，14.3s）、demo/demo-sensor.m4v（720p，3.5MB，9.6s）
+- 为什么降到 480p：GitHub Pages 实测下载速度仅约 21KB/s，原 720p 版 5.4MB 需 4 分钟，播放器一直转圈
+- 优化：video 的 preload 改为 none，进页面不预下载；增加 12 秒加载提示条
+- 提交：ed4d186（首次插入）→ feaf61d（换 480p）→ 63f7782（加载提示）
+- 线上确认：两个页面均含 video + preload="none" + 提示条，视频文件可 200 访问
